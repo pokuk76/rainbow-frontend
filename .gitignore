@@ -23,5 +23,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # files 
+debug.log
 src/throwaways
 src/chromatica.jpg
