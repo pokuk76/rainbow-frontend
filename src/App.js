@@ -1,26 +1,60 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// eslint-disable-next-line
+import React, { Component } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import BaseRouter from './routes';
+import 'antd/dist/antd.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import * as actions from './store/actions/auth';
+
+import { connect } from 'react-redux';
+
+
+class App extends Component {
+
+  componentDidMount = state => {
+    this.props.onTryAutoSignup();
+  }
+
+
+  render() {
+    return (
+      // <div>
+      //   <Router>
+      //     <Switch>
+      //       <Route exact path={["/"]}>
+      //         <CustomLayout {...this.props}>
+      //           <BaseRouter />
+      //         </CustomLayout>
+      //       </Route>
+
+      //       <Route exact path='/test'>
+      //         <SiderDemo {...this.props}>
+      //           <Route exact path='/test'/>
+      //         </SiderDemo>
+      //       </Route>
+      //     </Switch>
+          
+      //   </Router>
+      // </div>
+      <Router>
+        <BaseRouter {...this.props} />
+      </Router>
+    );
+  }
+
 }
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    isAuthenticated: state.token !== null,
+    username: state.username
+  }
+}
+
+const mapDispatchToProps = dispatchEvent => {
+  return {
+    onTryAutoSignup: () => dispatchEvent(actions.authCheckState())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
