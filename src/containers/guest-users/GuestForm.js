@@ -1,8 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
+
 import { Form, Input, Button, Upload, Modal, Progress } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
+
+import { guestFormCopy } from '../../utilities/deepCopy';
 
 import * as actions from '../../store/actions/guest-registration';
 import { DeleteIcon } from '../../components/Icons';
@@ -27,8 +30,8 @@ class GuestInfo extends React.Component {
       fileList: [],
       uploading: false,
       fileSelected: this.props.fileSelected,
-      guestForm: this.props.guestForm // We're passing by reference, which actually works for us 
-      // but might cause issues later?
+      // guestForm: this.props.guestForm 
+      // We're passing by reference, which actually works for us but might cause issues later?
     };
 
   }
@@ -38,6 +41,7 @@ class GuestInfo extends React.Component {
       left: 0,
       behavior: 'smooth'
     });
+    // console.log("Guest form copy: ", guestFormCopy(this.props.guestForm));
   }
 
   showModal = (body) => {
@@ -71,7 +75,10 @@ class GuestInfo extends React.Component {
     /* The id is the name of the Form.Item wrapping the input
     It is also the key needed for the given form object
     */
-    this.state.guestForm[e.target.id] = e.target.value;
+    // this.state.guestForm[e.target.id] = e.target.value;
+    let guestForm = guestFormCopy(this.props.guestForm);
+    guestForm[e.target.id] = e.target.value;
+    this.props.updateForm(guestForm);
   }
 
   /**
@@ -98,7 +105,8 @@ class GuestInfo extends React.Component {
   };
 
   /**
-   * Gets called on render. Populates the form with values from the guest store
+   * Gets called every render. Populates the form with values from the guest store
+   * TODO: Move the call into componentDidMount?
    * 
    */
   getInitialValues = () => {
@@ -190,6 +198,32 @@ class GuestInfo extends React.Component {
       return "my message";
     };
 
+    const imageUpload = (
+      this.state.fileSelected
+        ?
+        <Upload {...uploadProps} >
+
+        </Upload>
+        :
+        <ImgCrop>
+          <Dragger {...uploadProps} disabled={this.state.fileSelected} >
+            {/* <Button icon={<UploadOutlined />} disabled={this.state.fileSelected} >Select File</Button> */}
+
+
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined />
+            </p>
+            <p className="ant-upload-text">Click or drag image to this area to upload</p>
+            <p className="ant-upload-hint">
+              One upload per guest
+            </p>
+
+
+          </Dragger>
+        </ImgCrop>
+
+    )
+
     return (
       <div >
         <Form
@@ -265,31 +299,7 @@ class GuestInfo extends React.Component {
             />
           </Form.Item>
 
-          {
-            this.state.fileSelected
-              ?
-              <Upload {...uploadProps} >
-
-              </Upload>
-              :
-              <ImgCrop>
-                <Dragger {...uploadProps} disabled={this.state.fileSelected} >
-                  {/* <Button icon={<UploadOutlined />} disabled={this.state.fileSelected} >Select File</Button> */}
-
-
-                  <p className="ant-upload-drag-icon">
-                    <InboxOutlined />
-                  </p>
-                  <p className="ant-upload-text">Click or drag image to this area to upload</p>
-                  <p className="ant-upload-hint">
-                    One upload per guest
-            </p>
-
-
-                </Dragger>
-              </ImgCrop>
-
-          }
+          { imageUpload }
 
           <Modal
             title="Basic Modal"

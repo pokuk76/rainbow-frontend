@@ -1,14 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Form, Input, Button, Select, Upload, Collapse, Breadcrumb, Modal, BackTop } from 'antd';
+import { Button, Select, Upload, Collapse, Breadcrumb, Modal, BackTop } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { InboxOutlined, FileAddOutlined, CloseSquareOutlined, SaveOutlined, 
         TeamOutlined, RightOutlined, ArrowUpOutlined 
     } from '@ant-design/icons';
 
+import { formsCopy } from '../../utilities/deepCopy';
+import { getInitialValues } from '../../utilities/forms';
+
 import * as actions from '../../store/actions/guest-registration';
-import { DeleteIcon } from '../../components/Icons';
 
 import GuardianFormComponent from '../../components/guest-users/GuardianForm';
 
@@ -85,13 +87,10 @@ class GuardianForm extends React.Component {
             modalVisible: false,
             modalContent: <></>,
             images: this.props.images,
-            guardianForms: this.props.guardianForms // We're passing by reference, which actually works for us 
-                                                    // but might cause issues later?
         };
 
         this.onRemoveImage = this.onRemoveImage.bind(this);
         this.onPreview = this.onPreview.bind(this);
-        this.beforeUpload = this.beforeUpload.bind(this);
         // this.onCollapse = this.onCollapse.bind(this);
         this.renderForms = this.renderForms.bind(this);
         this.onContinue = this.onContinue.bind(this);
@@ -156,23 +155,6 @@ class GuardianForm extends React.Component {
         );
     }
 
-    beforeUpload(file, fileList) {
-        console.log("File: ", file);
-        //let file = fileList[0];
-        console.log("ID: ", this.state.currentId);
-        console.log("Filelist: ", fileList);
-        this.props.addImage(this.props.images, this.state.currentId, file, this.props.guardianForms);
-        this.setState(
-            {
-                fileList: this.props.images[this.props.id],
-                fileSelected: true,
-            }
-        );
-        // this.props.fileSelected = true;
-        console.log("file list: ", this.props.images);
-        return false;
-    }
-
     onPreview = async file => {
         let src = file.url;
         if (!src) {
@@ -189,13 +171,14 @@ class GuardianForm extends React.Component {
     }
 
     componentDidMount() {
-        this.getInitialValues();
+        getInitialValues(this.props.guardianForms);
         this.renderForms();
         window.scroll({
             top: 0, 
             left: 0, 
             behavior: 'smooth'
-          });
+        });
+        console.log("Guardian forms copy: ", formsCopy(this.props.guardianForms));
     }
 
     componentDidUpdate(prevProps){
@@ -218,32 +201,6 @@ class GuardianForm extends React.Component {
     }
 
     
-    getInitialValues() {
-        const guardianForms = this.props.guardianForms;
-        let initialValues = {}; // Each form has its own initial values and we'll map then using the form's id
-
-        for (let formUID in guardianForms){
-            let formItems = guardianForms[formUID];
-            let initialForm = {};
-            try{
-                for (const [name, value] of Object.entries(formItems)) {
-                    let key = formUID + "+" + name;
-                    // initialForm[name] = value;
-                    initialForm[key] = value;
-                }
-                initialValues[formUID] = initialForm;
-            }
-            catch(error) {
-                //initialValues[formUID] = initialForm;
-                console.log("Error getting initial values: ", error);
-            }
-        }
-
-        console.log("Initial values: ", initialValues);
-        return initialValues;
-        // this.setState({initialFormValues: initialValues});
-    }
-
     /**
      * Method to create the forms for the container, which are held in state
      * 
@@ -257,7 +214,7 @@ class GuardianForm extends React.Component {
 
         var forms = [];
         let i = 0;
-        const initialFormValues = this.getInitialValues();
+        const initialFormValues = getInitialValues(this.props.guardianForms);
         for (let formUID in this.props.guardianForms){
             // console.log("Form UID:", formUID);
             let fileSelected = (this.props.images[formUID]) ? true : false;
@@ -277,64 +234,6 @@ class GuardianForm extends React.Component {
                     // paddingRight: '1em',
                 }}
             />;
-
-            const uploadProps = {
-                multiple: false,
-          
-                onRemove: () => {
-                    // console.log("Props images before remove: ", this.props.images);
-                    this.props.removeImage(this.props.images, formUID, this.props.guardianForms)
-                    let images = {...this.state.images};
-                    // delete images[this.state.currentId]; 
-                    this.setState(
-                        {
-                            images: images,
-                        }
-                    );
-                    // fileSelected = (this.props.images[formUID]) ? true : false;
-                    // fileList = [this.props.images[formUID]];
-                },
-          
-                beforeUpload: file => {
-                    // console.log("Props images before upload: ", this.props.images);
-                    this.props.addImage(this.state.images, formUID, file, this.props.guardianForms);
-                    // console.log("Props images after upload: ", this.props.images);
-                    let images = {...this.props.images};
-                    this.setState(state => ({
-                        images: images,
-                    }));
-                    return false;
-                },
-
-                onPreview: async file => {
-                  let src = file.url;
-                  if (!src) {
-                    src = await new Promise(resolve => {
-                      const reader = new FileReader();
-                      reader.readAsDataURL(file);
-                      reader.onload = () => resolve(reader.result);
-                    });
-                  }
-                  // console.log("Img src: ", src);
-                  let modalContent = <div style={{backgroundColor:'red', height:20, width:20, }} ></div>;
-                  modalContent = <img src={src} alt="avatar" style={{ width: '100%' }} />;
-                  this.showModal(modalContent);
-                },
-          
-                // fileList: this.props.images[this.state.currentId],
-                fileList: fileList,
-          
-                listType: "picture", 
-                // progress: <Progress type="line"/>, 
-          
-                showUploadList: {
-                  showPreviewIcon: true,
-                  showDownloadIcon: true,
-                  downloadIcon: 'download ',
-                  showRemoveIcon: true,
-                  removeIcon: removeIcon,
-                },
-            };
 
             const guardianFormProps = {
                 showModal: this.showModal,
@@ -412,53 +311,53 @@ class GuardianForm extends React.Component {
                 </Breadcrumb>
                 <h1><TeamOutlined /> Guardians</h1>
                 <br />
-            {/* <Form 
+                {/* <Form 
                 key={"GuardianForm"} 
                 layout='vertical' 
                 id={"GuardianForm"} 
                 initialValues={initialValues} 
 
-            > */}
-            <br />
-            <Collapse
-                key='CollapseGuardians' 
-                defaultActiveKey={['GuardianPanel0']} 
-                onChange={callback} 
-                expandIcon={
-                    ({ isActive }) => <RightOutlined 
-                    rotate={isActive ? 90 : 0} 
-                    style={{ fontSize: '2em', }} 
-                    />
-                }
-                // expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} style={{ fontSize: '2em', }} />}
-                expandIconPosition='left' 
-            >
-                { this.state.forms }
-            </Collapse>
+                > */}
+                <br />
+                <Collapse
+                    key='CollapseGuardians'
+                    defaultActiveKey={['GuardianPanel0']}
+                    onChange={callback}
+                    expandIcon={
+                        ({ isActive }) => <RightOutlined
+                            rotate={isActive ? 90 : 0}
+                            style={{ fontSize: '2em', }}
+                        />
+                    }
+                    // expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} style={{ fontSize: '2em', }} />}
+                    expandIconPosition='left'
+                >
+                    {this.state.forms}
+                </Collapse>
 
-            <BackTop>
-                <div style={style}><ArrowUpOutlined /></div>
-            </BackTop>
+                <BackTop>
+                    <div style={style}><ArrowUpOutlined /></div>
+                </BackTop>
 
-            <Modal
-                title="Basic Modal"
-                className="imageModal"
-                visible={this.state.modalVisible}
-                onOk={this.handleOk}
-                onCancel={this.handleCancel}
-                destroyOnClose={true}
-            >
-                {this.state.modalContent}
-            </Modal>
-            
-            <br />
-            <Button key={this.props.selectedMenuItem} onClick={() => this.props.addForm(this.props.guardianForms, this.props.guardianUID, 'GuardianForm', this.props.images) }>
-                <FileAddOutlined /> Add Parent or Guardian
-            </Button>
+                <Modal
+                    title="Your Upload"
+                    className="imageModal"
+                    visible={this.state.modalVisible}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                    destroyOnClose={true}
+                >
+                    {this.state.modalContent}
+                </Modal>
 
-            <br/>
-            <br/>
-            {/* <div>
+                <br />
+                <Button key={this.props.selectedMenuItem} onClick={() => this.props.addForm(this.props.guardianForms, this.props.guardianUID, 'GuardianForm', this.props.images)}>
+                    <FileAddOutlined /> Add Parent/Guardian
+                </Button>
+
+                <br />
+                <br />
+                {/* <div>
                 <Form.Item>
                 <Button type='primary' htmlType='submit' onClick={this.onSave}>
                     <SaveOutlined /> Submit
@@ -469,11 +368,11 @@ class GuardianForm extends React.Component {
                     <SaveOutlined /> Save & Continue
                 </Button>
                 </Form.Item>
-            </div> */}
+                </div> */}
 
-            {/* </Form> */}
-            
-          </div>
+                {/* </Form> */}
+
+            </div>
         );
     }
 };

@@ -1,13 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Form, Input, Button, Select, Upload, Collapse, Breadcrumb, DatePicker } from 'antd';
+import { Button, Select, Upload, Collapse, Breadcrumb } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { InboxOutlined, FileAddOutlined, CloseSquareOutlined, SaveOutlined, UserAddOutlined, RightOutlined, CalendarOutlined } from '@ant-design/icons';
 
+import { formsCopy } from '../../utilities/deepCopy';
 
+import { getInitialValues } from '../../utilities/forms';
 import * as actions from '../../store/actions/guest-registration';
-import { DeleteIcon } from '../../components/Icons';
+
+import StudentFormComponent from '../../components/guest-users/StudentForm';
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -170,7 +173,8 @@ class StudentForm extends React.Component {
             top: 0, 
             left: 0, 
             behavior: 'smooth'
-          });
+        });
+        console.log("Student forms copy: ", formsCopy(this.props.studentForms));
     }
 
     componentDidUpdate(prevProps){
@@ -218,22 +222,10 @@ class StudentForm extends React.Component {
     // componentDidMount() {
         // console.log("Render forms");
         const { fileList, uploading, fileSelected } = this.state;
-        const props = {
-            multiple: false,
-
-            // fileList: this.props.images[this.props.id],
-
-            showUploadList: {
-                showDownloadIcon: true,
-                downloadIcon: 'download ',
-                showRemoveIcon: true,
-                removeIcon: <DeleteIcon />,
-            },
-
-        };
 
         var forms = [];
         let i = 0;
+        const initialFormValues = getInitialValues(this.props.studentForms);
         for (let formUID in this.props.studentForms){
             let fileSelected = (this.props.images[formUID]) ? true : false;
             let fileList = this.props.images[formUID];
@@ -258,6 +250,13 @@ class StudentForm extends React.Component {
                     // display: 'inline',
                 }}
             />;
+
+            const studentFormProps = {
+                showModal: this.showModal,
+                formUID: formUID,
+                initialValues: initialFormValues[formUID]
+            }
+
             let n = parseInt(formUID.split('_')[1], 10);
             console.log('FormUID :', formUID);
             forms.push(
@@ -275,213 +274,9 @@ class StudentForm extends React.Component {
                 }
                 
             >
-                <div>
-                    {/* <h1>ID: {formUID}</h1> */}
-                    <Form.Item name={formUID + "+first_name"} label="First Name:"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'First name required',
-                            },
-                        ]}
-                    >
-                        <Input
-                            placeholder="Enter first name" 
-                            onChange={(e) => this.handleChange(e)} 
-                        />
-                    </Form.Item>
+                <StudentFormComponent {...studentFormProps}>
 
-                    <Form.Item name={formUID + "+middle_name"} label="Middle Name:">
-                        <Input
-                            placeholder="Enter middle name"
-                        />
-                    </Form.Item>
-
-                    <Form.Item name={formUID + "+last_name"} label="Last Name:"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Last name required',
-                            },
-                        ]}
-                    >
-                        <Input
-                            placeholder="Enter last name"
-                            onChange={(e) => this.handleChange(e)} 
-
-                        />
-                    </Form.Item>
-
-                    <Form.Item name={formUID + "+nationality"} label="Nationality:">
-                        <Input
-                            placeholder="Enter nationality"
-                            onChange={(e) => this.handleChange(e)} 
-
-                        />
-                    </Form.Item>
-
-                    <Form.Item name={formUID + "+religion"} label="Religion:">
-                        <Input
-                            placeholder="Enter religion"
-                        />
-                    </Form.Item>
-
-                    <Form.Item name={formUID + "+sex"} label="Gender: "
-                        rules={[
-                            {
-                                required: true,
-                                message: "Student's gender is required",
-                            },
-                        ]}
-                    >
-                        {/* This is going to be a selection */}
-                        <Select
-                            style={{ width: 200 }}
-                            placeholder="Student's Gender"
-                            optionFilterProp="sex"
-                            filterOption={(input, option) =>
-                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                        >
-                            <Option value="male">M</Option>
-                            <Option value="female">F</Option>
-                        </Select>
-                    </Form.Item>
-
-                    <Form.Item name={formUID + "+date_of_birth"} label="Date of Birth"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Date of birth is required',
-                            },
-                        ]}
-                    >
-                        {/* {(isChrome) ? 
-                            <Input
-                                type='date'
-                                placeholder="Date Field"
-                                onChange={(e) => this.handleChange(e)}
-                                style={{ height: '100%' }}
-                            // iconRender={<CalendarOutlined />} 
-                            /> : <DatePicker />
-                        } */}
-                        <DatePicker />
-                    </Form.Item>
-
-                    <Form.Item name={formUID + "+has_ailments"} label="Does this student have allergies or ailments?">
-                        <Input.TextArea />
-                    </Form.Item>
-
-                    <Form.Item name={formUID + "+former_school"} label="Former School">
-                        <Input
-                            placeholder="Enter most recently attended school "
-                        />
-                    </Form.Item>
-
-                    <Form.Item name={formUID + "+former_school_address"} label="School Address:">
-                        <Input.TextArea />
-                    </Form.Item>
-
-                    <Form.Item name={formUID + "+class_reached"} label="Select Class reached:">
-                        <Select
-                            showSearch
-                            style={{ width: 200 }}
-                            placeholder="Select the most applicable"
-                            optionFilterProp="children"
-                            onChange={onChange}
-                            // onFocus={onFocus}
-                            // onBlur={onBlur}
-                            // onSearch={onSearch}
-                            filterOption={(input, option) =>
-                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                        >
-                            <Option value="father">Father</Option>
-                            <Option value="mother">Mother</Option>
-                            <Option value="legal_guardian">Legal Guardian</Option>
-                        </Select>
-                    </Form.Item>
-
-                    <Form.Item name={formUID + "+reason_for_leaving"} label="Reason For Leaving:">
-                        <Input
-                            placeholder="Enter reason for leaving"
-                        />
-                    </Form.Item>
-
-                    {/* {console.log('Form ID: ', formUID)} */}
-                    {/* {fileList.append(formUID)} */}
-                    {
-                        fileSelected
-                        ?
-                        <Upload
-                            onRemove={this.onRemoveImage}
-                            onPreview={this.onPreview}
-                            beforeUpload={
-                                (file, fileList) => {
-                                    this.setState(
-                                        {
-                                            currentId: formUID,
-                                        }
-                                    ); 
-                                    return this.beforeUpload(file, fileList); 
-                                }
-                            }  
-                            {...props}
-                            fileList={fileList}
-                        >
-                        {/* TODO: Pass an initial value for the image to the Upload component so it shows up 
-                        on re-render e.g. when we add a new form*/}
-                        </Upload>
-                        :
-                        <ImgCrop>
-                            <Dragger
-                                onRemove={this.onRemoveImage} 
-                                onPreview={this.onPreview} 
-                                beforeUpload={
-                                    (file, fileList) => {
-                                        this.setState(
-                                            {
-                                                currentId: formUID,
-                                            }
-                                        ); 
-                                        return this.beforeUpload(file, fileList); 
-                                    } 
-                                } 
-                                {...props} 
-                                disabled={fileSelected} 
-                            >
-                                {/* <Button icon={<UploadOutlined />} disabled={this.state.fileSelected} >Select File</Button> */}
-
-
-                                <p className="ant-upload-drag-icon">
-                                    <InboxOutlined />
-                                </p>
-                                <p className="ant-upload-text">Click or drag image to this area to upload</p>
-                                <p className="ant-upload-hint">
-                                    One upload per student
-                                </p>
-
-
-                            </Dragger>
-                        </ImgCrop>
-
-                    }
-
-                    {
-                        (Object.keys(this.props.studentForms).length > 1)
-                        ?
-                        <Form.Item style={{marginTop: '1em'}}>
-                            <Button
-                                type='danger'
-                                onClick={() => this.props.remove(this.props.studentForms, formUID, 'StudentForm')}
-                            >
-                                Remove
-                            </Button>
-                        </Form.Item>
-                        :
-                        <></>
-                    }
-                </div>
+                </StudentFormComponent>
                 {/* </Form> */}
             </Panel>
             );
@@ -508,13 +303,7 @@ class StudentForm extends React.Component {
                 </Breadcrumb>
             <h1><UserAddOutlined /> Students</h1>
             <br />
-            <Form 
-                key={"StudentForm"} 
-                layout='vertical' 
-                id={"StudentForm"} 
-                initialValues={initialValues} 
-
-            >
+            
             <br />
             <Collapse
                 key='CollapseStudents'
@@ -534,10 +323,7 @@ class StudentForm extends React.Component {
             </Button>
 
             <br/>
-            <br/>
-
-            </Form>
-            
+            <br/>            
           </div>
         );
     }

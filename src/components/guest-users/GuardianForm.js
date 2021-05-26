@@ -4,6 +4,8 @@ import { Form, Input, Button, Select, Upload, Collapse, Breadcrumb, Modal } from
 import ImgCrop from 'antd-img-crop';
 import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
+import { formsCopy } from '../../utilities/deepCopy';
+
 import * as actions from '../../store/actions/guest-registration';
 
 const { Option } = Select;
@@ -37,8 +39,6 @@ class GuardianFormComponent extends React.Component {
             // modalVisible: false,
             // modalContent: <></>,
             images: this.props.images,
-            guardianForms: this.props.guardianForms // We're passing by reference, which actually works for us 
-                                                    // but might cause issues later?
         };
         this.onContinue = this.onContinue.bind(this);
         this.onSave = this.onSave.bind(this);
@@ -48,9 +48,16 @@ class GuardianFormComponent extends React.Component {
         /* The id is the name of the Form.Item wrapping the input
         It is also the key needed for the given form object
         */
-        let form = e.target.id.split("+")[0];
-        let field = e.target.id.split("+")[1];
-        this.props.guardianForms[form][field] = e.target.value;
+       let guardianForms = formsCopy(this.props.guardianForms);
+       let form = e.target.id.split("+")[0];
+       let field = e.target.id.split("+")[1];
+       
+       guardianForms[form][field] = e.target.value;
+       this.props.updateForms(guardianForms);
+
+        // let form = e.target.id.split("+")[0];
+        // let field = e.target.id.split("+")[1];
+        // this.props.guardianForms[form][field] = e.target.value;
     }
 
     onContinue() {
@@ -402,7 +409,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        addForm: (forms, uid, currentForm, images) => dispatch(actions.addForm(forms, uid, currentForm, images)),
+        updateForms: (guardianForms) => dispatch(actions.updateGuardians(guardianForms)),
         addImage: (images, id, file, formData) => dispatch(actions.addImage(images, id, file, formData)),
         removeImage: (images, id, formData) => dispatch(actions.removeImage(images, id, formData)),
         remove: (guardianForms, uid, currentForm, images) => dispatch(actions.removeForm(guardianForms, uid, currentForm, images)),
