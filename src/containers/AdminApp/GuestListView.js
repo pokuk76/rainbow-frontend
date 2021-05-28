@@ -1,6 +1,6 @@
 import React from 'react';
-import Guest from '../components/Guest';
-import CustomForm from '../components/Form';
+import Guest from '../../components/Guest';
+import CustomForm from '../../components/Form';
 
 import { connect } from 'react-redux';
 import { Button, Spin } from 'antd';

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Button, Card, Breadcrumb } from 'antd';
 import { Link } from'react-router-dom';
 
-import CustomForm from '../components/Form';
+import CustomForm from '../../components/Form';
 
 class GuestDetail extends React.Component {
 

@@ -311,11 +311,7 @@ class GuestInfo extends React.Component {
           >
             {this.state.modalContent}
           </Modal>
-
-          <Form.Item>
-            <br />
-            <Button type="danger" htmlType="submit" >Next</Button>
-          </Form.Item>
+          
         </Form>
       </div>
     );

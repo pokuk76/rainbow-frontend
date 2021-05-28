@@ -10,7 +10,7 @@ import { formsCopy } from '../../utilities/deepCopy';
 import { getInitialValues } from '../../utilities/forms';
 import * as actions from '../../store/actions/guest-registration';
 
-import StudentFormComponent from '../../components/guest-users/StudentForm';
+import StudentFormComponent from '../../components/UserApp/StudentForm';
 
 const { Option } = Select;
 const { Dragger } = Upload;

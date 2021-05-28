@@ -5,7 +5,7 @@ import { Link, withRouter } from'react-router-dom';
 import './layout.css';  
 /*Needed a CSS file because the div with class 'site-layout-content' wasn't being styled correctly */
 import { connect } from 'react-redux'
-import * as actions from '../store/actions/auth';
+import * as actions from '../../store/actions/auth';
 
 const { Header, Content, Footer } = Layout;
 

@@ -1,6 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Form, Input, Button, Upload, Checkbox } from 'antd';
+import { Form, Input, Button, Upload, Checkbox, Breadcrumb} from 'antd';
+import {
+  WalletOutlined,
+} from '@ant-design/icons';
 import axios from 'axios';
 import { withRouter } from'react-router-dom';
 
@@ -232,6 +235,13 @@ class Declaration extends React.Component {
 
     return (
       <div >
+        <Breadcrumb style={{ margin: '3.5em 0 2em 0' }}>
+          <Breadcrumb.Item>Portals</Breadcrumb.Item>
+          <Breadcrumb.Item>Registration</Breadcrumb.Item>
+          <Breadcrumb.Item>Declaration & Signature</Breadcrumb.Item>
+        </Breadcrumb>
+        <h1><WalletOutlined /> Declaration</h1>
+        
         <Form 
           key={"DeclarationForm"} 
           layout='vertical'

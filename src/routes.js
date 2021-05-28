@@ -1,14 +1,14 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 
-import SchoolList from './containers/SchoolListView';
-import SchoolDetail from './containers/SchoolDetailView';
-import GuestList from './containers/GuestListView';
-import GuestDetail from './containers/GuestDetailView';
-import Login from './containers/Login';
+import SchoolList from './containers/AdminApp/SchoolListView';
+import SchoolDetail from './containers/AdminApp/SchoolDetailView';
+import GuestList from './containers/AdminApp/GuestListView';
+import GuestDetail from './containers/AdminApp/GuestDetailView';
+import Login from './containers/AdminApp/Login';
 
-import CustomLayout from './containers/Layout';
-import GuestLayout from './containers/LayoutGuest';
+import CustomLayout from './containers/AdminApp/Layout';
+import GuestLayout from './containers/UserApp/LayoutGuest';
 
 
 const BaseRouter = () => (

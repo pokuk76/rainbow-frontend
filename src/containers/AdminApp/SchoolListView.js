@@ -1,8 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 
-import School from '../components/School';
-import CustomForm from '../components/Form';
+import School from '../../components/School';
+import CustomForm from '../../components/Form';
 
 const listData = [];
 for (let i = 0; i < 23; i++) {

@@ -3,7 +3,7 @@ import React from 'react';
 import { Form, Input, Button, Checkbox, Spin } from 'antd';
 import { LoadingOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux'
-import * as actions from '../store/actions/auth';
+import * as actions from '../../store/actions/auth';
 
 
 const layout = {

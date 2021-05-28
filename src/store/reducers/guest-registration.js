@@ -7,6 +7,8 @@ const initialState = {
     studentForms: { "StudentForm_0": {}, },
     studentUID: 0,
     guardianForms: { "GuardianForm_0": {}, },
+    guardianFormsValid:{ "StudentForm_0": {}, },
+    guardianFormsTouched:{ "StudentForm_0": {}, },
     guardianUID: 0,
     declarationForm: {},
     images: {}  // key-value pairs where the key is the form uid 

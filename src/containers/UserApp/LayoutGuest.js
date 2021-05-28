@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from'react-router-dom';
 
-import { RainbowIcon } from '../components/Icons';
+import { RainbowIcon } from '../../components/Icons';
 
 import { Flex } from 'antd-mobile';
 // import { Drawer } from 'antd-mobile';
@@ -22,14 +22,14 @@ import {
 
 import './layout.css';  
 
-import * as actions from '../store/actions/guest-registration';
+import * as actions from '../../store/actions/guest-registration';
 
-import GuestInfo from './guest-users/GuestForm';
-import GuardianForm from '../throwaways/GuardianForm';
-import StudentForm from '../throwaways/StudentForm';
-import GuardianFormContainer from './guest-users/GuardianFormContainer';
-import StudentFormContainer from './guest-users/StudentFormContainer';
-import Declaration from './guest-users/Declaration';
+import GuestInfo from './GuestForm';
+// import GuardianForm from '../throwaways/GuardianForm';
+// import StudentForm from '../throwaways/StudentForm';
+import GuardianFormContainer from './GuardianFormContainer';
+import StudentFormContainer from './StudentFormContainer';
+import Declaration from './Declaration';
 
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -65,7 +65,13 @@ class GuestLayout extends React.Component {
       prevMenuItem: '',
       selectedMenuItem: 'guest-details',
       guardianForms: this.props.guardianForms,
-      visible: false,
+      visible: false, 
+      validation: {
+        'guest-details': null,
+        'students': [], 
+        'guardians': [], 
+        'declaration': null, 
+      }
     };
 
     this.componentSwitch = this.componentSwitch.bind(this);
@@ -79,6 +85,10 @@ class GuestLayout extends React.Component {
   componentDidUpdate(prevProps) {
     console.log("Props after update:", prevProps);
   }
+
+  // updateSelectedMenuItem = (menuItem) => {
+  //   this.setState({selectedMenuItem: menuItem});
+  // }
 
   componentSwitch = (key) => {
     let forms = [];
@@ -113,18 +123,13 @@ class GuestLayout extends React.Component {
         return (<GuardianFormContainer
           key={"GuardianFormContainer"}
           selectedMenuItem={this.state.selectedMenuItem}
+          componentSwitch={this.componentSwitch}
 
           {...this.props} />);
       case 'declaration':
         const declaration_id = "DeclarationForm_0";
         return (
           <div>
-            <Breadcrumb style={{ margin: '3.5em 0 2em 0' }}>
-              <Breadcrumb.Item>Portals</Breadcrumb.Item>
-              <Breadcrumb.Item>Registration</Breadcrumb.Item>
-              <Breadcrumb.Item>Declaration & Signature</Breadcrumb.Item>
-            </Breadcrumb>
-            <h1>Declaration</h1>
             <Declaration 
               id={declaration_id} 
               fileSelected={
@@ -174,6 +179,8 @@ class GuestLayout extends React.Component {
     
   };
 
+
+/* Currently unused */
   getInitialValues = () => {
     const guest = this.props.guestForm;
     const guardians = this.props.guardianForms;
@@ -207,60 +214,62 @@ class GuestLayout extends React.Component {
   }
 
   render() {
-    const drawerContents = <Menu 
-    theme="dark" 
-    style={{height: '100vh', marginTop:0 }}
-    defaultSelectedKeys={["guest-details"]} 
-    selectedKeys={this.state.selectedMenuItem} 
-    onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: e.key, visible: false })}
-  >
-    {/* <Menu.Item key="home" icon={<RainbowIcon />}>
+    const drawerContents = (
+      <Menu
+        theme="dark"
+        // style={{ height: '100vh', marginTop: 0 }}
+        style={{ height: '100%', marginTop: 0 }}
+        defaultSelectedKeys={["guest-details"]}
+        selectedKeys={this.state.selectedMenuItem}
+        onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: e.key, visible: false })}
+      >
+        {/* <Menu.Item key="home" icon={<RainbowIcon />}>
       <a href="http://127.0.0.1:8000/home/"> Rainbow</a>
     </Menu.Item> */}
 
-    <Menu.Divider />
+        {/* <Menu.Divider /> */}
 
-    <Menu.Item
-      key="guest-details"
-      icon={<ProfileOutlined />}
-      style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, }}
-    >
-      Guest Details
-</Menu.Item>
+        <Menu.Item
+          key="guest-details"
+          icon={<ProfileOutlined />}
+          style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%"}}
+        >
+          Guest Details
+        </Menu.Item>
 
-    <Menu.Divider />
+        <Menu.Divider />
 
-    <Menu.Item
-      key="students"
-      icon={<UserAddOutlined />}
-      style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, }}
-    >
-      Students
-</Menu.Item>
+        <Menu.Item
+          key="students"
+          icon={<UserAddOutlined />}
+          style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%"}}
+        >
+          Students
+        </Menu.Item>
 
-    <Menu.Divider />
+        <Menu.Divider />
 
-    <Menu.Item
-      key="guardians"
-      icon={<TeamOutlined />}
-      style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, }}
-    >
-      Guardians
-</Menu.Item>
+        <Menu.Item
+          key="guardians"
+          icon={<TeamOutlined />}
+          style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%"}}
+        >
+          Guardians
+        </Menu.Item>
 
-    <Menu.Divider />
+        <Menu.Divider />
 
-    <Menu.Item
-      key="declaration"
-      icon={<WalletOutlined />}
-      style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, }}
-    >
-      Declaration
-</Menu.Item>
+        <Menu.Item
+          key="declaration"
+          icon={<WalletOutlined />}
+          style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%"}}
+        >
+          Declaration
+        </Menu.Item>
 
-    <Menu.Divider />
+        <Menu.Divider />
 
-  </Menu>
+      </Menu>)
     
     return (
       <>
@@ -269,18 +278,19 @@ class GuestLayout extends React.Component {
       >
         <Drawer
           title={
-          <a href="http://127.0.0.1:8000/home/"><RainbowIcon /> Rainbow</a>}
-          placement="left"
-          closable={true}
-          closeIcon={<CloseOutlined style={{fontSize: '1.5em',}} />}
-          destroyOnClose={true}
-          onClose={this.onClose}
-          visible={this.state.visible}
-          getContainer={false}
+            <a href="http://127.0.0.1:8000/home/" ><RainbowIcon style={{ backgroundColor:"green", fontSize:"inherit"}} /> Rainbow School</a>
+          }
+          placement="left" 
+          closable={true} 
+          closeIcon={<CloseOutlined style={{fontSize: '1.2em',}} />} 
+          destroyOnClose={true} 
+          onClose={this.onClose} 
+          visible={this.state.visible} 
+          getContainer={false} 
           // drawerStyle={{ height:'100%', }}
-          // minHeight='100vh'
-          // style={{ position: 'absolute'}} 
-          bodyStyle={{padding:'0'}}
+          headerStyle={{backgroundColor: 'darkblue', }} 
+          bodyStyle={{padding: '0'}}
+          drawerStyle={{border: '2px solid white'}} 
         >
           { drawerContents }
         </Drawer>
@@ -291,8 +301,9 @@ class GuestLayout extends React.Component {
         >
           {/* <Header className="site-layout-background" style={{ padding: 0, height: '48px' }}> */}
           <Header style={{ position: 'fixed', zIndex: 1, width: '100vw' }}>
-            <Button type="primary" onClick={this.showDrawer} icon={<MenuOutlined />}>
+            <Button type="primary" onClick={this.showDrawer} icon={<MenuOutlined />} style={{backgroundColor: 'inherit', width: "50px"}}>
             </Button>
+            {/* <MenuOutlined onClick={this.showDrawer} /> */}
           </Header>
           
           <Content key={"Content" + this.state.selectedMenuItem} style={{ margin: '0 0', maxWidth: '100vw', }}>
@@ -304,7 +315,15 @@ class GuestLayout extends React.Component {
               {this.componentSwitch(this.state.selectedMenuItem)}
             </div>
 
+            <div style={{ margin: "auto", width: "80%" }}>
+              <br />
+              <Button type="danger" htmlType="button" style={{ float: "right" }}>Previous</Button>
+              {/* <Button type="danger" htmlType="button" onClick={(e) => this.componentSwitch('declaration')} style={{ float: "left" }}>Next</Button> */}
+              <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'declaration', visible: false })} style={{ float: "left" }}>Next</Button>
+            </div>
+
           </Content>
+
           <Footer style={{ textAlign: 'center' }}>Rainbow Edu ©2020 kbd</Footer>
         </Layout>
 

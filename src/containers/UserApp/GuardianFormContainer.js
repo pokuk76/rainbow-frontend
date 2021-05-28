@@ -12,7 +12,7 @@ import { getInitialValues } from '../../utilities/forms';
 
 import * as actions from '../../store/actions/guest-registration';
 
-import GuardianFormComponent from '../../components/guest-users/GuardianForm';
+import GuardianFormComponent from '../../components/UserApp/GuardianForm';
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -357,6 +357,12 @@ class GuardianForm extends React.Component {
 
                 <br />
                 <br />
+
+                <div style={{margin: "auto", width: "80%"}}>
+                    <br />
+                    <Button type="danger" htmlType="button" style={{float: "right"}}>Previous</Button>
+                    <Button type="danger" htmlType="button" onClick={ (e) => this.props.componentSwitch('declaration')} style={{float: "left"}}>Next</Button>
+                </div>
                 {/* <div>
                 <Form.Item>
                 <Button type='primary' htmlType='submit' onClick={this.onSave}>
