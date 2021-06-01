@@ -1,12 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Form, Input, Button, Select, Upload, Collapse, Breadcrumb, Modal } from 'antd';
+import debounce from "lodash/debounce";
+// import throttle from "lodash/throttle";
+
+import { Form, Input, Button, Select, Upload } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
-import { formsCopy } from '../../utilities/deepCopy';
+import { formsCopy } from '../../utility/deepCopy';
+import { checkValidityElement } from '../../utility/forms';
 
-import * as actions from '../../store/actions/guest-registration';
+import * as actions from '../../store/actions/guest';
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -31,75 +35,65 @@ class GuardianFormComponent extends React.Component {
         super(props);
 
         this.state = {
-            // forms: [],
-            // filesObject: {},
             uploading: false,
-            // fileSelected: this.props.fileSelected,
-            currentId: -1,
-            // modalVisible: false,
-            // modalContent: <></>,
-            images: this.props.images,
+            currentId: -1, 
         };
-        this.onContinue = this.onContinue.bind(this);
-        this.onSave = this.onSave.bind(this);
+
+        this.debounceHandleChange = debounce(this.debounceHandleChange.bind(this), 500);
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    debounceHandleChange(form, field, value) {
+
+        let guardianForms = formsCopy(this.props.guardianForms);
+        let guardianFormsValid = formsCopy(this.props.guardianFormsValid);
+        let guardianFormsTouched = formsCopy(this.props.guardianFormsTouched);
+
+        guardianForms[form][field] = value;
+        guardianFormsValid[form][field] = checkValidityElement(value, ["required"]);
+
+        this.props.updateForms(guardianForms, guardianFormsValid);
+        // this.props.updateForms(guardianForms, guardianFormsValid);
     }
 
     handleChange(e) {
         /* The id is the name of the Form.Item wrapping the input
         It is also the key needed for the given form object
         */
-       let guardianForms = formsCopy(this.props.guardianForms);
+       
        let form = e.target.id.split("+")[0];
        let field = e.target.id.split("+")[1];
-       
-       guardianForms[form][field] = e.target.value;
-       this.props.updateForms(guardianForms);
-
+       let value = e.target.value; 
+       this.debounceHandleChange(form, field, value);
         // let form = e.target.id.split("+")[0];
         // let field = e.target.id.split("+")[1];
         // this.props.guardianForms[form][field] = e.target.value;
     }
 
-    onContinue() {
-        console.log("Guardian Forms", this.props.guardianForms);
-    }
-
-    onSave = (values) => {
-        console.log("onSave values", values);
-        console.log("id", this.props.id);
-        console.log("First name: ", values.target['first_name']);
-    }
-
     render() {
 
-        // const initialValues = this.getInitialValues();
-        // console.log("Initial Values: ", initialValues);
-        let fileSelected = (this.props.images[this.props.formUID]) ? true : false;
-        let fileList = (this.props.images[this.props.formUID] === undefined) ? [] : this.props.images[this.props.formUID];
+        let fileSelected = false;
+        let fileList = [];
+        try {
+            fileSelected = (this.props.images[this.props.formUID]) ? true : false;
+            fileList = this.props.images[this.props.formUID];
+
+        }
+        catch(error) {
+        }
 
         const uploadProps = {
             multiple: false,
       
             onRemove: () => {
                 // console.log("Props images before remove: ", this.props.images);
-                this.props.removeImage(this.props.images, this.props.formUID, this.props.guardianForms)
-                let images = {...this.state.images};
-                // delete images[this.state.currentId];
-                this.setState(
-                    {
-                        images: images,
-                    }
-                );
+                this.props.removeImage(this.props.images, this.props.formUID)
             },
       
             beforeUpload: file => {
                 // console.log("Props images before upload: ", this.props.images);
-                this.props.addImage(this.state.images, this.props.formUID, file, this.props.guardianForms);
+                this.props.addImage(this.props.images, this.props.formUID, file);
                 // console.log("Props images after upload: ", this.props.images);
-                let images = {...this.props.images};
-                this.setState(state => ({
-                    images: images,
-                }));
                 return false;
             },
 
@@ -114,7 +108,7 @@ class GuardianFormComponent extends React.Component {
               }
               // console.log("Img src: ", src);
               let modalContent = <div style={{backgroundColor:'red', height:20, width:20, }} ></div>;
-              modalContent = <img src={src} alt="avatar" style={{ width: '100%' }} />;
+              modalContent = <img src={src} alt="your upload" style={{ width: '100%' }} />;
               this.props.showModal(modalContent);
             },
       
@@ -140,17 +134,19 @@ class GuardianFormComponent extends React.Component {
 
             >
                 {/* <h1>ID: {formUID}</h1> */}
-                <Form.Item name={this.props.formUID + "+first_name"} label="First Name:"
+                <Form.Item name={this.props.formUID + "+first_name"} label={ this.props.guardianFormsValid[this.props.formUID]['first_name'] ? "First Name: " : "Invalid First Name"}
                     rules={[
                         {
                             required: true,
                             message: 'Please input your first name',
                         },
                         {
-                            max: 64,
+                            max: 128, 
+                            message: 'First name must have fewer than 128 characters'
                         }
                     ]}
                 >
+                    
                     <Input
                         placeholder="First name"
                         onChange={e => this.handleChange(e)}
@@ -160,8 +156,8 @@ class GuardianFormComponent extends React.Component {
                 <Form.Item name={this.props.formUID + "+middle_name"} label="Middle Name:"
                     rules={[
                         {
-                            max: 64,
-                            message: 'Middle name must be less than 64 characters'
+                            max: 128,
+                            message: 'Middle name must have fewer than 64 characters'
                         }
                     ]}
                 >
@@ -178,8 +174,8 @@ class GuardianFormComponent extends React.Component {
                             message: 'Please input your last name',
                         },
                         {
-                            max: 64,
-                            message: 'Last name must be less than 64 characters'
+                            max: 128,
+                            message: 'Last name must have fewer than 128 characters'
                         }
                     ]}
                 >
@@ -189,6 +185,7 @@ class GuardianFormComponent extends React.Component {
                     />
                 </Form.Item>
 
+                {/* TODO: Add some RegEx check for phone number inputs  */}
                 <Form.Item name={this.props.formUID + "+phone_number"} label="Telephone Number:"
                     // Add an object with pattern (holding a regex for acceptable phone number input) 
                     // to rules 
@@ -199,7 +196,7 @@ class GuardianFormComponent extends React.Component {
                         },
                         {
                             max: 13,
-                            message: 'Phone number must be less than 13 characters'
+                            message: 'Phone number must have fewer than 13 characters'
                         }
                     ]}
                 >
@@ -216,11 +213,11 @@ class GuardianFormComponent extends React.Component {
                     rules={[
                         {
                             type: 'email',
-                            message: 'The input is not valid E-mail',
-                        },
+                            message: 'The input is not valid a E-mail address',
+                        }, 
                         {
-                            max: 64,
-                            message: 'E-mail must be less than 32 characters'
+                            max: 128,
+                            message: 'E-mail must have fewer than 128 characters'
                         }
                     ]}
                 >
@@ -253,7 +250,7 @@ class GuardianFormComponent extends React.Component {
                     rules={[
                         {
                             max: 128,
-                            message: 'Religion must be less than 128 characters'
+                            message: 'Religion must have fewer than 128 characters'
                         }
                     ]}
                 >
@@ -267,7 +264,7 @@ class GuardianFormComponent extends React.Component {
                     rules={[
                         {
                             required: true,
-                            message: 'Field is required',
+                            message: 'Please indicate the type of guardian',
                         },
                     ]}
                 >
@@ -290,12 +287,13 @@ class GuardianFormComponent extends React.Component {
                     </Select>
                 </Form.Item>
 
+                {/* TODO: Maybe change this so that they just indicate/list which students live with the guardian */}
                 <Form.Item name={this.props.formUID + "+lives_with_guardian"}
                     label="Do the students live with guardian?"
                     rules={[
                         {
                             required: true,
-                            message: 'Field is required',
+                            message: 'Please indicate whether students live with this guardian',
                         },
                     ]}
                 >
@@ -317,11 +315,11 @@ class GuardianFormComponent extends React.Component {
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your occupation',
+                            message: 'Please input an occupation',
                         },
                         {
                             max: 256,
-                            message: 'Occupation must be less than 128 characters'
+                            message: 'Occupation must have fewer than 256 characters'
                         }
                     ]}
                 >
@@ -339,7 +337,7 @@ class GuardianFormComponent extends React.Component {
                         },
                         {
                             max: 256,
-                            message: 'Place of work must be less than 128 characters'
+                            message: 'Place of work must have fewer than 256 characters'
                         }
                     ]}
                 >
@@ -370,9 +368,9 @@ class GuardianFormComponent extends React.Component {
                                 <p className="ant-upload-drag-icon">
                                     <InboxOutlined />
                                 </p>
-                                <p className="ant-upload-text">Click or drag image to this area to upload</p>
+                                <p className="ant-upload-text">Please provide a photo suitable for official identification</p>
                                 <p className="ant-upload-hint">
-                                    One upload per guardian
+                                    Click or drag image to this area to upload
                                 </p>
                             </Dragger>
                         </ImgCrop>
@@ -385,7 +383,7 @@ class GuardianFormComponent extends React.Component {
                         <Form.Item style={{ marginTop: '1em' }}>
                             <Button
                                 type='danger'
-                                onClick={() => this.props.remove(this.props.guardianForms, this.props.formUID, 'GuardianForm')}
+                                onClick={() => this.props.removeForm(this.props.guardianForms, this.props.guardianFormsValid, this.props.formUID, 'GuardianForm', this.props.images)}
                             >
                                 Remove
                             </Button>
@@ -399,9 +397,10 @@ class GuardianFormComponent extends React.Component {
 };
 
 const mapStateToProps = state => {
-    // console.log("Forms state-to-props: ", state);
     return {
         guardianForms: state.guest.guardianForms,
+        guardianFormsValid: state.guest.guardianFormsValid, 
+        guardianFormsTouched: state.guest.guardianFormsTouched, 
         guardianUID: state.guest.guardianUID,
         images: state.guest.images
     }
@@ -409,10 +408,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        updateForms: (guardianForms) => dispatch(actions.updateGuardians(guardianForms)),
-        addImage: (images, id, file, formData) => dispatch(actions.addImage(images, id, file, formData)),
-        removeImage: (images, id, formData) => dispatch(actions.removeImage(images, id, formData)),
-        remove: (guardianForms, uid, currentForm, images) => dispatch(actions.removeForm(guardianForms, uid, currentForm, images)),
+        updateForms: (guardianForms, guardianFormsValid) => dispatch(actions.updateGuardians(guardianForms, guardianFormsValid)),
+        addImage: (images, id, file) => dispatch(actions.addImage(images, id, file)),
+        removeImage: (images, id) => dispatch(actions.removeImage(images, id)),
+        removeForm: (guardianForms, guardianFormsValid, uid, currentForm, images) => dispatch(actions.removeForm(guardianForms, guardianFormsValid, uid, currentForm, images)),
     }
 }
 

@@ -7,7 +7,7 @@ import {
 import axios from 'axios';
 import { withRouter } from'react-router-dom';
 
-import * as actions from '../../store/actions/guest-registration';
+import * as actions from '../../store/actions/guest';
 import DeleteIcon from '../../components/Icons';
 
 const { Dragger } = Upload;
@@ -242,17 +242,25 @@ class Declaration extends React.Component {
         </Breadcrumb>
         <h1><WalletOutlined /> Declaration</h1>
         
+        <div style={{backgroundColor: "white", color:"#111d2c", width:"80%", margin:"auto", padding:"1em", border:"2px solid #111d2c"}}>
+          Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque 
+          ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia 
+          voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. 
+          Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi 
+          tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem 
+          ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea 
+          voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+        </div>
+
         <Form 
           key={"DeclarationForm"} 
           layout='vertical'
           initialValues={initialValues} 
         >
-            <Form.Item name="agreed" label="I have read and agreed to this declaration:"
+            <Form.Item name="agreed"
                 style={myStyle} 
             >
-                <Checkbox 
-                    // onChange={(e) => this.handleChange(e)} 
-                />
+              <Checkbox><b>I have read and agreed to this declaration.</b></Checkbox>
             </Form.Item>
 
             <Form.Item name="signature" label="Signature:"
@@ -289,9 +297,9 @@ class Declaration extends React.Component {
                 />
             </Form.Item>
 
-            <Form.Item>
+            {/* <Form.Item>
                 <Button type="primary" htmlType="submit" onClick={this.handleFormSubmit}>Finish</Button>
-            </Form.Item>
+            </Form.Item> */}
         </Form>
       </div>
     );

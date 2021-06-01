@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import axios from 'axios';
 
 import { Form, Input, Button, Upload, Modal, Progress } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
-import { guestFormCopy } from '../../utilities/deepCopy';
-
-import * as actions from '../../store/actions/guest-registration';
+import { guestFormCopy } from '../../utility/deepCopy';
+import * as actions from '../../store/actions/guest';
 import { DeleteIcon } from '../../components/Icons';
 
 const { Dragger } = Upload;
@@ -29,9 +29,10 @@ class GuestInfo extends React.Component {
       modalContent: <></>,
       fileList: [],
       uploading: false,
-      fileSelected: this.props.fileSelected,
+      fileSelected: this.props.fileSelected, 
       // guestForm: this.props.guestForm 
       // We're passing by reference, which actually works for us but might cause issues later?
+      usernames: ["username1", "username2", "poku.flacko"], //Just some dummy date for if I'm not running the backend locally TODO: Remove this for production
     };
 
   }
@@ -42,6 +43,18 @@ class GuestInfo extends React.Component {
       behavior: 'smooth'
     });
     // console.log("Guest form copy: ", guestFormCopy(this.props.guestForm));
+
+    /* I don't really like doing this in componentDidMount 
+    https://www.google.com/search?q=react+call+setstate+in+componentdidmount&oq=react+calling+setstate+in+com&aqs=edge.2.0j69i64j0i22i30l3j69i57.11612j0j4&sourceid=chrome&ie=UTF-8
+    */
+    axios.get('http://127.0.0.1:8000/api/usernames/')
+      .then(response => {
+        console.log(response.data);
+        this.setState({usernames: response.data});
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 
   showModal = (body) => {
@@ -110,20 +123,33 @@ class GuestInfo extends React.Component {
    * 
    */
   getInitialValues = () => {
-    console.log("Getting initial values...");
     const guestForm = this.props.guestForm;
-    // console.log("Initial Values Guest form:", guestForm);
 
     let initialForm = {};
     try {
       for (const [name, value] of Object.entries(guestForm)) {
-        console.log(`${name}: ${value}`);
+        // console.log(`${name}: ${value}`);
         initialForm[name] = value;
       }
     }
     finally {
       return initialForm;
     }
+  }
+
+  checkUsernameUnique = (rule, value /*, callback*/) => {
+    /* Apparently callbacks are deprecated */
+    // if (this.state.usernames.includes(value)) {
+    //   callback("Username already exists");
+    // }
+    // callback();
+    return new Promise(async (resolve, reject) => {
+      if (this.state.usernames.includes(value)) {
+        await reject("Username already exists");
+      } else {
+        await resolve();
+      }
+    });
   }
 
   render() {
@@ -213,9 +239,9 @@ class GuestInfo extends React.Component {
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
             </p>
-            <p className="ant-upload-text">Click or drag image to this area to upload</p>
+            <p className="ant-upload-text">Please provide a photo suitable for official identification</p>
             <p className="ant-upload-hint">
-              One upload per guest
+              Click or drag image to this area to upload
             </p>
 
 
@@ -240,8 +266,11 @@ class GuestInfo extends React.Component {
               {
                 required: true,
                 message: 'Username is required',
-              },
-            ]}
+              }, 
+              { validator: this.checkUsernameUnique }
+              
+            ]} 
+            // rules={[{ validator: this.validateUsername}]}
           >
             <Input
               placeholder="Enter username"
@@ -311,7 +340,7 @@ class GuestInfo extends React.Component {
           >
             {this.state.modalContent}
           </Modal>
-          
+
         </Form>
       </div>
     );
@@ -319,7 +348,7 @@ class GuestInfo extends React.Component {
 };
 
 const mapStateToProps = state => {
-  console.log("Forms state-to-props: ", state);
+  // console.log("Forms state-to-props: ", state);
   return {
     selectedMenuItem: state.guest.selectedMenuItem,
     guestForm: state.guest.guestForm,

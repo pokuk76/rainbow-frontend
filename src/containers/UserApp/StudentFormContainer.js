@@ -1,14 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Button, Select, Upload, Collapse, Breadcrumb } from 'antd';
+import { Button, Select, Upload, Collapse, Breadcrumb, Modal } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { InboxOutlined, FileAddOutlined, CloseSquareOutlined, SaveOutlined, UserAddOutlined, RightOutlined, CalendarOutlined } from '@ant-design/icons';
 
-import { formsCopy } from '../../utilities/deepCopy';
+import { formsCopy } from '../../utility/deepCopy';
 
-import { getInitialValues } from '../../utilities/forms';
-import * as actions from '../../store/actions/guest-registration';
+import { getInitialValues } from '../../utility/forms';
+import * as actions from '../../store/actions/guest';
 
 import StudentFormComponent from '../../components/UserApp/StudentForm';
 
@@ -89,19 +89,15 @@ class StudentForm extends React.Component {
             fileList: this.props.fileList,
             uploading: false,
             fileSelected: this.props.fileSelected,
-            currentId: -1,
-            images: this.props.images,
-            studentForms: this.props.studentForms // We're passing by reference, which actually works for us 
+            currentId: -1, 
+            modalVisible: false, 
+            modalContent: <></>, 
+            // studentForms: this.props.studentForms // We're passing by reference, which actually works for us 
                                                     // but might cause issues later?
         };
 
-        this.onRemoveImage = this.onRemoveImage.bind(this);
-        this.onPreview = this.onPreview.bind(this);
-        this.beforeUpload = this.beforeUpload.bind(this);
         // this.onCollapse = this.onCollapse.bind(this);
         this.renderForms = this.renderForms.bind(this);
-        this.onContinue = this.onContinue.bind(this);
-        this.onSave = this.onSave.bind(this);
     }
 
     handleChange = (e) => {
@@ -113,58 +109,6 @@ class StudentForm extends React.Component {
         let field = e.target.id.split("+")[1];
 
         this.props.studentForms[form][field] = e.target.value;
-    }
-
-    onContinue = () => {
-        console.log("Student Forms", this.props.studentForms);
-    }
-
-    onSave = (values) => {
-        console.log("onSave values", values);
-        console.log("id", this.props.id);
-        console.log("First name: ", values.target['first_name']);
-    }
-
-    onRemoveImage = () => {
-        this.props.removeImage(this.props.images, this.props.id, this.props.studentForms)
-        this.setState(
-            {
-                // fileList: this.props.images[this.props.id],
-                fileList: [],
-                fileSelected: false,
-            }
-        );
-    }
-
-    beforeUpload(file, fileList) {
-        // console.log("File: ", file);
-        // console.log("ID: ", this.state.currentId);
-        // console.log("Filelist: ", fileList);
-        this.props.persistImage(this.props.images, this.state.currentId, file, this.props.studentForms);
-        this.setState(
-            {
-                fileList: this.props.images[this.props.id],
-                fileSelected: true,
-            }
-        );
-        // this.props.fileSelected = true;
-        // console.log("file list: ", this.props.images);
-        return false;
-    }
-
-    onPreview = async file => {
-        let src = file.url;
-        if (!src) {
-            src = await new Promise(resolve => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-            });
-        }
-        const image = new Image();
-        image.src = src;
-        const imgWindow = window.open(src);
-        imgWindow.document.write(image.outerHTML);
     }
 
     componentDidMount() {
@@ -181,18 +125,41 @@ class StudentForm extends React.Component {
         /*  Added this to ensure that the forms re-render on add or remove
             Feels mad ghetto but it's working
         */
-       console.log("Prev props:", prevProps);
-       console.log("State images:", this.state.images);
-        if(prevProps.studentForms !== this.props.studentForms || this.state.images !== prevProps.images ){
+    //    console.log("Prev props:", prevProps);
+    //    console.log("State images:", this.state.images);
+        if(prevProps.studentForms !== this.props.studentForms || prevProps.images !== this.props.images ){
             // console.log("A disturbance in the force");
-            this.setState(
-                {
-                    images: this.props.images
-                }
-            );
+            // this.setState(
+            //     {
+            //         images: this.props.images
+            //     }
+            // );
             this.renderForms();
         }
     }
+
+    showModal = (body) => {
+        this.setState({
+            modalVisible: true,
+            modalContent: body,
+        });
+    };
+
+    handleOk = (e) => {
+        // console.log(e);
+        this.setState({
+            modalVisible: false,
+        });
+    };
+
+    handleCancel = (e) => {
+        // console.log(e);
+        this.setState({
+            modalVisible: false,
+        });
+    };
+
+
 
     
     getInitialValues() {
@@ -221,14 +188,14 @@ class StudentForm extends React.Component {
     renderForms = () => {
     // componentDidMount() {
         // console.log("Render forms");
-        const { fileList, uploading, fileSelected } = this.state;
+        // const { fileList, uploading, fileSelected } = this.state;
 
         var forms = [];
         let i = 0;
         const initialFormValues = getInitialValues(this.props.studentForms);
         for (let formUID in this.props.studentForms){
-            let fileSelected = (this.props.images[formUID]) ? true : false;
-            let fileList = this.props.images[formUID];
+            // let fileSelected = (this.props.images[formUID]) ? true : false;
+            // let fileList = this.props.images[formUID];
             var key = "StudentPanel" + i;
             this.setState(
             {
@@ -239,7 +206,7 @@ class StudentForm extends React.Component {
 
                 onClick={event => {
                     event.stopPropagation();
-                    this.props.remove(this.props.studentForms, formUID, 'StudentForm');
+                    this.props.removeForm(this.props.studentForms, this.props.studentFormsValid, formUID, 'StudentForm', this.props.images);
                 }}
                 style={{
                     // color: 'red',
@@ -316,9 +283,20 @@ class StudentForm extends React.Component {
                 { this.state.forms }
             </Collapse>
             
+            <Modal
+                title="Your Upload"
+                className="imageModal"
+                visible={this.state.modalVisible}
+                onOk={this.handleOk}
+                onCancel={this.handleCancel}
+                destroyOnClose={true}
+            >
+                {this.state.modalContent}
+            </Modal>
+                
             <br />
             {/* { console.log("Selected menu item: ", this.state.selectedMenuItem) } */}
-            <Button key={this.props.selectedMenuItem} onClick={() => this.props.addForm(this.props.studentForms, this.props.studentUID, 'StudentForm') }>
+            <Button key={this.props.selectedMenuItem} onClick={() => this.props.addForm(this.props.studentForms, this.props.studentFormsValid, this.props.studentUID, 'StudentForm') }>
                 <FileAddOutlined /> Add Student
             </Button>
 
@@ -333,6 +311,7 @@ const mapStateToProps = state => {
     // console.log("Forms state-to-props: ", state);
     return {
         studentForms: state.guest.studentForms,
+        studentFormsValid: state.guest.studentFormsValid, 
         studentUID: state.guest.studentUID,
         images: state.guest.images
     }
@@ -340,10 +319,9 @@ const mapStateToProps = state => {
   
   const mapDispatchToProps = dispatch => {
     return {
-        addForm: (forms, uid, currentForm, images) => dispatch(actions.addForm(forms, uid, currentForm, images)),
-        persistImage: (images, id, file, formData) => dispatch(actions.addImage(images, id, file, formData)),
+        addForm: (forms, studentFormsValid, uid, currentForm) => dispatch(actions.addForm(forms, studentFormsValid, uid, currentForm)),
         removeImage: (images, id, formData) => dispatch(actions.removeImage(images, id, formData)),
-        remove: (studentForms, uid, currentForm) => dispatch(actions.removeForm(studentForms, uid, currentForm)),
+        removeForm: (studentForms, studentFormsValid, uid, currentForm, images) => dispatch(actions.removeForm(studentForms, studentFormsValid, uid, currentForm, images)),
     }
   }
   

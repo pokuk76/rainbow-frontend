@@ -1,14 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Form, Input, Button, Select, Upload, Collapse, Breadcrumb, Modal, DatePicker } from 'antd';
+import debounce from "lodash/debounce";
+
+import { Form, Input, Button, Select, Upload, DatePicker } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
 import { DeleteIcon } from '../Icons';
 
-import { formsCopy } from '../../utilities/deepCopy';
+import { formsCopy } from '../../utility/deepCopy';
+import { checkValidityElement } from '../../utility/forms';
 
-import * as actions from '../../store/actions/guest-registration';
+
+import * as actions from '../../store/actions/guest';
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -44,48 +48,53 @@ class StudentFormComponent extends React.Component {
             studentForms: this.props.studentForms // We're passing by reference, which actually works for us 
                                                     // but might cause issues later?
         };
-        this.onContinue = this.onContinue.bind(this);
-        this.onSave = this.onSave.bind(this);
+        this.debounceHandleChange = debounce(this.debounceHandleChange.bind(this), 500);
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    debounceHandleChange(form, field, value) {
+
+        let studentForms = formsCopy(this.props.studentForms);
+        let studentFormsValid = formsCopy(this.props.studentFormsValid);
+        // let guardianFormsTouched = formsCopy(this.props.guardianFormsTouched);
+
+        studentForms[form][field] = value;
+        studentFormsValid[form][field] = checkValidityElement(value, ["required"]);
+
+        this.props.updateForms(studentForms, studentFormsValid);
     }
 
     handleChange(e) {
-
         /* The id is the name of the Form.Item wrapping the input
         It is also the key needed for the given form object
         */
-        
-        let studentForms = formsCopy(this.props.studentForms);
-        let form = e.target.id.split("+")[0];
-        let field = e.target.id.split("+")[1];
-        studentForms[form][field] = e.target.value;
-        this.props.updateForms(studentForms);
-
-        // let form = e.target.id.split("+")[0];
-        // let field = e.target.id.split("+")[1];
-        // this.props.studentForms[form][field] = e.target.value;
-    }
-
-    onContinue() {
-        console.log("Student Forms", this.props.studentForms);
-    }
-
-    onSave = (values) => {
-        console.log("onSave values", values);
-        console.log("id", this.props.id);
-        console.log("First name: ", values.target['first_name']);
+       let form = e.target.id.split("+")[0];
+       let field = e.target.id.split("+")[1];
+       let value = e.target.value; 
+       this.debounceHandleChange(form, field, value);
     }
     
     render() {
 
-        let fileSelected = (this.props.images[this.props.formUID]) ? true : false;
-        let fileList = (this.props.images[this.props.formUID] === undefined) ? [] : this.props.images[this.props.formUID];
+        // let fileSelected = (this.props.images[this.props.formUID]) ? true : false;
+        // let fileList = (this.props.images[this.props.formUID] === undefined) ? [] : this.props.images[this.props.formUID];
+
+        let fileSelected = false;
+        let fileList = [];
+        try {
+            fileSelected = (this.props.images[this.props.formUID]) ? true : false;
+            fileList = this.props.images[this.props.formUID];
+
+        }
+        catch(error) {
+        }
 
         const uploadProps = {
             multiple: false,
       
             onRemove: () => {
                 // console.log("Props images before remove: ", this.props.images);
-                this.props.removeImage(this.props.images, this.props.formUID, this.props.studentForms)
+                this.props.removeImage(this.props.images, this.props.formUID)
                 let images = {...this.state.images};
                 // delete images[this.state.currentId];
                 this.setState(
@@ -97,7 +106,7 @@ class StudentFormComponent extends React.Component {
       
             beforeUpload: file => {
                 // console.log("Props images before upload: ", this.props.images);
-                this.props.addImage(this.state.images, this.props.formUID, file, this.props.studentForms);
+                this.props.addImage(this.state.images, this.props.formUID, file);
                 // console.log("Props images after upload: ", this.props.images);
                 let images = {...this.props.images};
                 this.setState(state => ({
@@ -292,58 +301,22 @@ class StudentFormComponent extends React.Component {
                 {/* {fileList.append(formUID)} */}
                 {
                     fileSelected
-                    ?
-                    <Upload
-                        onRemove={this.onRemoveImage}
-                        onPreview={this.onPreview}
-                        beforeUpload={
-                            (file, fileList) => {
-                                this.setState(
-                                    {
-                                        currentId: this.props.formUID,
-                                    }
-                                ); 
-                                return this.beforeUpload(file, fileList); 
-                            }
-                        }  
-                        {...props}
-                        fileList={fileList}
-                    >
-                    {/* TODO: Pass an initial value for the image to the Upload component so it shows up 
-                    on re-render e.g. when we add a new form*/}
-                    </Upload>
-                    :
-                    <ImgCrop>
-                        <Dragger
-                            onRemove={this.onRemoveImage} 
-                            onPreview={this.onPreview} 
-                            beforeUpload={
-                                (file, fileList) => {
-                                    this.setState(
-                                        {
-                                            currentId: this.props.formUID,
-                                        }
-                                    ); 
-                                    return this.beforeUpload(file, fileList); 
-                                } 
-                            } 
-                            {...props} 
-                            disabled={fileSelected} 
-                        >
-                            {/* <Button icon={<UploadOutlined />} disabled={this.state.fileSelected} >Select File</Button> */}
+                        ?
+                        <Upload {...uploadProps} >
 
-
-                            <p className="ant-upload-drag-icon">
-                                <InboxOutlined />
-                            </p>
-                            <p className="ant-upload-text">Click or drag image to this area to upload</p>
-                            <p className="ant-upload-hint">
-                                One upload per student
-                            </p>
-
-
-                        </Dragger>
-                    </ImgCrop>
+                        </Upload>
+                        :
+                        <ImgCrop>
+                            <Dragger {...uploadProps} disabled={fileSelected} >
+                                <p className="ant-upload-drag-icon">
+                                    <InboxOutlined />
+                                </p>
+                                <p className="ant-upload-text">Please provide a photo suitable for official identification</p>
+                                <p className="ant-upload-hint">
+                                    Click or drag image to this area to upload
+                                </p>
+                            </Dragger>
+                        </ImgCrop>
 
                 }
 
@@ -353,7 +326,7 @@ class StudentFormComponent extends React.Component {
                     <Form.Item style={{marginTop: '1em'}}>
                         <Button
                             type='danger'
-                            onClick={() => this.props.remove(this.props.studentForms, this.props.formUID, 'StudentForm')}
+                            onClick={() => this.props.removeForm(this.props.studentForms, this.props.studentFormsValid, this.props.formUID, 'StudentForm')}
                         >
                             Remove
                         </Button>
@@ -372,6 +345,7 @@ const mapStateToProps = state => {
     // console.log("Forms state-to-props: ", state);
     return {
         studentForms: state.guest.studentForms,
+        studentFormsValid: state.guest.studentFormsValid, 
         studentUID: state.guest.studentUID,
         images: state.guest.images
     }
@@ -379,10 +353,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        updateForms: (studentForms) => dispatch(actions.updateStudents(studentForms)),
-        addImage: (images, id, file, formData) => dispatch(actions.addImage(images, id, file, formData)),
-        removeImage: (images, id, formData) => dispatch(actions.removeImage(images, id, formData)),
-        remove: (studentForms, uid, currentForm, images) => dispatch(actions.removeForm(studentForms, uid, currentForm, images)),
+        updateForms: (studentForms, studentFormsValid) => dispatch(actions.updateStudents(studentForms, studentFormsValid)),
+        addImage: (images, id, file) => dispatch(actions.addImage(images, id, file)),
+        removeImage: (images, id) => dispatch(actions.removeImage(images, id)),
+        removeForm: (studentForms, studentFormsValid, uid, currentForm, images) => dispatch(actions.removeForm(studentForms, studentFormsValid, uid, currentForm, images)),
     }
 }
 

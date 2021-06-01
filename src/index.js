@@ -5,7 +5,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 import authReducer from './store/reducers/auth';
-import guestReducer from './store/reducers/guest-registration';
+import guestReducer from './store/reducers/guest';
 import { createStore, compose, applyMiddleware, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';

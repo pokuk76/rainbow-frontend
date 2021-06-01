@@ -4,25 +4,24 @@ import { withRouter } from'react-router-dom';
 
 import { RainbowIcon } from '../../components/Icons';
 
-import { Flex } from 'antd-mobile';
+// import { Flex } from 'antd-mobile';
 // import { Drawer } from 'antd-mobile';
 
-import { Layout, Menu, Breadcrumb, Form, Button, Collapse,Drawer } from 'antd';
+import { Layout, Menu, Breadcrumb, Form, Button, Drawer, Badge } from 'antd';
 import {
-  HomeOutlined,
   ProfileOutlined,
   UserAddOutlined,
   TeamOutlined,
   WalletOutlined,
-  FileAddOutlined,
   CloseOutlined,
   CloseSquareOutlined,
   MenuOutlined, 
+  ExclamationCircleOutlined, 
 } from '@ant-design/icons';
 
 import './layout.css';  
 
-import * as actions from '../../store/actions/guest-registration';
+import * as actions from '../../store/actions/guest';
 
 import GuestInfo from './GuestForm';
 // import GuardianForm from '../throwaways/GuardianForm';
@@ -34,25 +33,12 @@ import Declaration from './Declaration';
 
 const { Header, Content, Footer, Sider } = Layout;
 
- /* Collapse */
-const { Panel } = Collapse;
-
 function callback(key) {
   console.log(key);
 }
 
 /*******/
 
-
-const genExtra = () => (
-  <CloseSquareOutlined
-    onClick={event => {
-      // If you don't want click extra trigger collapse, you can prevent this:
-      event.stopPropagation();
-    }} 
-    style={{color: 'red', }} 
-  />
-);
 
 class GuestLayout extends React.Component {
   constructor(props) {
@@ -66,11 +52,11 @@ class GuestLayout extends React.Component {
       selectedMenuItem: 'guest-details',
       guardianForms: this.props.guardianForms,
       visible: false, 
-      validation: {
-        'guest-details': null,
-        'students': [], 
-        'guardians': [], 
-        'declaration': null, 
+      valid: {
+        'guest-details': true,
+        'students': true, 
+        'guardians': true, 
+        'declaration': true, 
       }
     };
 
@@ -79,16 +65,27 @@ class GuestLayout extends React.Component {
   }
 
   componentDidMount() {
-    console.log("Props after mount:", this.props);
+    // console.log("Props after mount:", this.props);
   }
 
   componentDidUpdate(prevProps) {
-    console.log("Props after update:", prevProps);
+    // console.log("Props after update:", prevProps);
   }
 
-  // updateSelectedMenuItem = (menuItem) => {
-  //   this.setState({selectedMenuItem: menuItem});
-  // }
+  checkValiditySection = (formObj) => {
+    let valid = true;
+    for (let formUID in formObj){
+      for (let element in formObj[formUID]) {
+        try {
+          valid = valid && formObj[formUID][element];
+        }
+        catch (error) {
+          valid = valid && true;
+        }
+      }
+    }
+    return valid;
+  }
 
   componentSwitch = (key) => {
     let forms = [];
@@ -123,7 +120,7 @@ class GuestLayout extends React.Component {
         return (<GuardianFormContainer
           key={"GuardianFormContainer"}
           selectedMenuItem={this.state.selectedMenuItem}
-          componentSwitch={this.componentSwitch}
+          // componentSwitch={this.componentSwitch}
 
           {...this.props} />);
       case 'declaration':
@@ -142,6 +139,44 @@ class GuestLayout extends React.Component {
         break;
     }
   };
+
+  controlSwitch = (key) => {
+    switch (key) {
+      case 'guest-details':
+        return (
+          <div style={{ margin: "auto", width: "80%" }}>
+            <br />
+            <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'students', visible: false })} style={{ float: "right" }}>Next</Button>
+          </div>
+        );
+      case 'students':
+        return (
+          <div style={{ margin: "auto", width: "80%" }}>
+            <br />
+            <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'guest-details', visible: false })} style={{ float: "left" }}>Previous</Button>
+            <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'guardians', visible: false })} style={{ float: "right" }}>Next</Button>
+          </div>
+        );
+      case 'guardians':
+        return (
+          <div style={{ margin: "auto", width: "80%" }}>
+            <br />
+            <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'students', visible: false })} style={{ float: "left" }}>Previous</Button>
+            <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'declaration', visible: false })} style={{ float: "right" }}>Next </Button>
+          </div>
+        );
+      case 'declaration':
+        return (
+          <div style={{ margin: "auto", width: "80%" }}>
+            <br />
+            <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'guardians', visible: false })} style={{ float: "left" }}>Previous</Button>
+            <Form.Item style={{ float: "right" }}>
+              <Button type="primary" htmlType="submit" onClick={this.handleFormSubmit}>Finish</Button>
+            </Form.Item>
+          </div>
+        );
+    }
+  }
 
   showDrawer = () => {
     // let viewportmeta = document.querySelector('meta[name="viewport"]');
@@ -196,6 +231,7 @@ class GuestLayout extends React.Component {
     }
   }
 
+/* Currently unused (called in func above) */
   handleForm = (formArray) => {
     let initialValues = {}; // Each form has its own initial values and we'll map then using the form's id
 
@@ -211,6 +247,10 @@ class GuestLayout extends React.Component {
     }
 
     return initialValues;
+  }
+
+  handleFormSubmit = () => {
+    console.log("Form Submit to be handled...");
   }
 
   render() {
@@ -254,7 +294,9 @@ class GuestLayout extends React.Component {
           icon={<TeamOutlined />}
           style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%"}}
         >
-          Guardians
+          Guardians {this.checkValiditySection(this.props.guardianForms) ? " Valid" : " Not Valid"}
+          { !this.checkValiditySection(this.props.guardianForms) ?
+          <ExclamationCircleOutlined style={{ color: '#f5222d', fontSize: '1.5em' }} /> : null }
         </Menu.Item>
 
         <Menu.Divider />
@@ -278,30 +320,28 @@ class GuestLayout extends React.Component {
       >
         <Drawer
           title={
-            <a href="http://127.0.0.1:8000/home/" ><RainbowIcon style={{ backgroundColor:"green", fontSize:"inherit"}} /> Rainbow School</a>
+            <a href="http://127.0.0.1:8000/home/" 
+              style={{ display: "flex", flexFlow: "column", justifyContent:"center", alignItems: "center", }}
+            ><RainbowIcon style={{ backgroundColor:"inherit", fontSize:"inherit"}} /> Rainbow School</a>
           }
           placement="left" 
           closable={true} 
-          closeIcon={<CloseOutlined style={{fontSize: '1.2em',}} />} 
+          closeIcon={<CloseOutlined style={{fontSize: '1.2em', color: 'white'}} />} 
           destroyOnClose={true} 
           onClose={this.onClose} 
           visible={this.state.visible} 
           getContainer={false} 
           // drawerStyle={{ height:'100%', }}
-          headerStyle={{backgroundColor: 'darkblue', }} 
+          headerStyle={{backgroundColor: '#111d2c', }} 
           bodyStyle={{padding: '0'}}
           drawerStyle={{border: '2px solid white'}} 
         >
           { drawerContents }
         </Drawer>
 
-        <Layout key={"Layout" + this.state.selectedMenuItem} className="site-layout"
-          // style={{ minHeight: '100vh', maxWidth: '100vw', margin: '0', padding:'1em' }}
-          // style={{ paddingLeft: this.state.leftMargin }}
-        >
-          {/* <Header className="site-layout-background" style={{ padding: 0, height: '48px' }}> */}
+        <Layout key={"Layout" + this.state.selectedMenuItem} className="site-layout">
           <Header style={{ position: 'fixed', zIndex: 1, width: '100vw' }}>
-            <Button type="primary" onClick={this.showDrawer} icon={<MenuOutlined />} style={{backgroundColor: 'inherit', width: "50px"}}>
+            <Button type="primary" onClick={this.showDrawer} icon={<MenuOutlined style={{fontSize: "1.5em"}} />} style={{backgroundColor: 'inherit', borderColor: "white"}}>
             </Button>
             {/* <MenuOutlined onClick={this.showDrawer} /> */}
           </Header>
@@ -312,15 +352,14 @@ class GuestLayout extends React.Component {
               {/* <Form key={this.state.selectedMenuItem} layout='vertical' >
               {this.componentSwitch(this.state.selectedMenuItem)}
             </Form> */}
-              {this.componentSwitch(this.state.selectedMenuItem)}
+
+              <Form.Provider>
+                {this.componentSwitch(this.state.selectedMenuItem)}
+
+              </Form.Provider>
             </div>
 
-            <div style={{ margin: "auto", width: "80%" }}>
-              <br />
-              <Button type="danger" htmlType="button" style={{ float: "right" }}>Previous</Button>
-              {/* <Button type="danger" htmlType="button" onClick={(e) => this.componentSwitch('declaration')} style={{ float: "left" }}>Next</Button> */}
-              <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'declaration', visible: false })} style={{ float: "left" }}>Next</Button>
-            </div>
+            { this.controlSwitch(this.state.selectedMenuItem) }
 
           </Content>
 
@@ -336,7 +375,6 @@ class GuestLayout extends React.Component {
 
 
 const mapStateToProps = state => {
-  //console.log("Forms state-to-props: ", state);
   return {
     guestForm: state.guest.guestForm,
     studentForms: state.guest.studentForms,
