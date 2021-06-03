@@ -6,32 +6,24 @@ import { RainbowIcon } from '../../components/Icons';
 
 // import { Flex } from 'antd-mobile';
 // import { Drawer } from 'antd-mobile';
-
 import { Layout, Menu, Breadcrumb, Form, Button, Drawer, Badge } from 'antd';
-import {
-  ProfileOutlined,
-  UserAddOutlined,
-  TeamOutlined,
-  WalletOutlined,
-  CloseOutlined,
-  CloseSquareOutlined,
-  MenuOutlined, 
-  ExclamationCircleOutlined, 
+import { ProfileOutlined, UserAddOutlined, TeamOutlined, WalletOutlined,
+  CloseOutlined, CloseSquareOutlined, MenuOutlined, ExclamationCircleOutlined, 
 } from '@ant-design/icons';
 
 import './layout.css';  
 
-import * as actions from '../../store/actions/guest';
+import * as guestActions from '../../store/actions/guest';
+import * as formActions from '../../store/actions/form';
 
 import GuestInfo from './GuestForm';
-// import GuardianForm from '../throwaways/GuardianForm';
-// import StudentForm from '../throwaways/StudentForm';
 import GuardianFormContainer from './GuardianFormContainer';
 import StudentFormContainer from './StudentFormContainer';
 import Declaration from './Declaration';
 
-
 const { Header, Content, Footer, Sider } = Layout;
+
+const menuItemStyle = { paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%", fontSize:"1.2em", display: "flex", alignItems:"center", paddingLeft:"3em" }
 
 function callback(key) {
   console.log(key);
@@ -61,7 +53,6 @@ class GuestLayout extends React.Component {
     };
 
     this.componentSwitch = this.componentSwitch.bind(this);
-    this.onCollapse = this.onCollapse.bind(this);
   }
 
   componentDidMount() {
@@ -129,10 +120,7 @@ class GuestLayout extends React.Component {
           <div>
             <Declaration 
               id={declaration_id} 
-              fileSelected={
-                (this.props.images[declaration_id]) ? true : false
-              } 
-              />
+            />
           </div>
         );
       default:
@@ -194,25 +182,12 @@ class GuestLayout extends React.Component {
     });
   };
 
+  /* Currently Unused */
   onOpenChange = () => {
     this.setState({
       visible: !this.state.visible,
     });
   }
-
-  onCollapse = (collapsed) => {
-    console.log(collapsed);
-    //let layout = document.querySelector('.site-layout');
-    if (collapsed){
-      this.setState({ collapsed: collapsed, leftMargin: 80});
-    } else {
-      
-      this.setState({ collapsed: collapsed });
-      setTimeout( () => this.setState({ leftMargin: 200 }) , 100);
-    }
-    // this.setState({ collapsed });
-    
-  };
 
 
 /* Currently unused */
@@ -251,6 +226,11 @@ class GuestLayout extends React.Component {
 
   handleFormSubmit = () => {
     console.log("Form Submit to be handled...");
+    this.props.handleSubmit(this.props.guestForm, 
+                            this.props.studentForms, 
+                            this.props.guardianForms, 
+                            this.props.declarationForm, this.props.images);
+    
   }
 
   render() {
@@ -272,9 +252,9 @@ class GuestLayout extends React.Component {
         <Menu.Item
           key="guest-details"
           icon={<ProfileOutlined />}
-          style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%"}}
+          style={menuItemStyle}
         >
-          Guest Details
+          Guest Account
         </Menu.Item>
 
         <Menu.Divider />
@@ -282,9 +262,9 @@ class GuestLayout extends React.Component {
         <Menu.Item
           key="students"
           icon={<UserAddOutlined />}
-          style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%"}}
+          style={menuItemStyle} 
         >
-          Students
+          <span>Students</span>
         </Menu.Item>
 
         <Menu.Divider />
@@ -292,7 +272,7 @@ class GuestLayout extends React.Component {
         <Menu.Item
           key="guardians"
           icon={<TeamOutlined />}
-          style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%"}}
+          style={menuItemStyle}
         >
           Guardians {this.checkValiditySection(this.props.guardianForms) ? " Valid" : " Not Valid"}
           { !this.checkValiditySection(this.props.guardianForms) ?
@@ -304,7 +284,7 @@ class GuestLayout extends React.Component {
         <Menu.Item
           key="declaration"
           icon={<WalletOutlined />}
-          style={{ paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%"}}
+          style={menuItemStyle}
         >
           Declaration
         </Menu.Item>
@@ -340,7 +320,7 @@ class GuestLayout extends React.Component {
         </Drawer>
 
         <Layout key={"Layout" + this.state.selectedMenuItem} className="site-layout">
-          <Header style={{ position: 'fixed', zIndex: 1, width: '100vw' }}>
+          <Header style={{ position: 'fixed', zIndex: 1, width: '100vw', paddingLeft: "3em" }}>
             <Button type="primary" onClick={this.showDrawer} icon={<MenuOutlined style={{fontSize: "1.5em"}} />} style={{backgroundColor: 'inherit', borderColor: "white"}}>
             </Button>
             {/* <MenuOutlined onClick={this.showDrawer} /> */}
@@ -355,7 +335,6 @@ class GuestLayout extends React.Component {
 
               <Form.Provider>
                 {this.componentSwitch(this.state.selectedMenuItem)}
-
               </Form.Provider>
             </div>
 
@@ -382,13 +361,18 @@ const mapStateToProps = state => {
     guardianForms: state.guest.guardianForms,
     guardianUID: state.guest.guardianUID,
     declaration: state.guest.declarationForm,
-    images: state.guest.images
+    images: state.guest.images, 
+
+    /* Form Submission Props */
+    submitStatus: state.form.submitStatus, 
+    loading: state.form.loading, 
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    addForm: (forms, uid, currentForm) => dispatch(actions.addForm(forms, uid, currentForm)),
+    addForm: (forms, uid, currentForm) => dispatch(guestActions.addForm(forms, uid, currentForm)), 
+    handleSubmit: (guestForm, studentForms, guardianForms, declarationForm, images) => dispatch(formActions.handleSubmit(guestForm, studentForms, guardianForms, declarationForm, images)),
   }
 }
 

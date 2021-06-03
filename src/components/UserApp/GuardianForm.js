@@ -26,7 +26,7 @@ const removeIcon = <CloseSquareOutlined
 /**
  * Class-based Component for an individual guardian form 
  *
- * @version 
+ * @version 0.1
  * @author [Kofi Poku](https://github.com/pokuk76)
  */
 class GuardianFormComponent extends React.Component {
@@ -34,10 +34,8 @@ class GuardianFormComponent extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            uploading: false,
-            currentId: -1, 
-        };
+        // this.state = {
+        // };
 
         this.debounceHandleChange = debounce(this.debounceHandleChange.bind(this), 500);
         this.handleChange = this.handleChange.bind(this);
@@ -124,6 +122,41 @@ class GuardianFormComponent extends React.Component {
               removeIcon: removeIcon,
             },
         };
+
+        const imageUpload = (
+            fileSelected
+                ?
+                <Upload {...uploadProps} >
+
+                </Upload>
+                :
+                <ImgCrop>
+                    <Dragger {...uploadProps} disabled={fileSelected} >
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">Please provide a photo suitable for official identification</p>
+                        <p className="ant-upload-hint">
+                            Click or drag image to this area to upload
+                                </p>
+                    </Dragger>
+                </ImgCrop>
+        );
+
+        const removeFormButton = (
+            (Object.keys(this.props.guardianForms).length > 1)
+                ?
+                <Form.Item style={{ marginTop: '1em' }}>
+                    <Button
+                        type='danger'
+                        onClick={() => this.props.removeForm(this.props.guardianForms, this.props.guardianFormsValid, this.props.formUID, 'GuardianForm', this.props.images)}
+                    >
+                        Remove
+                            </Button>
+                </Form.Item>
+                :
+                <></>
+        );
 
         return (
             <Form
@@ -269,9 +302,10 @@ class GuardianFormComponent extends React.Component {
                     ]}
                 >
                     <Select
-                        showSearch
+                        showSearch 
+                        notFoundContent={<p>Not Found</p>}
                         style={{ width: 200 }}
-                        placeholder="Relationship with students"
+                        placeholder="Relationship to students"
                         optionFilterProp="children"
                         // onChange={onChange}
                         // onFocus={onFocus}
@@ -289,26 +323,16 @@ class GuardianFormComponent extends React.Component {
 
                 {/* TODO: Maybe change this so that they just indicate/list which students live with the guardian */}
                 <Form.Item name={this.props.formUID + "+lives_with_guardian"}
-                    label="Do the students live with guardian?"
+                    label="Students that live with this parent/guardian"
                     rules={[
                         {
                             required: true,
-                            message: 'Please indicate whether students live with this guardian',
+                            message: 'Please indicate which students live with this guardian',
                         },
                     ]}
                 >
-                    {/* This is going to be a checkbox */}
-                    <Select
-                        style={{ width: 200 }}
-                        placeholder="Select yes or no"
-                        optionFilterProp="children"
-                        filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                    >
-                        <Option value="yes">Yes</Option>
-                        <Option value="no">No</Option>
-                    </Select>
+                    <Input.TextArea />
+
                 </Form.Item>
 
                 <Form.Item name={this.props.formUID + "+occupation"} label="Occupation:"
@@ -356,41 +380,9 @@ class GuardianFormComponent extends React.Component {
                 </Form.Item>
 
                 {/* {fileList.append(formUID)} */}
-                {
-                    fileSelected
-                        ?
-                        <Upload {...uploadProps} >
+                { imageUpload }
 
-                        </Upload>
-                        :
-                        <ImgCrop>
-                            <Dragger {...uploadProps} disabled={fileSelected} >
-                                <p className="ant-upload-drag-icon">
-                                    <InboxOutlined />
-                                </p>
-                                <p className="ant-upload-text">Please provide a photo suitable for official identification</p>
-                                <p className="ant-upload-hint">
-                                    Click or drag image to this area to upload
-                                </p>
-                            </Dragger>
-                        </ImgCrop>
-
-                }
-
-                {
-                    (Object.keys(this.props.guardianForms).length > 1)
-                        ?
-                        <Form.Item style={{ marginTop: '1em' }}>
-                            <Button
-                                type='danger'
-                                onClick={() => this.props.removeForm(this.props.guardianForms, this.props.guardianFormsValid, this.props.formUID, 'GuardianForm', this.props.images)}
-                            >
-                                Remove
-                            </Button>
-                        </Form.Item>
-                        :
-                        <></>
-                }
+                { removeFormButton }
             </Form>
         );
     }

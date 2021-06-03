@@ -50,6 +50,8 @@ class StudentFormComponent extends React.Component {
         };
         this.debounceHandleChange = debounce(this.debounceHandleChange.bind(this), 500);
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeSelect = this.handleChangeSelect.bind(this);
+
     }
 
     debounceHandleChange(form, field, value) {
@@ -72,6 +74,16 @@ class StudentFormComponent extends React.Component {
        let field = e.target.id.split("+")[1];
        let value = e.target.value; 
        this.debounceHandleChange(form, field, value);
+    }
+
+    handleChangeSelect(value) {
+        console.log("Handle Select component change event: ", value);
+    }
+
+    handleChangeDate(dateMoment, dateString) {
+        console.log("Handle DatePicker change (date moment obj): ", dateMoment);
+        // Should probably just send a dateString and convert that on the backend to DateField
+        console.log("Handle DatePicker change (date string): ", dateString);
     }
     
     render() {
@@ -157,6 +169,41 @@ class StudentFormComponent extends React.Component {
 
         };
 
+        const imageUpload = (
+            fileSelected
+                ?
+                <Upload {...uploadProps} >
+
+                </Upload>
+                :
+                <ImgCrop>
+                    <Dragger {...uploadProps} disabled={fileSelected} >
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">Please provide a photo suitable for official identification</p>
+                        <p className="ant-upload-hint">
+                            Click or drag image to this area to upload
+                                </p>
+                    </Dragger>
+                </ImgCrop>
+        );
+
+        const removeFormButton = (
+            (Object.keys(this.props.studentForms).length > 1)
+                ?
+                <Form.Item style={{ marginTop: '1em' }}>
+                    <Button
+                        type='danger'
+                        onClick={() => this.props.removeForm(this.props.studentForms, this.props.studentFormsValid, this.props.formUID, 'StudentForm')}
+                    >
+                        Remove
+                        </Button>
+                </Form.Item>
+                :
+                <></>
+        );
+
         return (
             <Form 
                 key={"StudentForm"} 
@@ -177,6 +224,7 @@ class StudentFormComponent extends React.Component {
                     <Input
                         placeholder="Enter first name"
                         onChange={(e) => this.handleChange(e)}
+                        onBlur={(e) => {console.log("First name blur event: ", e)}}
                     />
                 </Form.Item>
 
@@ -231,9 +279,10 @@ class StudentFormComponent extends React.Component {
                         filterOption={(input, option) =>
                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
+                        onChange={(value) => this.handleChangeSelect(value)}
                     >
-                        <Option value="male">M</Option>
-                        <Option value="female">F</Option>
+                        <Option value="male">Male</Option>
+                        <Option value="female">Female</Option>
                     </Select>
                 </Form.Item>
 
@@ -254,10 +303,21 @@ class StudentFormComponent extends React.Component {
                             // iconRender={<CalendarOutlined />} 
                             /> : <DatePicker />
                         } */}
-                    <DatePicker />
+                    <DatePicker onChange={(dateMoment, dateString) => this.handleChangeDate(dateMoment, dateString)} />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+has_ailments"} label="Does this student have allergies or ailments?">
+                <Form.Item name={this.props.formUID + "+image_file"} label="Passport Photo: "
+                    rules={[
+                        {
+                            required: true,
+                            message: 'A passport-style photo is required', 
+                        },
+                    ]}
+                >
+                    { imageUpload }
+                </Form.Item>
+
+                <Form.Item name={this.props.formUID + "+has_ailments"} label="Please list any allergies or ailments">
                     <Input.TextArea />
                 </Form.Item>
 
@@ -299,45 +359,11 @@ class StudentFormComponent extends React.Component {
 
                 {/* {console.log('Form ID: ', formUID)} */}
                 {/* {fileList.append(formUID)} */}
-                {
-                    fileSelected
-                        ?
-                        <Upload {...uploadProps} >
 
-                        </Upload>
-                        :
-                        <ImgCrop>
-                            <Dragger {...uploadProps} disabled={fileSelected} >
-                                <p className="ant-upload-drag-icon">
-                                    <InboxOutlined />
-                                </p>
-                                <p className="ant-upload-text">Please provide a photo suitable for official identification</p>
-                                <p className="ant-upload-hint">
-                                    Click or drag image to this area to upload
-                                </p>
-                            </Dragger>
-                        </ImgCrop>
-
-                }
-
-                {
-                    (Object.keys(this.props.studentForms).length > 1)
-                    ?
-                    <Form.Item style={{marginTop: '1em'}}>
-                        <Button
-                            type='danger'
-                            onClick={() => this.props.removeForm(this.props.studentForms, this.props.studentFormsValid, this.props.formUID, 'StudentForm')}
-                        >
-                            Remove
-                        </Button>
-                    </Form.Item>
-                    :
-                    <></>
-                }
+                { removeFormButton }
             </Form>
         );
     }
-
 }
 
 

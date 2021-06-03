@@ -1,4 +1,3 @@
-import axios from 'axios';
 import * as actionTypes from './actionTypes';
 
 const GUEST_INFO = 'GuestForm';
@@ -7,11 +6,11 @@ const GUARDIAN_FORM = 'GuardianForm';
 const DECLARATION_FORM = 'DeclarationForm';
 const RESET_VALUES_ON_DEFAULT = 'RESET_VALUES_ON_DEFAULT';
 
-export const updateGuestInfo = (guestInfo, images={}) => {
+
+export const updateGuestInfo = (guestInfo) => {
     return {
         type: actionTypes.GUEST_INFO,
         guestForm: guestInfo,
-        images: images
     }
 }
 

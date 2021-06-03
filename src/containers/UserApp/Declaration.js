@@ -20,10 +20,12 @@ class Declaration extends React.Component {
     this.state = {
       fileList: [],
       uploading: false,
-      fileSelected: this.props.fileSelected,
+      fileSelected: this.props.fileSelected, 
       declaration: this.props.declaration // We're passing by reference, which actually works for us 
                                       // but might cause issues later?
     };
+
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
 
   }
 
@@ -31,6 +33,17 @@ class Declaration extends React.Component {
    * Called when an input field changes
    * 
    * @param {Event} e - A change event?
+   */
+  handleCheckboxChange = (e) => {
+    /* The id is the name of the Form.Item wrapping the input
+    It is also the key needed for the given form object
+    */
+    console.log("Checkbox Event: ", e);
+  }
+
+  /**
+   * Called when an input field changes
+   * @param {Event} e - A change event
    */
   handleChange = (e) => {
     /* The id is the name of the Form.Item wrapping the input
@@ -260,7 +273,7 @@ class Declaration extends React.Component {
             <Form.Item name="agreed"
                 style={myStyle} 
             >
-              <Checkbox><b>I have read and agreed to this declaration.</b></Checkbox>
+              <Checkbox onChange={(e) => this.handleCheckboxChange(e)}><b>I have read and agreed to this declaration.</b></Checkbox>
             </Form.Item>
 
             <Form.Item name="signature" label="Signature:"

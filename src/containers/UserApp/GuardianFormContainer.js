@@ -1,21 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Button, Select, Upload, Collapse, Breadcrumb, Modal, BackTop } from 'antd';
-import ImgCrop from 'antd-img-crop';
-import { InboxOutlined, FileAddOutlined, CloseSquareOutlined, SaveOutlined, 
-        TeamOutlined, RightOutlined, ArrowUpOutlined 
-    } from '@ant-design/icons';
+import { Button, Collapse, Breadcrumb, Modal, BackTop } from 'antd';
+import {
+    InboxOutlined, FileAddOutlined, CloseSquareOutlined, SaveOutlined,
+    TeamOutlined, RightOutlined, ArrowUpOutlined
+} from '@ant-design/icons';
 
-import { formsCopy } from '../../utility/deepCopy';
 import { getInitialValues } from '../../utility/forms';
 
 import * as actions from '../../store/actions/guest';
 
 import GuardianFormComponent from '../../components/UserApp/GuardianForm';
-
-const { Option } = Select;
-const { Dragger } = Upload;
 
 /* For the Select component */
 function onChange(value) {
@@ -80,16 +76,12 @@ class GuardianForm extends React.Component {
 
         this.state = {
             forms: [],
-            filesObject: {},
             initialFormValues: {},
-            uploading: false,
-            currentId: -1, 
+            // currentId: -1, 
             modalVisible: false, 
             modalContent: <></>, 
         };
 
-        this.onRemoveImage = this.onRemoveImage.bind(this);
-        this.onPreview = this.onPreview.bind(this);
         // this.onCollapse = this.onCollapse.bind(this);
         this.renderForms = this.renderForms.bind(this);
         this.onExpand = this.onExpand.bind(this);
@@ -98,16 +90,6 @@ class GuardianForm extends React.Component {
     onExpand(key) {
         console.log("On expand:", key);
         return 90;
-    }
-
-    handleChange(e) {
-        /* The id is the name of the Form.Item wrapping the input
-        It is also the key needed for the given form object
-        */
-
-        let form = e.target.id.split("+")[0];
-        let field = e.target.id.split("+")[1];
-        this.props.guardianForms[form][field] = e.target.value;
     }
 
     showModal = (body) => {
@@ -131,31 +113,6 @@ class GuardianForm extends React.Component {
         });
     };
     
-    onRemoveImage() {
-        this.props.removeImage(this.props.images, this.props.id, this.props.guardianForms)
-        this.setState(
-            {
-                // fileList: this.props.images[this.props.id],
-                filesObject: {},
-                // fileSelectedObject: {},
-            }
-        );
-    }
-
-    onPreview = async file => {
-        let src = file.url;
-        if (!src) {
-            src = await new Promise(resolve => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-            });
-        }
-        const image = new Image();
-        image.src = src;
-        const imgWindow = window.open(src);
-        imgWindow.document.write(image.outerHTML);
-    }
 
     componentDidMount() {
         getInitialValues(this.props.guardianForms);
@@ -165,7 +122,6 @@ class GuardianForm extends React.Component {
             left: 0, 
             behavior: 'smooth'
         });
-        console.log("Guardian forms copy: ", formsCopy(this.props.guardianForms));
     }
 
     componentDidUpdate(prevProps){
@@ -173,16 +129,14 @@ class GuardianForm extends React.Component {
             Feels mad ghetto but it's working
             TODO: Try adding a state change on add and remove to re-render
         */
-        // console.log("Prev props:", prevProps);
-        // console.log("current props:", this.props);
-        // console.log("State images:", this.state.images);
+
         if(prevProps.guardianForms !== this.props.guardianForms || prevProps.images !== this.props.images ){
             // console.log("A disturbance in the force");
-            this.setState(
-                {
-                    images: this.props.images
-                }
-            );
+            // this.setState(
+            //     {
+            //         images: this.props.images
+            //     }
+            // );
             this.renderForms();
         }
     }
@@ -194,7 +148,7 @@ class GuardianForm extends React.Component {
                 valid = valid && this.props.guardianFormsValid[formUID][element];
             }
             catch(error) {
-                valid = valid && true;
+                valid = valid && true;  // If the form or element is undefined, we leave valid unchanged TODO: does this make sense?
             }
         }
         return valid;
@@ -202,14 +156,12 @@ class GuardianForm extends React.Component {
     
     /**
      * Method to create the forms for the container, which are held in state
-     * 
      * Called when the GuardianFormContainer mounts and when it updates
      * 
      * TODO: Make this better?
      */
     renderForms(){
         // console.log("Rendering forms...");
-        const { uploading } = this.state;
 
         var forms = [];
         let i = 0;
@@ -219,10 +171,10 @@ class GuardianForm extends React.Component {
             // let fileSelected = (this.props.images[formUID]) ? true : false;
             // let fileList = (this.props.images[formUID] === undefined) ? [] : this.props.images[formUID];
             var key = "GuardianPanel" + i;
-            this.setState(
-            {
-                currentId: formUID,
-            });
+            // this.setState(
+            // {
+            //     currentId: formUID,
+            // });
 
             const guardianFormProps = {
                 showModal: this.showModal,
@@ -230,7 +182,7 @@ class GuardianForm extends React.Component {
                 initialValues: initialFormValues[formUID]
             }
 
-            let removeIcon = <CloseSquareOutlined
+            let closeIcon = <CloseSquareOutlined
                 onClick={event => {
                     event.stopPropagation();
                     this.props.removeForm(this.props.guardianForms, this.props.guardianFormsValid, formUID, 'GuardianForm', this.props.images);
@@ -254,7 +206,7 @@ class GuardianForm extends React.Component {
                 extra={
                     (Object.keys(this.props.guardianForms).length > 1) ? 
 
-                    <Button type="text" icon={removeIcon} style={{padding: 0}} danger>
+                    <Button type="text" icon={closeIcon} style={{padding: 0}} danger>
                         
                     </Button>
                      : <></>
@@ -387,5 +339,5 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-connect(mapStateToProps, mapDispatchToProps)(Dragger);
+// connect(mapStateToProps, mapDispatchToProps)(Dragger);
 export default connect(mapStateToProps, mapDispatchToProps)(GuardianForm);

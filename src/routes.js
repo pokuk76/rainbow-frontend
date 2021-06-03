@@ -21,7 +21,7 @@ const BaseRouter = () => (
             <Route exact path='/login' render={matchProps => <CustomLayout {...matchProps} ><Login {...matchProps} /></CustomLayout>} />
 
             <Route exact path='/test' render={matchProps => <GuestLayout {...matchProps} ></GuestLayout>} />
-            <Route exact path='/test/success' render={matchProps => <div {...matchProps} ><h1>Submit Successful</h1></div>} />
+            {/* <Route exact path='/test/success' render={matchProps => <div {...matchProps} ><h1>Submit Successful</h1></div>} /> */}
 
         </Switch>
         

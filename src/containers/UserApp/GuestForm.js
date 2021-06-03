@@ -168,7 +168,7 @@ class GuestInfo extends React.Component {
       multiple: false,
 
       onRemove: () => {
-        this.props.removeImage(this.props.images, this.props.id, this.props.guestForm)
+        this.props.removeImage(this.props.images, this.props.id)
         this.setState(state => {
           return {
             fileList: [],
@@ -179,7 +179,7 @@ class GuestInfo extends React.Component {
 
       beforeUpload: file => {
         // console.log(this.props);
-        this.props.persistImage(this.props.images, this.props.id, file, this.props.guestForm);
+        this.props.persistImage(this.props.images, this.props.id, file);
         this.setState(state => ({
           fileList: this.props.images[this.props.id],
           fileSelected: true,
@@ -328,7 +328,7 @@ class GuestInfo extends React.Component {
             />
           </Form.Item>
 
-          { imageUpload }
+          {/* { imageUpload } */}
 
           <Modal
             title="Basic Modal"
@@ -359,8 +359,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     updateForm: (guestForm) => dispatch(actions.updateGuestInfo(guestForm)),
-    persistImage: (images, id, file, formData) => dispatch(actions.addImage(images, id, file, formData)),
-    removeImage: (images, id, formData) => dispatch(actions.removeImage(images, id, formData)),
+    persistImage: (images, id, file) => dispatch(actions.addImage(images, id, file)),
+    removeImage: (images, id) => dispatch(actions.removeImage(images, id)),
   }
 }
 

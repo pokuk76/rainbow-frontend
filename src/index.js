@@ -6,6 +6,8 @@ import * as serviceWorker from './serviceWorker';
 
 import authReducer from './store/reducers/auth';
 import guestReducer from './store/reducers/guest';
+import formReducer from './store/reducers/form';
+
 import { createStore, compose, applyMiddleware, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
@@ -13,7 +15,8 @@ import thunk from 'redux-thunk';
 const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const reducer = combineReducers({
     auth: authReducer,
-    guest: guestReducer
+    guest: guestReducer, 
+    form: formReducer, 
 });
 
 const store = createStore(reducer, composeEnhancer(

@@ -13,7 +13,7 @@ class App extends Component {
 
   componentDidMount = state => {
     // TODO: Remove this, this is where the random AUTH_FAIL action is coming from
-    this.props.onTryAutoSignup();
+    // this.props.onTryAutoSignup();
   }
 
 

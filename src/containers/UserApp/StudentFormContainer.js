@@ -1,19 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Button, Select, Upload, Collapse, Breadcrumb, Modal } from 'antd';
-import ImgCrop from 'antd-img-crop';
-import { InboxOutlined, FileAddOutlined, CloseSquareOutlined, SaveOutlined, UserAddOutlined, RightOutlined, CalendarOutlined } from '@ant-design/icons';
-
-import { formsCopy } from '../../utility/deepCopy';
+import { Button, Collapse, Breadcrumb, Modal } from 'antd';
+import {
+    InboxOutlined, FileAddOutlined, CloseSquareOutlined, SaveOutlined, UserAddOutlined,
+    RightOutlined, CalendarOutlined
+} from '@ant-design/icons';
 
 import { getInitialValues } from '../../utility/forms';
 import * as actions from '../../store/actions/guest';
 
 import StudentFormComponent from '../../components/UserApp/StudentForm';
-
-const { Option } = Select;
-const { Dragger } = Upload;
 
 // Opera 8.0+
 // const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
@@ -89,7 +86,6 @@ class StudentForm extends React.Component {
             fileList: this.props.fileList,
             uploading: false,
             fileSelected: this.props.fileSelected,
-            currentId: -1, 
             modalVisible: false, 
             modalContent: <></>, 
             // studentForms: this.props.studentForms // We're passing by reference, which actually works for us 
@@ -100,17 +96,6 @@ class StudentForm extends React.Component {
         this.renderForms = this.renderForms.bind(this);
     }
 
-    handleChange = (e) => {
-        /* The id is the name of the Form.Item wrapping the input
-        It is also the key needed for the given form object
-        */
-
-        let form = e.target.id.split("+")[0];
-        let field = e.target.id.split("+")[1];
-
-        this.props.studentForms[form][field] = e.target.value;
-    }
-
     componentDidMount() {
         this.renderForms();
         window.scroll({
@@ -118,22 +103,14 @@ class StudentForm extends React.Component {
             left: 0, 
             behavior: 'smooth'
         });
-        console.log("Student forms copy: ", formsCopy(this.props.studentForms));
     }
 
     componentDidUpdate(prevProps){
         /*  Added this to ensure that the forms re-render on add or remove
             Feels mad ghetto but it's working
         */
-    //    console.log("Prev props:", prevProps);
-    //    console.log("State images:", this.state.images);
+
         if(prevProps.studentForms !== this.props.studentForms || prevProps.images !== this.props.images ){
-            // console.log("A disturbance in the force");
-            // this.setState(
-            //     {
-            //         images: this.props.images
-            //     }
-            // );
             this.renderForms();
         }
     }
@@ -161,6 +138,7 @@ class StudentForm extends React.Component {
 
 
 
+    /* Currently Unused */
     
     getInitialValues() {
         const studentForms = this.props.studentForms;
@@ -197,10 +175,6 @@ class StudentForm extends React.Component {
             // let fileSelected = (this.props.images[formUID]) ? true : false;
             // let fileList = this.props.images[formUID];
             var key = "StudentPanel" + i;
-            this.setState(
-            {
-                currentId: formUID,
-            });
             let closeIcon = <CloseSquareOutlined
                 // onMouseEnter={console.log("Square Hover")}
 
@@ -258,7 +232,7 @@ class StudentForm extends React.Component {
 
     render() {
 
-        const initialValues = this.getInitialValues();
+        // const initialValues = this.getInitialValues();
         // console.log("Initial Values: ", initialValues);
 
         return (
@@ -325,5 +299,5 @@ const mapStateToProps = state => {
     }
   }
   
-  connect(mapStateToProps, mapDispatchToProps)(Dragger);
+//   connect(mapStateToProps, mapDispatchToProps)(Dragger);
   export default connect(mapStateToProps, mapDispatchToProps)(StudentForm);

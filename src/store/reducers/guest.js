@@ -63,8 +63,9 @@ const initialState = {
         }, 
     }, 
     declarationForm: {},
-    images: {}  // key-value pairs where the key is the form UID 
+    images: {},  // key-value pairs where the key is the form UID 
                 // and the value is an array holding a single image file object 
+    submitStatus: null, 
 }
 
 const updateImages = (state, action) => {
@@ -74,18 +75,7 @@ const updateImages = (state, action) => {
 }
 
 const updateGuestInfo = (state, action) => {
-    return updateObject(state, 
-        (action.images==={})
-        ?
-        {
-            guestForm: action.guestForm,
-        }
-        :
-        {
-            guestForm: action.guestForm,
-            images: action.images
-        } 
-    );
+    return updateObject(state, { guestForm: action.guestForm, });
 }
 
 const updateStudents = (state, action) => {
@@ -133,7 +123,7 @@ const updateDeclaration = (state, action) => {
 }
 
 const guestReducer = (state=initialState, action) => {
-    switch (action.type){
+    switch (action.type) {
         case actionTypes.GUEST_INFO:
             return updateGuestInfo(state, action);
         case actionTypes.GUARDIAN_FORM:

@@ -68,7 +68,7 @@ export const authLogin = (username, password, callback) => {
             // TODO: Do I need to call the callback within a dispatch?
             callback();
         })
-    }
+    };
 }
 
 export const authSignup = (username, email=null, password1, password2) => {
