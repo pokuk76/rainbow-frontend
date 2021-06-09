@@ -1,16 +1,24 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
+import debounce from "lodash/debounce";
 
 import { Form, Input, Button, Upload, Modal, Progress } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
-import { guestFormCopy } from '../../utility/deepCopy';
 import * as actions from '../../store/actions/guest';
+import * as actionTypes from '../../store/actions/actionTypes';
+import { guestFormCopy } from '../../utility/deepCopy';
+import { guestFormItems, checkValidityItem } from '../../utility/forms';
+
+import ValidationMessage from '../../components/ValidationMessage';
 import { DeleteIcon } from '../../components/Icons';
 
 const { Dragger } = Upload;
+
+const testInvalidSubmitState = true;
+
 
 /**
  * Class-based Component for guest user's to input information/details
@@ -35,7 +43,11 @@ class GuestInfo extends React.Component {
       usernames: ["username1", "username2", "poku.flacko"], //Just some dummy date for if I'm not running the backend locally TODO: Remove this for production
     };
 
+    this.debounceHandleChange = debounce(this.debounceHandleChange.bind(this), 1000);
+    this.handleChange = this.handleChange.bind(this);
+
   }
+
   componentDidMount() {
     window.scroll({
       top: 0,
@@ -64,6 +76,10 @@ class GuestInfo extends React.Component {
     });
   };
 
+  /**
+   * Called when the user clicks OK on the modal
+   * @param {Event} e - A click event
+   */
   handleOk = (e) => {
     // console.log(e);
     this.setState({
@@ -71,6 +87,10 @@ class GuestInfo extends React.Component {
     });
   };
 
+  /**
+   * Called when the user clicks OK on the modal
+   * @param {Event} e - A change event?
+   */
   handleCancel = (e) => {
     // console.log(e);
     this.setState({
@@ -78,28 +98,43 @@ class GuestInfo extends React.Component {
     });
   };
 
+  //TODO: Maybe add a debounceCheckValidity? Or maybe we actually go with web workers?
+  debounceHandleChange(field, value) {
+
+    let guestForm = guestFormCopy(this.props.guestForm);
+    let guestFormValid = guestFormCopy(this.props.guestFormValid);
+
+    guestForm[field] = value;
+    var rules = guestFormItems[field]['validation_rules'];
+    guestFormValid[field] = checkValidityItem(value, rules);
+    // let testRequired = [{ required: true, message: "Username Required" }, { unique: true, message: "Must be unique" } ];
+    // if(testInvalidSubmitState) {
+    //   this.props.guestFormValid[field] = checkValidityItem(value, guestFormItems[field]['validation_rules']);
+    // }
+    this.props.updateForm(guestForm, guestFormValid);
+  }
+
   /**
    * Called when an input field changes
-   * 
    * @param {Event} e - A change event?
-   * 
    */
   handleChange = (e) => {
     /* The id is the name of the Form.Item wrapping the input
     It is also the key needed for the given form object
     */
     // this.state.guestForm[e.target.id] = e.target.value;
-    let guestForm = guestFormCopy(this.props.guestForm);
-    guestForm[e.target.id] = e.target.value;
-    this.props.updateForm(guestForm);
+    // let guestForm = guestFormCopy(this.props.guestForm);
+    // guestForm[e.target.id] = e.target.value;
+
+    let field = e.target.id;
+    let value = e.target.value; 
+    this.debounceHandleChange(field, value);
   }
 
   /**
-   * TODO: finish this?
+   * TODO: finish this? Get rid of it
    * Gets called when the user clicks on the (Next || Save & Continue) button
-   * 
    * @param {Object} values -  An object holding the form values
-   * 
    */
   handleFormSubmit = (values) => {
     /* Need to understand how onFinish works (how do I override default behaviour then?)*/
@@ -116,6 +151,7 @@ class GuestInfo extends React.Component {
     First name: ${first_name}
     Last name: ${last_name}`);
   };
+
 
   /**
    * Gets called every render. Populates the form with values from the guest store
@@ -152,14 +188,19 @@ class GuestInfo extends React.Component {
     });
   }
 
+  getValidationProps = (key) => {
+    // console.log(this.props.submitStatus);
+    return (this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL) ? this.props.guestFormValid[key] : null;
+  }
+
   render() {
 
     const initialValues = this.getInitialValues();
 
     let closeIcon = <CloseSquareOutlined
       style={{
-        color: 'red',
-        fontSize: '1em',
+        color: 'red', 
+        fontSize: '1em', 
         // paddingRight: '1em',
       }}
     />;
@@ -179,7 +220,7 @@ class GuestInfo extends React.Component {
 
       beforeUpload: file => {
         // console.log(this.props);
-        this.props.persistImage(this.props.images, this.props.id, file);
+        this.props.addImage(this.props.images, this.props.id, file);
         this.setState(state => ({
           fileList: this.props.images[this.props.id],
           fileSelected: true,
@@ -250,12 +291,22 @@ class GuestInfo extends React.Component {
 
     )
 
+    // console.log(this.props.guestFormValid['username'] !== null);
+    // const testItemInvalid = this.props.guestFormValid['username'] !== null;
+
+    // const customValidationProps = ( (testInvalidSubmitState && testItemInvalid) ? 
+    //   { 
+    //     validateStatus: "error", 
+    //     help: <div><div>Should be combination of numbers & alphabets</div><div>Some other nonsense</div></div>
+    //   } : null
+    // );
+
     return (
       <div >
         <Form
           key={"GuestForm"}
           layout='vertical'
-          requiredMark="*"
+          requiredMark={true}
           initialValues={initialValues}
           style={{ padding: '0.5em', }}
         >
@@ -263,19 +314,21 @@ class GuestInfo extends React.Component {
             rules={[
               // Add an object with pattern (holding a regex for acceptable username input) 
               // to rules 
-              {
-                required: true,
-                message: 'Username is required',
-              }, 
+              { required: true, message: 'Username is required' }, 
+              { max: 128, message: 'username must be less than 128 characters' }, 
               { validator: this.checkUsernameUnique }
-              
             ]} 
+            // { ...customValidationProps }
+            {  ...this.getValidationProps('username')  }
             // rules={[{ validator: this.validateUsername}]}
           >
             <Input
               placeholder="Enter username"
               onChange={(e) => this.handleChange(e)}
             />
+            
+            {/* { customValidation } */}
+
           </Form.Item>
 
           <Form.Item name="first_name" label="First Name:"
@@ -285,10 +338,11 @@ class GuestInfo extends React.Component {
                 message: 'Please input your first name',
               },
               {
-                max: 64,
-                message: 'First name must be less than 64 characters'
+                max: 128,
+                message: 'First name must be less than 128 characters'
               }
-            ]}
+            ]} 
+            { ...this.getValidationProps('first_name') }
           >
             <Input
               placeholder="Enter first name"
@@ -299,10 +353,11 @@ class GuestInfo extends React.Component {
           <Form.Item name="middle_name" label="Middle Name:"
             rules={[
               {
-                maxLength: 64,
-                message: 'Middle name must be less than 64 characters'
+                max: 128,
+                message: 'Middle name must be less than 128 characters'
               }
-            ]}
+            ]} 
+            {  ...this.getValidationProps('middle_name')  }
           >
             <Input
               placeholder="Enter middle name"
@@ -312,15 +367,10 @@ class GuestInfo extends React.Component {
 
           <Form.Item name="last_name" label="Last Name:"
             rules={[
-              {
-                required: true,
-                message: 'Please input your last name',
-              },
-              {
-                maxLength: 64,
-                message: 'Last name must be less than 64 characters'
-              }
-            ]}
+              { required: true, message: 'Please input your last name' },
+              { max: 128, message: 'Last name must be less than 64 characters' }
+            ]} 
+            {  ...this.getValidationProps('last_name')  }
           >
             <Input
               placeholder="Enter last name"
@@ -352,14 +402,17 @@ const mapStateToProps = state => {
   return {
     selectedMenuItem: state.guest.selectedMenuItem,
     guestForm: state.guest.guestForm,
-    images: state.guest.images
+    images: state.guest.images, 
+    guestFormValid: state.guest.guestFormValid, 
+    
+    submitStatus: state.form.submitStatus, 
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateForm: (guestForm) => dispatch(actions.updateGuestInfo(guestForm)),
-    persistImage: (images, id, file) => dispatch(actions.addImage(images, id, file)),
+    updateForm: (guestForm, guestFormValid) => dispatch(actions.updateGuestInfo(guestForm, guestFormValid)),
+    addImage: (images, id, file) => dispatch(actions.addImage(images, id, file)),
     removeImage: (images, id) => dispatch(actions.removeImage(images, id)),
   }
 }

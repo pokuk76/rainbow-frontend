@@ -1,4 +1,92 @@
-export const guardianFormElements = {
+import React from 'react';
+
+export const guestFormItems = {
+    username: {
+        validation_rules: [ 
+            { required: true, message: "Username Required" }, 
+            { unique: true, message: "Username already exists"}, 
+            { type: "username", message: "Username can only contain alphanumeric characters, punctuation, and special characters" }, 
+            { max: 128, message: "First name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+    first_name: {
+        validation_rules: [ 
+            { required: true, message: "First Name Required" }, 
+            { max: 128, message: "First name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+    middle_name: {
+        validation_rules: [ 
+            { max: 128, message: "Middle name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+    last_name: {
+        validation_rules: [ 
+            { required: true, message: "Last Name Required" }, 
+            { max: 128, message: "Last name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+}
+export const studentFormItems = {
+    first_name: {
+        validation_rules: [ 
+            { required: true, message: "First Name Required" }, 
+            { max: 128, message: "First name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+    middle_name: {
+        validation_rules: [ 
+            { max: 128, message: "Middle name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+    last_name: {
+        validation_rules: [ 
+            { required: true, message: "Last Name Required" }, 
+            { max: 128, message: "Last name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+    sex: {
+        validation_rules: [ 
+            { required: true, message: "Please specify" }, 
+        ], 
+    }, 
+    date_of_birth: {
+        validation_rules: [ 
+            { required: true, message: "Please specify a date of birth" }, 
+        ], 
+    }, 
+    image_file: {
+        validation_rules: [ 
+            { required: true, message: "Please provide a passport-style photo" }, 
+        ], 
+    }, 
+    nationality: {
+        validation_rules: [ 
+            { required: true, message: "Please enter the nationality" }, 
+            { max: 128, message: "Nationality must be less than 128 characters" }, 
+        ], 
+    }, 
+    religion: {
+        validation_rules: [ 
+            { max: 128, message: "Religion must have fewer than 128 characters" }, 
+        ], 
+    }, 
+    has_ailments: {
+        validation_rules: [ ], 
+    }, 
+    former_school: {
+        validation_rules: [ ], 
+    }, 
+    former_school_address: {
+        validation_rules: [ ], 
+    }, 
+    class_reached: {
+        validation_rules: [ ], 
+    }, 
+    reason_for_leaving: {}, 
+}
+
+export const guardianFormItems = {
     first_name: {
         validation_rules: [ 
             { required: true, message: "First Name Required" }, 
@@ -27,6 +115,9 @@ export const guardianFormElements = {
             { type: "email", message: "Please enter a valid a E-mail address" }, 
             { max: 128, message: "E-mail must have fewer than 128 characters" }, 
         ], 
+    }, 
+    image_file: {
+        validation_rules: [ ], 
     }, 
     nationality: {
         validation_rules: [ 
@@ -91,22 +182,39 @@ export const getInitialValues = (formsObj) => {
     // this.setState({initialFormValues: initialValues});
 }
 
-export const checkValidityElement = (value, rules, touched=false, data={}) => {
+// { validateStatus: "error", 
+// help: <div>Should be combination of numbers & alphabets<br/> Some other nonsense<br/></div>}
+export const checkValidityItem = (value, rules, touched=false, data={'username': ["username"]}) => {
     let valid = true;
+    let help_messages = [];
     for(let rule of rules) {
-        switch (rule) {
+        // Each rule is an object of the form { rule_name:[Boolean | data], message: String  }
+        let [rule_name_key, message_key] = Object.keys(rule).slice(0, 2);  // Slice up to index 2 (3rd element) non-inclusive
+        // console.log("Message key: ", message_key);
+        switch (rule_name_key) {
             case "required":
                 if (value === "") {
                     valid = false;
+                    help_messages.push(<div>{rule[message_key]}</div>);
                 }
                 break;
             case "unique":
+                if (data['username'].includes(value)) {
+                    valid = false;
+                    help_messages.push(<div>Some other nonsense</div>)
+                }
                 break;
             default:
-                /* If we somehow encounter a rule that we're not checking, we should probably just set valid to true right? */
-                valid = true;
+                /* If we somehow encounter a rule that we're not checking, we should just set valid to true right?
+                    Ok decided that seemed like a bad idea so lets leave it unchanged?
+                */
+                valid = valid;
         }
     }
-    
-    return valid;
+    let response = !valid ? { validateStatus: "error", help: help_messages } : null;
+    return response;
+}
+
+export const checkValidityForm = () => {
+
 }

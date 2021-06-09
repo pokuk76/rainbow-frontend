@@ -8,7 +8,7 @@ import ImgCrop from 'antd-img-crop';
 import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
 import { formsCopy } from '../../utility/deepCopy';
-import { checkValidityElement } from '../../utility/forms';
+import { checkValidityItem } from '../../utility/forms';
 
 import * as actions from '../../store/actions/guest';
 
@@ -34,11 +34,9 @@ class GuardianFormComponent extends React.Component {
     constructor(props) {
         super(props);
 
-        // this.state = {
-        // };
-
         this.debounceHandleChange = debounce(this.debounceHandleChange.bind(this), 500);
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeSelect = this.handleChangeSelect.bind(this);
     }
 
     debounceHandleChange(form, field, value) {
@@ -48,7 +46,7 @@ class GuardianFormComponent extends React.Component {
         let guardianFormsTouched = formsCopy(this.props.guardianFormsTouched);
 
         guardianForms[form][field] = value;
-        guardianFormsValid[form][field] = checkValidityElement(value, ["required"]);
+        guardianFormsValid[form][field] = checkValidityItem(value, ["required"]);
 
         this.props.updateForms(guardianForms, guardianFormsValid);
         // this.props.updateForms(guardianForms, guardianFormsValid);
@@ -68,8 +66,14 @@ class GuardianFormComponent extends React.Component {
         // this.props.guardianForms[form][field] = e.target.value;
     }
 
-    render() {
+    handleChangeSelect(value, option, itemUID) {
+        console.log("Handle Select component change [value, itemUID, option]: ", value, option, itemUID);
+        let [form, field] = itemUID.split("+");
+        // console.log("form, field: ", form, field);
+        this.debounceHandleChange(form, field, value);
+    }
 
+    render() {
         let fileSelected = false;
         let fileList = [];
         try {
@@ -236,13 +240,14 @@ class GuardianFormComponent extends React.Component {
                     <Input
                         placeholder="Enter your phone number"
                         type="tel"
-                        maxLength={13}
+                        // maxLength={13}
+                        // TODO: Think it's best if we remove this for now and let the validation feedback show. Should figure out a way to have both later
 
                         onChange={e => this.handleChange(e)}
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+email_address"} label="Email:"
+                <Form.Item name={this.props.formUID + "+email_address"} label="Email Address:"
                     rules={[
                         {
                             type: 'email',
@@ -261,6 +266,17 @@ class GuardianFormComponent extends React.Component {
                     />
                 </Form.Item>
 
+                <Form.Item name={this.props.formUID + "+image_file"} label="Passport Photo: "
+                    rules={[
+                        {
+                            required: true,
+                            message: 'A passport-style photo is required', 
+                        },
+                    ]}
+                >
+                    { imageUpload }
+                </Form.Item>
+                                
                 <Form.Item name={this.props.formUID + "+nationality"} label="Nationality:"
                     rules={[
                         {
@@ -380,7 +396,6 @@ class GuardianFormComponent extends React.Component {
                 </Form.Item>
 
                 {/* {fileList.append(formUID)} */}
-                { imageUpload }
 
                 { removeFormButton }
             </Form>

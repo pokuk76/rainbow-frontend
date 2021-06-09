@@ -5,10 +5,11 @@ const initialState = {
     // username_valid: null,
     guestForm: {}, 
     guestFormValid: {
-        username: true, 
-        first_name: true, 
-        middle_name: true, 
-        last_name: true, 
+        // Valid if the element is null (should probably rename it from guestFormValid to something like GuestFormErrors so it makes more sense)
+        username: { validateStatus: "error", help: "Username required" },  // So this is initially invalid
+        first_name: { validateStatus: "error", help: "First Name Required" }, 
+        middle_name: null, 
+        last_name: { validateStatus: "error", help: "Last Name Required" }, 
     }, 
     studentForms: { "StudentForm_0": {}, },
     studentUID: 0, 
@@ -75,7 +76,10 @@ const updateImages = (state, action) => {
 }
 
 const updateGuestInfo = (state, action) => {
-    return updateObject(state, { guestForm: action.guestForm, });
+    return updateObject(state, { 
+        guestForm: action.guestForm, 
+        guestFormValid: action.guestFormValid, 
+    });
 }
 
 const updateStudents = (state, action) => {
@@ -85,16 +89,16 @@ const updateStudents = (state, action) => {
         (action.studentUID === null)
         ?
         {
-            studentForms: action.studentForms,
-            images: action.images
+            studentForms: action.studentForms, 
+            studentFormsValid: action.studentFormsValid, 
         }
         :
         {
-            studentForms: action.studentForms,
-            studentUID: action.studentUID,
-            images: action.images
+            studentForms: action.studentForms, 
+            studentFormsValid: action.studentFormsValid, 
+            studentUID: action.studentUID, 
         }
-    )
+    );
 }
 
 const updateGuardians = (state, action) => {

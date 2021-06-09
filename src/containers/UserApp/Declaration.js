@@ -25,8 +25,8 @@ class Declaration extends React.Component {
                                       // but might cause issues later?
     };
 
+    this.handleChange = this.handleChange.bind(this);
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
-
   }
 
   /**

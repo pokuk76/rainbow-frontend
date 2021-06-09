@@ -7,10 +7,11 @@ const DECLARATION_FORM = 'DeclarationForm';
 const RESET_VALUES_ON_DEFAULT = 'RESET_VALUES_ON_DEFAULT';
 
 
-export const updateGuestInfo = (guestInfo) => {
+export const updateGuestInfo = (guestInfo, guestFormValid) => {
     return {
         type: actionTypes.GUEST_INFO,
-        guestForm: guestInfo,
+        guestForm: guestInfo, 
+        guestFormValid: guestFormValid, 
     }
 }
 
@@ -110,12 +111,12 @@ export const removeForm = (formsObject, formsValid, uid, currentForm, images) =>
     switch(currentForm) {
         case STUDENT_FORM:
             return dispatch => {
-                dispatch( updateStudents(newFormSet, newFormValidSet, null) );
+                dispatch( updateStudents(newFormSet, newFormValidSet) );
                 dispatch( removeImage(images, uid) );
             };
         case GUARDIAN_FORM:
             return dispatch => {
-                dispatch( updateGuardians(newFormSet, newFormValidSet, null) );
+                dispatch( updateGuardians(newFormSet, newFormValidSet) );
                 dispatch( removeImage(images, uid) );
             };
         default:

@@ -9,7 +9,7 @@ import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from
 import { DeleteIcon } from '../Icons';
 
 import { formsCopy } from '../../utility/deepCopy';
-import { checkValidityElement } from '../../utility/forms';
+import { checkValidityItem } from '../../utility/forms';
 
 
 import * as actions from '../../store/actions/guest';
@@ -42,16 +42,14 @@ class StudentFormComponent extends React.Component {
         super(props);
 
         this.state = {
-            uploading: false,
-            currentId: -1,
-            images: this.props.images,
             studentForms: this.props.studentForms // We're passing by reference, which actually works for us 
                                                     // but might cause issues later?
         };
+
         this.debounceHandleChange = debounce(this.debounceHandleChange.bind(this), 500);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeSelect = this.handleChangeSelect.bind(this);
-
+        this.handleChangeDate = this.handleChangeDate.bind(this);
     }
 
     debounceHandleChange(form, field, value) {
@@ -61,7 +59,7 @@ class StudentFormComponent extends React.Component {
         // let guardianFormsTouched = formsCopy(this.props.guardianFormsTouched);
 
         studentForms[form][field] = value;
-        studentFormsValid[form][field] = checkValidityElement(value, ["required"]);
+        studentFormsValid[form][field] = checkValidityItem(value, ["required"]);
 
         this.props.updateForms(studentForms, studentFormsValid);
     }
@@ -76,14 +74,18 @@ class StudentFormComponent extends React.Component {
        this.debounceHandleChange(form, field, value);
     }
 
-    handleChangeSelect(value) {
-        console.log("Handle Select component change event: ", value);
+    handleChangeSelect(value, option, itemUID) {
+        console.log("Handle Select component change [value, itemUID, option]: ", value, option, itemUID);
+        let [form, field] = itemUID.split("+");
+        // console.log("form, field: ", form, field);
+        this.debounceHandleChange(form, field, value);
     }
 
-    handleChangeDate(dateMoment, dateString) {
-        console.log("Handle DatePicker change (date moment obj): ", dateMoment);
-        // Should probably just send a dateString and convert that on the backend to DateField
-        console.log("Handle DatePicker change (date string): ", dateString);
+    handleChangeDate(dateMoment, dateString, itemUID) {
+        // Should probably just send a dateString and convert that on the backend to DateField (that's actually the only choice we have Kof)
+        // console.log("Handle DatePicker change (date string): ", dateString);
+        let [form, field] = itemUID.split("+");
+        this.debounceHandleChange(form, field, dateMoment);
     }
     
     render() {
@@ -118,12 +120,12 @@ class StudentFormComponent extends React.Component {
       
             beforeUpload: file => {
                 // console.log("Props images before upload: ", this.props.images);
-                this.props.addImage(this.state.images, this.props.formUID, file);
+                this.props.addImage(this.props.images, this.props.formUID, file);
                 // console.log("Props images after upload: ", this.props.images);
-                let images = {...this.props.images};
-                this.setState(state => ({
-                    images: images,
-                }));
+                // let images = {...this.props.images};
+                // this.setState(state => ({
+                //     images: images,
+                // }));
                 return false;
             },
 
@@ -249,20 +251,6 @@ class StudentFormComponent extends React.Component {
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+nationality"} label="Nationality:">
-                    <Input
-                        placeholder="Enter nationality"
-                        onChange={(e) => this.handleChange(e)}
-
-                    />
-                </Form.Item>
-
-                <Form.Item name={this.props.formUID + "+religion"} label="Religion:">
-                    <Input
-                        placeholder="Enter religion"
-                    />
-                </Form.Item>
-
                 <Form.Item name={this.props.formUID + "+sex"} label="Gender: "
                     rules={[
                         {
@@ -279,7 +267,7 @@ class StudentFormComponent extends React.Component {
                         filterOption={(input, option) =>
                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
-                        onChange={(value) => this.handleChangeSelect(value)}
+                        onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID + "+sex")}
                     >
                         <Option value="male">Male</Option>
                         <Option value="female">Female</Option>
@@ -303,7 +291,9 @@ class StudentFormComponent extends React.Component {
                             // iconRender={<CalendarOutlined />} 
                             /> : <DatePicker />
                         } */}
-                    <DatePicker onChange={(dateMoment, dateString) => this.handleChangeDate(dateMoment, dateString)} />
+                    <DatePicker 
+                        onChange={(dateMoment, dateString, itemUID) => this.handleChangeDate(dateMoment, dateString, this.props.formUID + "+date_of_birth")} 
+                    />
                 </Form.Item>
 
                 <Form.Item name={this.props.formUID + "+image_file"} label="Passport Photo: "
@@ -317,18 +307,34 @@ class StudentFormComponent extends React.Component {
                     { imageUpload }
                 </Form.Item>
 
+                <Form.Item name={this.props.formUID + "+nationality"} label="Nationality:">
+                    <Input
+                        placeholder="Enter nationality"
+                        onChange={(e) => this.handleChange(e)} 
+                    />
+                </Form.Item>
+
+                <Form.Item name={this.props.formUID + "+religion"} label="Religion:">
+                    <Input
+                        placeholder="Enter religion" 
+                        onChange={(e) => this.handleChange(e)} 
+                    />
+                </Form.Item>
+
+
                 <Form.Item name={this.props.formUID + "+has_ailments"} label="Please list any allergies or ailments">
-                    <Input.TextArea />
+                    <Input.TextArea onChange={(e) => this.handleChange(e)} />
                 </Form.Item>
 
                 <Form.Item name={this.props.formUID + "+former_school"} label="Former School">
                     <Input
-                        placeholder="Enter most recently attended school "
+                        placeholder="Enter most recently attended school " 
+                        onChange={(e) => this.handleChange(e)}
                     />
                 </Form.Item>
 
                 <Form.Item name={this.props.formUID + "+former_school_address"} label="School Address:">
-                    <Input.TextArea />
+                    <Input.TextArea onChange={(e) => this.handleChange(e)} />
                 </Form.Item>
 
                 <Form.Item name={this.props.formUID + "+class_reached"} label="Select Class reached:">
@@ -336,24 +342,35 @@ class StudentFormComponent extends React.Component {
                         showSearch
                         style={{ width: 200 }}
                         placeholder="Select the most applicable"
-                        optionFilterProp="children"
-                        onChange={onChange}
+                        optionFilterProp="label"
+                        // onChange={onChange}
                         // onFocus={onFocus}
                         // onBlur={onBlur}
                         // onSearch={onSearch}
                         filterOption={(input, option) =>
                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
+                        } 
+
+                        onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID + "+class_reached")} 
+                        options={[
+                            { label: "Test", value: "test"}, 
+                            { label: "Class 1", value: "class 1"}, 
+                            { label: "Class 2", value: "class 2"}, 
+                            { label: "Class 3", value: "class 3"}, 
+                            { label: "Class 4", value: "class 4"}, 
+                            { label: "Class 5", value: "class 5"}, 
+                            { label: "Class 6", value: "class 6"}, 
+                            { label: "Form 1", value: "form 1"}, 
+                        ]}
                     >
-                        <Option value="father">Father</Option>
-                        <Option value="mother">Mother</Option>
-                        <Option value="legal_guardian">Legal Guardian</Option>
+                        
                     </Select>
                 </Form.Item>
 
                 <Form.Item name={this.props.formUID + "+reason_for_leaving"} label="Reason For Leaving:">
-                    <Input
-                        placeholder="Enter reason for leaving"
+                    <Input 
+                        placeholder="Enter reason for leaving" 
+                        onChange={(e) => this.handleChange(e)}
                     />
                 </Form.Item>
 

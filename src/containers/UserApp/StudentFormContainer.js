@@ -115,6 +115,10 @@ class StudentForm extends React.Component {
         }
     }
 
+    /**
+     * Called when the user clicks on an uploaded image
+     * @param {Event} body - 
+     */
     showModal = (body) => {
         this.setState({
             modalVisible: true,
@@ -122,6 +126,10 @@ class StudentForm extends React.Component {
         });
     };
 
+    /**
+     * Called when the user clicks OK on the modal
+     * @param {Event} e - A click event
+     */
     handleOk = (e) => {
         // console.log(e);
         this.setState({
@@ -129,6 +137,8 @@ class StudentForm extends React.Component {
         });
     };
 
+    // Right now, handleOk and handleCancel are doing the same thing (and the buttons are doing the same things)
+    // TODO: Remove cancel (think that could be confusing language i.e. cancel the upload)
     handleCancel = (e) => {
         // console.log(e);
         this.setState({
