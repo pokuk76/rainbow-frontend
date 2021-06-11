@@ -9,10 +9,10 @@ import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from
 import { DeleteIcon } from '../Icons';
 
 import { formsCopy } from '../../utility/deepCopy';
-import { checkValidityItem } from '../../utility/forms';
-
+import { studentFormItems, checkValidityItem } from '../../utility/forms';
 
 import * as actions from '../../store/actions/guest';
+import * as actionTypes from '../../store/actions/actionTypes';
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -56,10 +56,10 @@ class StudentFormComponent extends React.Component {
 
         let studentForms = formsCopy(this.props.studentForms);
         let studentFormsValid = formsCopy(this.props.studentFormsValid);
-        // let guardianFormsTouched = formsCopy(this.props.guardianFormsTouched);
 
         studentForms[form][field] = value;
-        studentFormsValid[form][field] = checkValidityItem(value, ["required"]);
+        var rules = studentFormItems[field]['validation_rules'];
+        studentFormsValid[form][field] = checkValidityItem(value, rules);
 
         this.props.updateForms(studentForms, studentFormsValid);
     }
@@ -74,9 +74,9 @@ class StudentFormComponent extends React.Component {
        this.debounceHandleChange(form, field, value);
     }
 
-    handleChangeSelect(value, option, itemUID) {
-        console.log("Handle Select component change [value, itemUID, option]: ", value, option, itemUID);
-        let [form, field] = itemUID.split("+");
+    handleChangeSelect(value, option, form, field) {
+        console.log("Handle Select component change [value, field, option]: ", value, field, option);
+        // let [form, field] = itemUID.split("+");
         // console.log("form, field: ", form, field);
         this.debounceHandleChange(form, field, value);
     }
@@ -86,6 +86,12 @@ class StudentFormComponent extends React.Component {
         // console.log("Handle DatePicker change (date string): ", dateString);
         let [form, field] = itemUID.split("+");
         this.debounceHandleChange(form, field, dateMoment);
+    }
+
+    getValidationProps = (form, key) => {
+        // console.log(this.props.submitStatus);
+        let s = (this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL);
+        return ( this.props.submitStatus===actionTypes.SUBMIT_INVALID_FAIL ) ? this.props.studentFormsValid[form][key] : null;
     }
     
     render() {
@@ -98,7 +104,6 @@ class StudentFormComponent extends React.Component {
         try {
             fileSelected = (this.props.images[this.props.formUID]) ? true : false;
             fileList = this.props.images[this.props.formUID];
-
         }
         catch(error) {
         }
@@ -214,14 +219,14 @@ class StudentFormComponent extends React.Component {
                 initialValues={this.props.initialValues} 
 
             >
-                {/* <h1>ID: {formUID}</h1> */}
                 <Form.Item name={this.props.formUID + "+first_name"} label="First Name:"
                     rules={[
                         {
                             required: true,
                             message: 'First name required',
                         },
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'first_name') }
                 >
                     <Input
                         placeholder="Enter first name"
@@ -230,7 +235,9 @@ class StudentFormComponent extends React.Component {
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+middle_name"} label="Middle Name:">
+                <Form.Item name={this.props.formUID + "+middle_name"} label="Middle Name:"
+                    { ...this.getValidationProps(this.props.formUID, 'middle_name') }
+                >
                     <Input
                         placeholder="Enter middle name"
                     />
@@ -242,7 +249,8 @@ class StudentFormComponent extends React.Component {
                             required: true,
                             message: 'Last name required',
                         },
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'last_name') }
                 >
                     <Input
                         placeholder="Enter last name"
@@ -257,7 +265,8 @@ class StudentFormComponent extends React.Component {
                             required: true,
                             message: "Student's gender is required",
                         },
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'sex') }
                 >
                     {/* This is going to be a selection */}
                     <Select
@@ -267,7 +276,7 @@ class StudentFormComponent extends React.Component {
                         filterOption={(input, option) =>
                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
-                        onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID + "+sex")}
+                        onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID, "sex")}
                     >
                         <Option value="male">Male</Option>
                         <Option value="female">Female</Option>
@@ -280,7 +289,8 @@ class StudentFormComponent extends React.Component {
                             required: true,
                             message: 'Date of birth is required',
                         },
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'date_of_birth') }
                 >
                         {/* {(isChrome) ? 
                             <Input
@@ -302,19 +312,24 @@ class StudentFormComponent extends React.Component {
                             required: true,
                             message: 'A passport-style photo is required', 
                         },
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'image_file') }
                 >
                     { imageUpload }
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+nationality"} label="Nationality:">
+                <Form.Item name={this.props.formUID + "+nationality"} label="Nationality:" 
+                    { ...this.getValidationProps(this.props.formUID, 'nationality') }
+                >
                     <Input
                         placeholder="Enter nationality"
                         onChange={(e) => this.handleChange(e)} 
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+religion"} label="Religion:">
+                <Form.Item name={this.props.formUID + "+religion"} label="Religion:"
+                    { ...this.getValidationProps(this.props.formUID, 'religion') }
+                >
                     <Input
                         placeholder="Enter religion" 
                         onChange={(e) => this.handleChange(e)} 
@@ -322,22 +337,30 @@ class StudentFormComponent extends React.Component {
                 </Form.Item>
 
 
-                <Form.Item name={this.props.formUID + "+has_ailments"} label="Please list any allergies or ailments">
+                <Form.Item name={this.props.formUID + "+has_ailments"} label="Please list any allergies or ailments"
+                    { ...this.getValidationProps(this.props.formUID, 'has_ailments') }
+                >
                     <Input.TextArea onChange={(e) => this.handleChange(e)} />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+former_school"} label="Former School">
+                <Form.Item name={this.props.formUID + "+former_school"} label="Former School"
+                    { ...this.getValidationProps(this.props.formUID, 'former_school') }
+                >
                     <Input
                         placeholder="Enter most recently attended school " 
                         onChange={(e) => this.handleChange(e)}
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+former_school_address"} label="School Address:">
+                <Form.Item name={this.props.formUID + "+former_school_address"} label="School Address:"
+                    { ...this.getValidationProps(this.props.formUID, 'former_school_address') }
+                >
                     <Input.TextArea onChange={(e) => this.handleChange(e)} />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+class_reached"} label="Select Class reached:">
+                <Form.Item name={this.props.formUID + "+class_reached"} label="Select Class reached:"
+                    { ...this.getValidationProps(this.props.formUID, 'class_reached') }
+                >
                     <Select
                         showSearch
                         style={{ width: 200 }}
@@ -348,10 +371,12 @@ class StudentFormComponent extends React.Component {
                         // onBlur={onBlur}
                         // onSearch={onSearch}
                         filterOption={(input, option) =>
-                            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            // option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            // console.log(option)
+                            option['value'].indexOf(input.toLowerCase()) >= 0
                         } 
 
-                        onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID + "+class_reached")} 
+                        onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID, "class_reached")} 
                         options={[
                             { label: "Test", value: "test"}, 
                             { label: "Class 1", value: "class 1"}, 
@@ -367,7 +392,9 @@ class StudentFormComponent extends React.Component {
                     </Select>
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+reason_for_leaving"} label="Reason For Leaving:">
+                <Form.Item name={this.props.formUID + "+reason_for_leaving"} label="Reason For Leaving:"
+                    { ...this.getValidationProps(this.props.formUID, 'reason_for_leaving') }
+                >
                     <Input 
                         placeholder="Enter reason for leaving" 
                         onChange={(e) => this.handleChange(e)}
@@ -390,7 +417,10 @@ const mapStateToProps = state => {
         studentForms: state.guest.studentForms,
         studentFormsValid: state.guest.studentFormsValid, 
         studentUID: state.guest.studentUID,
-        images: state.guest.images
+        images: state.guest.images, 
+        studentFormsValid: state.guest.studentFormsValid, 
+        
+        submitStatus: state.form.submitStatus, 
     }
 }
 

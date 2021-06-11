@@ -75,10 +75,6 @@ export const submitFormset = (formsetData) => {
     };
 }
 
-const handleGuestForm = () => {
-    // checkValidityForm
-}
-
 // const handleImages = (form, images) => {
 //     let formType; // GuestForm, StudentForm, GuardianForm
 //     for (let imageKey in images){
@@ -267,22 +263,6 @@ export const handleSubmit = (guestForm, studentForms, guardianForms, declaration
         //     // console.log("form data entry: ", entry);
         //     guestFormData.append(key, value);
         // }
-
-        // axios({
-        //     method: 'post',
-        //     url: 'http://127.0.0.1:8000/api/formsets/',
-        //     // data: studentFormsData, 
-        //     data: formsetData, 
-        //     headers: { 'Accept': 'application/json', 'Content-Type': 'multipart/form-data' }
-        // })
-        // .then(response => {
-        //     console.log("POST response:", response);
-        //     const guest_id = response.data['id'];
-        //     // handleStudentForms(guest_id, studentForms, images); 
-        // })
-        // .catch(error => {
-        //     console.log("POST error:", error);
-        // });
         
     };
 }

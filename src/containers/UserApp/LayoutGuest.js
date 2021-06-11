@@ -6,28 +6,52 @@ import { RainbowIcon } from '../../components/Icons';
 
 // import { Flex } from 'antd-mobile';
 // import { Drawer } from 'antd-mobile';
-import { Layout, Menu, Breadcrumb, Form, Button, Drawer, Badge } from 'antd';
+import { Layout, Menu, Breadcrumb, Form, Button, Drawer, Badge, Spin, notification } from 'antd';
 import { ProfileOutlined, UserAddOutlined, TeamOutlined, WalletOutlined,
   CloseOutlined, CloseSquareOutlined, MenuOutlined, ExclamationCircleOutlined, 
+  LoadingOutlined, 
 } from '@ant-design/icons';
 
 import './layout.css';  
 
 import * as guestActions from '../../store/actions/guest';
 import * as formActions from '../../store/actions/form';
+import * as actionTypes from '../../store/actions/actionTypes';
 
 import GuestInfo from './GuestForm';
 import GuardianFormContainer from './GuardianFormContainer';
 import StudentFormContainer from './StudentFormContainer';
 import Declaration from './Declaration';
 
+import { checkValiditySection, checkValidityForm } from '../../utility/forms';
+
 const { Header, Content, Footer, Sider } = Layout;
+
+const LoadingIcon = <LoadingOutlined style={{ fontSize: '5em' }} spin />;
 
 const menuItemStyle = { paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%", fontSize:"1.2em", display: "flex", alignItems:"center", paddingLeft:"3em" }
 
 function callback(key) {
   console.log(key);
 }
+
+const openInvalidErrorNotification = type => {
+  notification[type]({
+    message: 'Invalid Form(s)',
+    description:
+      'One or more of your forms were submitted with errors. Please fix these errors before attempting to re-submit.', 
+    placement: 'bottomRight', 
+    duration: 10,
+  });
+};
+
+const openNetworkErrorNotification = type => {
+  notification[type]({
+    message: 'Network Error',
+    description:
+      'This is the content of the notification. This is the content of the notification. This is the content of the notification.',
+  });
+};
 
 /*******/
 
@@ -38,29 +62,30 @@ class GuestLayout extends React.Component {
     // this.myRef = React.createRef();
 
     this.state = {
-      collapsed: false,
-      leftMargin: 200,
-      prevMenuItem: '',
-      selectedMenuItem: 'guest-details',
-      guardianForms: this.props.guardianForms,
+      collapsed: false, 
+      prevMenuItem: '', 
+      selectedMenuItem: 'guest-details', 
       visible: false, 
-      valid: {
-        'guest-details': true,
-        'students': true, 
-        'guardians': true, 
-        'declaration': true, 
-      }
+      showBadge: true, 
+      invalidNotificationShown: false, 
+      networkNotificationShown: false, 
     };
 
     this.componentSwitch = this.componentSwitch.bind(this);
   }
 
-  componentDidMount() {
-    // console.log("Props after mount:", this.props);
-  }
-
   componentDidUpdate(prevProps) {
-    // console.log("Props after update:", prevProps);
+    // TODO: Maybe provide the notification functions as callbacks to the submitForms action creator/handler thingy
+    // If the user submits an invalid formset more than once, notification won't fire more than once
+    if ( this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL && !this.state.invalidNotificationShown ) {
+      openInvalidErrorNotification('warning');
+      this.setState({
+        invalidNotificationShown: true,
+      });
+    } else if ( this.props.submitStatus === actionTypes.SUBMIT_NETWORK_FAIL ) {
+      openNetworkErrorNotification('error');
+    }
+
   }
 
   checkValiditySection = (formObj) => {
@@ -233,6 +258,15 @@ class GuestLayout extends React.Component {
     
   }
 
+  showBadge = () => {
+    let guestValid = checkValidityForm(this.props.guestFormValid);
+    let studentsValid = checkValiditySection(this.props.studentFormsValid);
+    let guardiansValid = checkValiditySection(this.props.guardianFormsValid);
+    let declarationValid = checkValidityForm(this.props.declarationFormValid);
+
+    return ( this.props.submitStatus===actionTypes.SUBMIT_INVALID_FAIL ) && ( !guestValid || !studentsValid || !guardiansValid || !declarationValid );
+  }
+
   render() {
     const drawerContents = (
       <Menu
@@ -254,7 +288,9 @@ class GuestLayout extends React.Component {
           icon={<ProfileOutlined />}
           style={menuItemStyle}
         >
-          Guest Account
+          <span>Guest Account  </span>
+          { ( this.props.submitStatus===actionTypes.SUBMIT_INVALID_FAIL && !checkValidityForm(this.props.guestFormValid) ) ?
+          <ExclamationCircleOutlined style={{ color: '#f5222d', fontSize: '1em' }} /> : null }
         </Menu.Item>
 
         <Menu.Divider />
@@ -264,7 +300,9 @@ class GuestLayout extends React.Component {
           icon={<UserAddOutlined />}
           style={menuItemStyle} 
         >
-          <span>Students</span>
+          <span>Students  </span> 
+          { ( this.props.submitStatus===actionTypes.SUBMIT_INVALID_FAIL && !checkValiditySection(this.props.studentFormsValid) ) ?
+          <ExclamationCircleOutlined style={{ color: '#f5222d', fontSize: '1em' }} /> : null }
         </Menu.Item>
 
         <Menu.Divider />
@@ -274,9 +312,9 @@ class GuestLayout extends React.Component {
           icon={<TeamOutlined />}
           style={menuItemStyle}
         >
-          Guardians {this.checkValiditySection(this.props.guardianForms) ? " Valid" : " Not Valid"}
-          { !this.checkValiditySection(this.props.guardianForms) ?
-          <ExclamationCircleOutlined style={{ color: '#f5222d', fontSize: '1.5em' }} /> : null }
+          <span>Guardians  </span>
+          { ( this.props.submitStatus===actionTypes.SUBMIT_INVALID_FAIL && !checkValiditySection(this.props.guardianFormsValid) ) ?
+          <ExclamationCircleOutlined style={{ color: '#f5222d', fontSize: '1em' }} /> : null }
         </Menu.Item>
 
         <Menu.Divider />
@@ -286,7 +324,9 @@ class GuestLayout extends React.Component {
           icon={<WalletOutlined />}
           style={menuItemStyle}
         >
-          Declaration
+          <span>Declaration  </span>
+          { ( this.props.submitStatus===actionTypes.SUBMIT_INVALID_FAIL && !checkValidityForm(this.props.declarationFormValid) ) ?
+          <ExclamationCircleOutlined style={{ color: '#f5222d', fontSize: '1em' }} /> : null }
         </Menu.Item>
 
         <Menu.Divider />
@@ -294,10 +334,10 @@ class GuestLayout extends React.Component {
       </Menu>)
     
     return (
-      <>
       <Layout 
-        style={{ minHeight: '100vh', maxWidth: '100vw' }}
+        style={{ minHeight: '100vh', maxWidth: '100vw', boxSizing:'border-box' }}
       >
+        <Spin spinning={this.props.loading} indicator={LoadingIcon} style={{position: "fixed"}}>
         <Drawer
           title={
             <a href="http://127.0.0.1:8000/home/" 
@@ -314,40 +354,38 @@ class GuestLayout extends React.Component {
           // drawerStyle={{ height:'100%', }}
           headerStyle={{backgroundColor: '#111d2c', }} 
           bodyStyle={{padding: '0'}}
-          drawerStyle={{border: '2px solid white'}} 
+          drawerStyle={{border: '2px solid white', backgroundColor: '#001529'}}  // Have to specify the dark-mode bg color b/c it's white on mobile
         >
           { drawerContents }
         </Drawer>
 
-        <Layout key={"Layout" + this.state.selectedMenuItem} className="site-layout">
-          <Header style={{ position: 'fixed', zIndex: 1, width: '100vw', paddingLeft: "3em" }}>
-            <Button type="primary" onClick={this.showDrawer} icon={<MenuOutlined style={{fontSize: "1.5em"}} />} style={{backgroundColor: 'inherit', borderColor: "white"}}>
-            </Button>
+        <Layout key={"Layout" + this.state.selectedMenuItem}>
+          <Header style={{ position: 'fixed', zIndex: 1, width: '100vw', paddingLeft: "3em", boxSizing:'border-box' }}>
+            <Badge dot={ this.showBadge() }> 
+              <Button type="primary" onClick={this.showDrawer} icon={<MenuOutlined style={{fontSize: "1.5em"}} />} style={{backgroundColor: 'inherit', borderColor: "white"}}>
+              </Button>
+            </Badge>
             {/* <MenuOutlined onClick={this.showDrawer} /> */}
           </Header>
           
           <Content key={"Content" + this.state.selectedMenuItem} style={{ margin: '0 0', maxWidth: '100vw', }}>
-            <div className="site-layout-background" style={{ padding: 24, minHeight: '100vh' }}>
-              {/* <Form layout='vertical' initialValues={() => this.getInitialValues()}> */}
-              {/* <Form key={this.state.selectedMenuItem} layout='vertical' >
-              {this.componentSwitch(this.state.selectedMenuItem)}
-            </Form> */}
+            <div style={{ padding: '1.8em', minHeight: '100vh' }}>
 
               <Form.Provider>
                 {this.componentSwitch(this.state.selectedMenuItem)}
               </Form.Provider>
-            </div>
 
-            { this.controlSwitch(this.state.selectedMenuItem) }
+              { this.controlSwitch(this.state.selectedMenuItem) }
+
+            </div>
 
           </Content>
 
-          <Footer style={{ textAlign: 'center' }}>Rainbow Edu ©2020 kbd</Footer>
+          <Footer style={{ textAlign: 'center' }}>Rainbow Edu ©2020 | By kbd</Footer>
         </Layout>
 
-        
+        </Spin>
       </Layout>
-      </>
     );
   }
 }
@@ -356,11 +394,15 @@ class GuestLayout extends React.Component {
 const mapStateToProps = state => {
   return {
     guestForm: state.guest.guestForm,
-    studentForms: state.guest.studentForms,
+    guestFormValid: state.guest.guestFormValid, 
+    studentForms: state.guest.studentForms, 
+    studentFormsValid: state.guest.studentFormsValid, 
     studentUID: state.guest.studentUID,
-    guardianForms: state.guest.guardianForms,
+    guardianForms: state.guest.guardianForms, 
+    guardianFormsValid: state.guest.guardianFormsValid, 
     guardianUID: state.guest.guardianUID,
     declaration: state.guest.declarationForm,
+    declarationFormValid: state.guest.declarationFormValid, 
     images: state.guest.images, 
 
     /* Form Submission Props */
@@ -371,7 +413,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    addForm: (forms, uid, currentForm) => dispatch(guestActions.addForm(forms, uid, currentForm)), 
     handleSubmit: (guestForm, studentForms, guardianForms, declarationForm, images) => dispatch(formActions.handleSubmit(guestForm, studentForms, guardianForms, declarationForm, images)),
   }
 }

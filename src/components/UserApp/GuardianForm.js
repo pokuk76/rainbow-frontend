@@ -8,9 +8,10 @@ import ImgCrop from 'antd-img-crop';
 import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
 import { formsCopy } from '../../utility/deepCopy';
-import { checkValidityItem } from '../../utility/forms';
+import { guardianFormItems, checkValidityItem } from '../../utility/forms';
 
 import * as actions from '../../store/actions/guest';
+import * as actionTypes from '../../store/actions/actionTypes';
 
 const { Option } = Select;
 const { Dragger } = Upload;
@@ -43,13 +44,13 @@ class GuardianFormComponent extends React.Component {
 
         let guardianForms = formsCopy(this.props.guardianForms);
         let guardianFormsValid = formsCopy(this.props.guardianFormsValid);
-        let guardianFormsTouched = formsCopy(this.props.guardianFormsTouched);
+        // let guardianFormsTouched = formsCopy(this.props.guardianFormsTouched);
 
         guardianForms[form][field] = value;
-        guardianFormsValid[form][field] = checkValidityItem(value, ["required"]);
+        var rules = guardianFormItems[field]['validation_rules'];
+        guardianFormsValid[form][field] = checkValidityItem(value, rules);
 
         this.props.updateForms(guardianForms, guardianFormsValid);
-        // this.props.updateForms(guardianForms, guardianFormsValid);
     }
 
     handleChange(e) {
@@ -66,11 +67,17 @@ class GuardianFormComponent extends React.Component {
         // this.props.guardianForms[form][field] = e.target.value;
     }
 
-    handleChangeSelect(value, option, itemUID) {
-        console.log("Handle Select component change [value, itemUID, option]: ", value, option, itemUID);
-        let [form, field] = itemUID.split("+");
+    handleChangeSelect(value, option, form, field) {
+        // console.log("Handle Select component change [value, field, option]: ", value, field, option);
+        // let [form, field] = itemUID.split("+");
         // console.log("form, field: ", form, field);
         this.debounceHandleChange(form, field, value);
+    }
+
+    getValidationProps = (form, key) => {
+        // console.log(this.props.submitStatus);
+        let s = ( this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL );
+        return true ? this.props.guardianFormsValid[form][key] : null;
     }
 
     render() {
@@ -170,18 +177,19 @@ class GuardianFormComponent extends React.Component {
                 initialValues={this.props.initialValues}
 
             >
-                {/* <h1>ID: {formUID}</h1> */}
-                <Form.Item name={this.props.formUID + "+first_name"} label={ this.props.guardianFormsValid[this.props.formUID]['first_name'] ? "First Name: " : "Invalid First Name"}
+                {/* <Form.Item name={this.props.formUID + "+first_name"} label={ this.props.guardianFormsValid[this.props.formUID]['first_name'] ? "First Name: " : "Invalid First Name"} */}
+                <Form.Item name={this.props.formUID + "+first_name"} label="First Name: "
                     rules={[
                         {
                             required: true,
-                            message: 'Please input your first name',
+                            message: 'Please input first name',
                         },
                         {
                             max: 128, 
                             message: 'First name must have fewer than 128 characters'
                         }
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'first_name') } 
                 >
                     
                     <Input
@@ -196,7 +204,8 @@ class GuardianFormComponent extends React.Component {
                             max: 128,
                             message: 'Middle name must have fewer than 64 characters'
                         }
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'middle_name') }
                 >
                     <Input
                         placeholder="Middle name"
@@ -214,7 +223,8 @@ class GuardianFormComponent extends React.Component {
                             max: 128,
                             message: 'Last name must have fewer than 128 characters'
                         }
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'last_name') }
                 >
                     <Input
                         placeholder="Last name"
@@ -233,9 +243,10 @@ class GuardianFormComponent extends React.Component {
                         },
                         {
                             max: 13,
-                            message: 'Phone number must have fewer than 13 characters'
+                            message: 'Phone number must be 10 character (written as 0244324577) or 13 characters (written as +233244324577)'
                         }
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'phone_number') }
                 >
                     <Input
                         placeholder="Enter your phone number"
@@ -257,7 +268,8 @@ class GuardianFormComponent extends React.Component {
                             max: 128,
                             message: 'E-mail must have fewer than 128 characters'
                         }
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'email_address') }
                 >
                     <Input
                         placeholder="Enter your email"
@@ -272,7 +284,8 @@ class GuardianFormComponent extends React.Component {
                             required: true,
                             message: 'A passport-style photo is required', 
                         },
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'image_file') }
                 >
                     { imageUpload }
                 </Form.Item>
@@ -287,7 +300,8 @@ class GuardianFormComponent extends React.Component {
                             max: 128,
                             message: 'Nationality must be less than 128 characters'
                         }
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'nationality') }
                 >
                     <Input
                         placeholder="Enter your nationality"
@@ -301,7 +315,8 @@ class GuardianFormComponent extends React.Component {
                             max: 128,
                             message: 'Religion must have fewer than 128 characters'
                         }
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'religion') }
                 >
                     <Input
                         placeholder="Enter your religion"
@@ -313,9 +328,10 @@ class GuardianFormComponent extends React.Component {
                     rules={[
                         {
                             required: true,
-                            message: 'Please indicate the type of guardian',
+                            message: "Please specify this guardian's relationship with the students",
                         },
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'guardian_type') }
                 >
                     <Select
                         showSearch 
@@ -324,6 +340,7 @@ class GuardianFormComponent extends React.Component {
                         placeholder="Relationship to students"
                         optionFilterProp="children"
                         // onChange={onChange}
+                        onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID, "guardian_type")}
                         // onFocus={onFocus}
                         // onBlur={onBlur}
                         // onSearch={onSearch}
@@ -339,15 +356,16 @@ class GuardianFormComponent extends React.Component {
 
                 {/* TODO: Maybe change this so that they just indicate/list which students live with the guardian */}
                 <Form.Item name={this.props.formUID + "+lives_with_guardian"}
-                    label="Students that live with this parent/guardian"
+                    label='Students that live with this parent/guardian (If no children reside with this parent please enter "N/A")'
                     rules={[
                         {
                             required: true,
-                            message: 'Please indicate which students live with this guardian',
+                            message: 'Please indicate which children live with this parent',
                         },
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'lives_with_guardian') }
                 >
-                    <Input.TextArea />
+                    <Input.TextArea onChange={e => this.handleChange(e)} />
 
                 </Form.Item>
 
@@ -361,7 +379,8 @@ class GuardianFormComponent extends React.Component {
                             max: 256,
                             message: 'Occupation must have fewer than 256 characters'
                         }
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'occupation') }
                 >
                     <Input
                         placeholder="Enter occupation"
@@ -379,7 +398,8 @@ class GuardianFormComponent extends React.Component {
                             max: 256,
                             message: 'Place of work must have fewer than 256 characters'
                         }
-                    ]}
+                    ]} 
+                    { ...this.getValidationProps(this.props.formUID, 'place_of_work') }
                 >
                     <Input
                         placeholder="Enter place of work"
@@ -388,15 +408,14 @@ class GuardianFormComponent extends React.Component {
                 </Form.Item>
 
                 <Form.Item name={this.props.formUID + "+home_address"} label="Home Address:">
-                    <Input.TextArea />
+                    <Input.TextArea onChange={e => this.handleChange(e)} />
                 </Form.Item>
 
                 <Form.Item name={this.props.formUID + "+postal_address"} label="Postal Address:">
-                    <Input.TextArea />
+                    <Input.TextArea onChange={e => this.handleChange(e)} />
                 </Form.Item>
 
                 {/* {fileList.append(formUID)} */}
-
                 { removeFormButton }
             </Form>
         );
@@ -409,7 +428,10 @@ const mapStateToProps = state => {
         guardianFormsValid: state.guest.guardianFormsValid, 
         guardianFormsTouched: state.guest.guardianFormsTouched, 
         guardianUID: state.guest.guardianUID,
-        images: state.guest.images
+        images: state.guest.images, 
+        guardianFormsValid: state.guest.guardianFormsValid, 
+        
+        submitStatus: state.form.submitStatus,
     }
 }
 

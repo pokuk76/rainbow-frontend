@@ -27,6 +27,7 @@ export const guestFormItems = {
         ], 
     }, 
 }
+
 export const studentFormItems = {
     first_name: {
         validation_rules: [ 
@@ -47,22 +48,22 @@ export const studentFormItems = {
     }, 
     sex: {
         validation_rules: [ 
-            { required: true, message: "Please specify" }, 
+            { required: true, message: "Please specify child's sex" }, 
         ], 
     }, 
     date_of_birth: {
         validation_rules: [ 
-            { required: true, message: "Please specify a date of birth" }, 
+            { required: true, message: "Please provide a date of birth" }, 
         ], 
     }, 
     image_file: {
         validation_rules: [ 
-            { required: true, message: "Please provide a passport-style photo" }, 
+            // { required: true, message: "Please provide a passport-style photo" }, 
         ], 
     }, 
     nationality: {
         validation_rules: [ 
-            { required: true, message: "Please enter the nationality" }, 
+            { required: true, message: "Please specify child's nationality" }, 
             { max: 128, message: "Nationality must be less than 128 characters" }, 
         ], 
     }, 
@@ -71,19 +72,26 @@ export const studentFormItems = {
             { max: 128, message: "Religion must have fewer than 128 characters" }, 
         ], 
     }, 
-    has_ailments: {
-        validation_rules: [ ], 
-    }, 
-    former_school: {
-        validation_rules: [ ], 
-    }, 
-    former_school_address: {
-        validation_rules: [ ], 
-    }, 
-    class_reached: {
-        validation_rules: [ ], 
-    }, 
-    reason_for_leaving: {}, 
+    has_ailments: { validation_rules: [ ], }, 
+    former_school: { validation_rules: [ ], }, 
+    former_school_address: { validation_rules: [ ], }, 
+    class_reached: { validation_rules: [ ], }, 
+    reason_for_leaving: { validation_rules: [ ], }, 
+}
+
+export const studentFormValidInitialState = {
+    first_name: { validateStatus: "error", help: "First Name required" }, 
+    middle_name: null, 
+    last_name: { validateStatus: "error", help: "Last Name required" }, 
+    sex: { validateStatus: "error", help: "Please specify child's sex" }, 
+    date_of_birth: { validateStatus: "error", help: "Please provide a date of birth" }, 
+    nationality: { validateStatus: "error", help: "Please specify child's nationality" }, 
+    religion: null, 
+    has_ailments: null, 
+    former_school: null, 
+    former_school_address: null, 
+    class_reached: null, 
+    reason_for_leaving: null, 
 }
 
 export const guardianFormItems = {
@@ -107,7 +115,7 @@ export const guardianFormItems = {
     phone_number: {
         validation_rules: [ 
             { required: true, message: "Please enter a phone number" }, 
-            { max: 13, message: "Phone number must have fewer than 13 characters" } 
+            { max: 13, message: "Phone number must be 10 character (written as 0244324577) or 13 characters (written as +233244324577)" } 
         ], 
     }, 
     email_address: {
@@ -116,12 +124,10 @@ export const guardianFormItems = {
             { max: 128, message: "E-mail must have fewer than 128 characters" }, 
         ], 
     }, 
-    image_file: {
-        validation_rules: [ ], 
-    }, 
+    image_file: { validation_rules: [ ], }, 
     nationality: {
         validation_rules: [ 
-            { required: true, message: "Please enter the nationality" }, 
+            { required: true, message: "Please specify a nationality" }, 
             { max: 128, message: "Nationality must be less than 128 characters" }, 
         ], 
     }, 
@@ -152,8 +158,43 @@ export const guardianFormItems = {
             { max: 256, message: "Place of work must have fewer than 256 characters" }, 
         ], 
     }, 
-    home_address: {}, 
-    postal_address: {}, 
+    home_address: { validation_rules: [ ], }, 
+    postal_address: { validation_rules: [ ], }, 
+}
+
+export const guardianFormValidInitialState = {
+    first_name: { validateStatus: "error", help: "First Name required" },
+    middle_name: null, 
+    last_name: { validateStatus: "error", help: "Last Name required" }, 
+    phone_number: { validateStatus: "error", help: "Please input a phone number" },
+    email_address: null,
+    nationality: { validateStatus: "error", help: "Please specify a nationality" }, 
+    religion: null, 
+    guardian_type: { validateStatus: "error", help: "Please specify this guardian's relationship with the students" },
+    lives_with_guardian: { validateStatus: "error", help: "Please indicate which children live with this parent" },
+    occupation: null, 
+    place_of_work: null, 
+    home_address: null, 
+    postal_address: null, 
+}
+
+export const declarationFormItems = {
+    declaration_read: {
+        validation_rules: [ 
+            { required: true, message: "Please indicate that you have read & understood this declaration" }, 
+        ], 
+    }, 
+    signature: {
+        validation_rules: [ 
+            { required: true, message: "Electronic signature required" }, 
+            { max: 256, message: "Signature must have fewer than 256 characters" }, 
+        ], 
+    }, 
+    date: {
+        validation_rules: [ 
+            { required: true, message: "Please enter today's date" },  
+        ], 
+    }, 
 }
 
 export const getInitialValues = (formsObj) => {
@@ -184,7 +225,7 @@ export const getInitialValues = (formsObj) => {
 
 // { validateStatus: "error", 
 // help: <div>Should be combination of numbers & alphabets<br/> Some other nonsense<br/></div>}
-export const checkValidityItem = (value, rules, touched=false, data={'username': ["username"]}) => {
+export const checkValidityItem = (value, rules, touched=false, kwargs={'usernames': ["username"]}) => {
     let valid = true;
     let help_messages = [];
     for(let rule of rules) {
@@ -193,13 +234,14 @@ export const checkValidityItem = (value, rules, touched=false, data={'username':
         // console.log("Message key: ", message_key);
         switch (rule_name_key) {
             case "required":
-                if (value === "") {
+                // Added null check for images (don't think it's even used rn) and false check for checkbox
+                if (value === "" || value ===  null || value === false) {
                     valid = false;
                     help_messages.push(<div>{rule[message_key]}</div>);
                 }
                 break;
             case "unique":
-                if (data['username'].includes(value)) {
+                if (kwargs['usernames'].includes(value)) {
                     valid = false;
                     help_messages.push(<div>Some other nonsense</div>)
                 }
@@ -215,6 +257,18 @@ export const checkValidityItem = (value, rules, touched=false, data={'username':
     return response;
 }
 
-export const checkValidityForm = () => {
+export const checkValidityForm = (formValidObj) => {
+    let valid = true;
+    for (let element in formValidObj) {
+        valid = valid && ( formValidObj[element] === null );
+    }
+    return valid;
+}
 
+export const checkValiditySection = (formValidObj) => {
+    let valid = true;
+    for (let formUID in formValidObj) {
+        valid = valid && checkValidityForm(formValidObj[formUID]);
+    }
+    return valid;
 }

@@ -7,7 +7,7 @@ import {
     RightOutlined, CalendarOutlined
 } from '@ant-design/icons';
 
-import { getInitialValues } from '../../utility/forms';
+import { getInitialValues, checkValidityForm } from '../../utility/forms';
 import * as actions from '../../store/actions/guest';
 
 import StudentFormComponent from '../../components/UserApp/StudentForm';
@@ -76,6 +76,19 @@ function panelHeader(text) {
     </h1></div>;
 }
 
+function setPanelHeader(text, formValid) {
+    return (
+        <div style={{ display: 'inline-flex', marginLeft: '1em', height: '100%', width: '70%' }}>
+            <h1 style={{ fontSize: '1.5em', margin: 'auto', textAlign: 'right',
+                height: '100%', width: '60%', // backgroundColor: 'red',
+            }} >
+                {text}
+                { ( formValid === null ) ? " Valid" : "Not Valid" }
+            </h1>
+        </div>
+    );
+}
+
 class StudentForm extends React.Component {
 
     constructor(props) {
@@ -93,16 +106,16 @@ class StudentForm extends React.Component {
         };
 
         // this.onCollapse = this.onCollapse.bind(this);
-        this.renderForms = this.renderForms.bind(this);
     }
 
     componentDidMount() {
-        this.renderForms();
         window.scroll({
             top: 0, 
             left: 0, 
             behavior: 'smooth'
         });
+        this.renderForms();
+
     }
 
     componentDidUpdate(prevProps){
@@ -117,7 +130,7 @@ class StudentForm extends React.Component {
 
     /**
      * Called when the user clicks on an uploaded image
-     * @param {Event} body - 
+     * @param {ReactNode} body - content for the modal (In this case an image)
      */
     showModal = (body) => {
         this.setState({
@@ -146,10 +159,7 @@ class StudentForm extends React.Component {
         });
     };
 
-
-
-    /* Currently Unused */
-    
+    /* Currently Unused */ 
     getInitialValues() {
         const studentForms = this.props.studentForms;
         let initialValues = {}; // Each form has its own initial values and we'll map then using the form's id
@@ -187,7 +197,6 @@ class StudentForm extends React.Component {
             var key = "StudentPanel" + i;
             let closeIcon = <CloseSquareOutlined
                 // onMouseEnter={console.log("Square Hover")}
-
                 onClick={event => {
                     event.stopPropagation();
                     this.props.removeForm(this.props.studentForms, this.props.studentFormsValid, formUID, 'StudentForm', this.props.images);
@@ -213,7 +222,8 @@ class StudentForm extends React.Component {
             forms.push(
             <Panel 
                 // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
-                header={panelHeader("Student " + (n+1))} 
+                header={ setPanelHeader("Student " + (n+1), checkValidityForm(formUID, this.props.studentFormsValid)) } 
+                // header={setPanelHeader("Student " + (n+1))} 
                 key={key} 
                 extra={
                     (Object.keys(this.props.studentForms).length > 1) ? 
@@ -225,25 +235,18 @@ class StudentForm extends React.Component {
                 }
                 
             >
-                <StudentFormComponent {...studentFormProps}>
-
-                </StudentFormComponent>
+                <StudentFormComponent {...studentFormProps} />
                 {/* </Form> */}
             </Panel>
             );
             i++;
         }
-        // console.log("Forms in cDM: ", forms);
-
         this.setState({forms: forms});
 
     }
 
 
     render() {
-
-        // const initialValues = this.getInitialValues();
-        // console.log("Initial Values: ", initialValues);
 
         return (
             <div>
@@ -252,41 +255,40 @@ class StudentForm extends React.Component {
                     <Breadcrumb.Item>Registration</Breadcrumb.Item>
                     <Breadcrumb.Item>Student Details</Breadcrumb.Item>
                 </Breadcrumb>
-            <h1><UserAddOutlined /> Students</h1>
-            <br />
-            
-            <br />
-            <Collapse
-                key='CollapseStudents'
-                defaultActiveKey={['StudentPanel0']}
-                onChange={callback}
-                expandIcon={({ isActive }) => <RightOutlined rotate={isActive ? 90 : 0} style={{ fontSize: '2em', }} />}
-                expandIconPosition='left' 
-            >
-                {/* { console.log("Forms: ", this.state.forms) } */}
-                { this.state.forms }
-            </Collapse>
-            
-            <Modal
-                title="Your Upload"
-                className="imageModal"
-                visible={this.state.modalVisible}
-                onOk={this.handleOk}
-                onCancel={this.handleCancel}
-                destroyOnClose={true}
-            >
-                {this.state.modalContent}
-            </Modal>
-                
-            <br />
-            {/* { console.log("Selected menu item: ", this.state.selectedMenuItem) } */}
-            <Button key={this.props.selectedMenuItem} onClick={() => this.props.addForm(this.props.studentForms, this.props.studentFormsValid, this.props.studentUID, 'StudentForm') }>
-                <FileAddOutlined /> Add Student
-            </Button>
 
-            <br/>
-            <br/>            
-          </div>
+                <h1><UserAddOutlined /> Students</h1>
+                <br />
+                <br />
+                <Collapse
+                    key='CollapseStudents'
+                    defaultActiveKey={['StudentPanel0']}
+                    onChange={callback}
+                    expandIcon={({ isActive }) => <RightOutlined rotate={isActive ? 90 : 0} style={{ fontSize: '2em', }} />}
+                    expandIconPosition='left'
+                >
+                    {/* { console.log("Forms: ", this.state.forms) } */}
+                    {this.state.forms}
+                </Collapse>
+
+                <Modal
+                    title="Your Upload"
+                    className="imageModal"
+                    visible={this.state.modalVisible}
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                    destroyOnClose={true}
+                >
+                    {this.state.modalContent}
+                </Modal>
+
+                <br />
+                {/* { console.log("Selected menu item: ", this.state.selectedMenuItem) } */}
+                <Button key={this.props.selectedMenuItem} onClick={() => this.props.addForm(this.props.studentForms, this.props.studentFormsValid, this.props.studentUID, 'StudentForm')}>
+                    <FileAddOutlined /> Add Student
+                </Button>
+                <br />
+                <br />
+            </div>
         );
     }
 };

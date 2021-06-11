@@ -1,5 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
-import { updateObject } from '../utility';
+import { updateObject } from '../../utility/utility';
 
 const initialState = {
     // username_valid: null,
@@ -15,36 +15,37 @@ const initialState = {
     studentUID: 0, 
     studentFormsValid: { 
         "StudentForm_0": { 
-            first_name: true, 
-            middle_name: true, 
-            last_name: true, 
-            nationality: true, 
-            religion: true, 
-            sex: true, 
-            date_of_birth: true, 
-            has_ailments: true, 
-            former_school: true, 
-            former_school_address: true, 
-            class_reached: true, 
-            reason_for_leaving: true, 
+            first_name: { validateStatus: "error", help: "First Name required" }, 
+            middle_name: null, 
+            last_name: { validateStatus: "error", help: "Last Name required" }, 
+            sex: { validateStatus: "error", help: "Please specify child's sex" }, 
+            date_of_birth: { validateStatus: "error", help: "Please provide a date of birth" }, 
+            nationality: { validateStatus: "error", help: "Please specify child's nationality" }, 
+            religion: null,  
+            has_ailments: null, 
+            former_school: null, 
+            former_school_address: null, 
+            class_reached: null, 
+            reason_for_leaving: null, 
         }, 
     }, 
     guardianForms: { "GuardianForm_0": {}, }, 
     guardianUID: 0, 
     guardianFormsValid: { 
         "GuardianForm_0": { 
-            first_name: true, 
-            last_name: true, 
-            phone_number: true, 
-            email_address: true, 
-            nationality: true, 
-            religion: true, 
-            guardian_type: true, 
-            lives_with_guardian: true, 
-            occupation: true, 
-            place_of_work: true, 
-            home_address: true, 
-            postal_address: true, 
+            first_name: { validateStatus: "error", help: "First Name required" }, 
+            middle_name: null, 
+            last_name: { validateStatus: "error", help: "Last Name required" }, 
+            phone_number: { validateStatus: "error", help: "Please input a phone number" }, 
+            email_address: null, 
+            nationality: { validateStatus: "error", help: "Please specify a nationality" }, 
+            religion: null, 
+            guardian_type: { validateStatus: "error", help: "Please specify this guardian's relationship with the students" }, 
+            lives_with_guardian: { validateStatus: "error", help: "Please indicate which children live with this parent" }, 
+            occupation: null, 
+            place_of_work: null, 
+            home_address: null, 
+            postal_address: null, 
         }, 
     }, 
     guardianFormsTouched: { 
@@ -63,7 +64,12 @@ const initialState = {
             postal_address: false, 
         }, 
     }, 
-    declarationForm: {},
+    declarationForm: {}, 
+    declarationFormValid: {
+        declaration_read: { validateStatus: "error", help: "Please indicate that you have read & understood this declaration" },  // So this is initially invalid
+        signature: { validateStatus: "error", help: "Electronic signature required" }, 
+        date: { validateStatus: "error", help: "Please enter today's date" }, 
+    }, 
     images: {},  // key-value pairs where the key is the form UID 
                 // and the value is an array holding a single image file object 
     submitStatus: null, 
@@ -122,7 +128,8 @@ const updateGuardians = (state, action) => {
 
 const updateDeclaration = (state, action) => {
     return updateObject(state, {
-        declarationForm: action.declarationForm
+        declarationForm: action.declarationForm, 
+        declarationFormValid: action.declarationFormValid,
     });
 }
 

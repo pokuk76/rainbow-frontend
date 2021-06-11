@@ -1,4 +1,6 @@
 import * as actionTypes from './actionTypes';
+import { formValidCopy } from '../../utility/deepCopy';
+import { studentFormValidInitialState, guardianFormValidInitialState } from '../../utility/forms';
 
 const GUEST_INFO = 'GuestForm';
 const STUDENT_FORM = 'StudentForm';
@@ -72,12 +74,12 @@ export const addForm = (formsObject, formsValid, uid, currentForm) => {
     uid++;  
     switch(currentForm) {
         case STUDENT_FORM:
-            console.log("StudentUID:", uid);
+            // console.log("StudentUID:", uid);
             var id = "StudentForm_" + uid;
             var newFormSet = {...formsObject};  // Don't think we need to make a deep copy since we are just adding a formObject
             var newFormValidSet = {...formsValid}
             newFormSet[id] = {};
-            newFormValidSet[id] = {};
+            newFormValidSet[id] = formValidCopy(studentFormValidInitialState);
 
             return dispatch => {
                 dispatch( updateStudents(newFormSet, newFormValidSet, uid) );
@@ -87,7 +89,7 @@ export const addForm = (formsObject, formsValid, uid, currentForm) => {
             var newFormSet = {...formsObject};
             var newFormValidSet = {...formsValid}
             newFormSet[id] = {};
-            newFormValidSet[id] = {};
+            newFormValidSet[id] = formValidCopy(guardianFormValidInitialState);
             return dispatch => {
                 dispatch( updateGuardians(newFormSet, newFormValidSet, uid) );
             }
@@ -126,10 +128,11 @@ export const removeForm = (formsObject, formsValid, uid, currentForm, images) =>
     }
 }
 
-export const updateDeclaration = (declarationForm) => {
+export const updateDeclaration = (declarationForm, declarationFormValid) => {
     return {
         type: actionTypes.DECLARATION_FORM,
-        declarationForm: declarationForm
+        declarationForm: declarationForm, 
+        declarationFormValid: declarationFormValid
     }
 }
 

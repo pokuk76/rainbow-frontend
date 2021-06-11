@@ -7,7 +7,7 @@ import {
     TeamOutlined, RightOutlined, ArrowUpOutlined
 } from '@ant-design/icons';
 
-import { getInitialValues } from '../../utility/forms';
+import { getInitialValues, checkValidityForm } from '../../utility/forms';
 
 import * as actions from '../../store/actions/guest';
 
@@ -57,7 +57,7 @@ function setPanelHeader(text, formValid) {
                 }}
             >
                 {text}
-                {formValid ? " Valid" : "Not Valid"}
+                { ( formValid === null ) ? " Valid" : "Not Valid" }
             </h1></div>;
 }
 
@@ -76,7 +76,6 @@ class GuardianForm extends React.Component {
 
         this.state = {
             forms: [],
-            initialFormValues: {},
             // currentId: -1, 
             modalVisible: false, 
             modalContent: <></>, 
@@ -115,19 +114,20 @@ class GuardianForm extends React.Component {
     
 
     componentDidMount() {
-        getInitialValues(this.props.guardianForms);
-        this.renderForms();
+        // Not sure why we were calling get initialValues here?
+        // getInitialValues(this.props.guardianForms);
         window.scroll({
             top: 0, 
             left: 0, 
             behavior: 'smooth'
         });
+        this.renderForms();
     }
 
     componentDidUpdate(prevProps){
-        /*  Added this to ensure that the forms re-render on add or remove (Forms i think maybe images too)
+        /*  Added this to ensure that the forms re-render on add or remove (Forms & i think maybe images too)
             Feels mad ghetto but it's working
-            TODO: Try adding a state change on add and remove to re-render
+            TODO: Try adding a state change on add and remove to auto re-render
         */
 
         if(prevProps.guardianForms !== this.props.guardianForms || prevProps.images !== this.props.images ){
@@ -201,20 +201,13 @@ class GuardianForm extends React.Component {
             forms.push(
             <Panel 
                 // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
-                header={setPanelHeader("Guardian " + (n+1), this.checkValidityForm(formUID))} 
+                header={setPanelHeader("Guardian " + (n+1), checkValidityForm(this.props.guardianFormsValid[formUID]))} 
                 key={key} 
                 extra={
                     (Object.keys(this.props.guardianForms).length > 1) ? 
-
-                    <Button type="text" icon={closeIcon} style={{padding: 0}} danger>
-                        
-                    </Button>
-                     : <></>
-                }
+                        <Button type="text" icon={closeIcon} style={{padding: 0}} danger /> : <></> }
             >
-                <GuardianFormComponent {...guardianFormProps}>
-
-                </GuardianFormComponent>
+                <GuardianFormComponent {...guardianFormProps} />
                 {/* </Form> */}
             </Panel>
             );
@@ -227,6 +220,7 @@ class GuardianForm extends React.Component {
 
     render() {
 
+        // Think this was for the BackToTop component?
         const style = {
             height: 40,
             width: 40,

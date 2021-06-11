@@ -11,3 +11,11 @@ export const formsCopy = (formsObj) => {
     }
     return forms;
 }
+
+export const formValidCopy = (formValidObj) => {
+    let formValid = {};
+    for (let field in formValidObj){
+        formValid[field] = {...formValidObj[field]};
+    }
+    return formValid;
+}

@@ -1,13 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Form, Input, Button, Upload, Checkbox, Breadcrumb} from 'antd';
-import {
-  WalletOutlined,
-} from '@ant-design/icons';
 import axios from 'axios';
 import { withRouter } from'react-router-dom';
+import debounce from "lodash/debounce";
+
+import { Form, Input, Button, Upload, Checkbox, Breadcrumb} from 'antd';
+import { WalletOutlined, } from '@ant-design/icons';
 
 import * as actions from '../../store/actions/guest';
+import * as actionTypes from '../../store/actions/actionTypes';
+import { guestFormCopy } from '../../utility/deepCopy';
+import { declarationFormItems, checkValidityItem } from '../../utility/forms';
+
 import DeleteIcon from '../../components/Icons';
 
 const { Dragger } = Upload;
@@ -25,20 +29,51 @@ class Declaration extends React.Component {
                                       // but might cause issues later?
     };
 
+    this.debounceHandleChange = debounce(this.debounceHandleChange.bind(this), 1000);
     this.handleChange = this.handleChange.bind(this);
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+  }
+
+  debounceHandleChange(field, value) {
+
+    let declaration = guestFormCopy(this.props.declaration);
+    let declarationValid = guestFormCopy(this.props.declarationValid);
+
+    declaration[field] = value;
+    var rules = declarationFormItems[field]['validation_rules'];
+    declarationValid[field] = checkValidityItem(value, rules);
+    // let testRequired = [{ required: true, message: "Username Required" }, { unique: true, message: "Must be unique" } ];
+    // if(testInvalidSubmitState) {
+    //   this.props.guestFormValid[field] = checkValidityItem(value, guestFormItems[field]['validation_rules']);
+    // }
+    this.props.updateForm(declaration, declarationValid);
   }
 
   /**
    * Called when an input field changes
    * 
-   * @param {Event} e - A change event?
+   * @param {Event} e - A change event
    */
   handleCheckboxChange = (e) => {
     /* The id is the name of the Form.Item wrapping the input
     It is also the key needed for the given form object
     */
-    console.log("Checkbox Event: ", e);
+    console.log("Checkbox Event: ", e.target);
+    let field = e.target.id;
+    let value = e.target.checked;
+    this.debounceHandleChange(field, value);
+  }
+
+  /**
+   * Called when an input field changes
+   * 
+   * @param {Event} e - A change event
+   */
+  handleChangeDate = (e) => {
+    /* The id is the name of the Form.Item wrapping the input
+    It is also the key needed for the given form object
+    */
+    console.log("Date Change Event: ", e.target);
   }
 
   /**
@@ -49,17 +84,21 @@ class Declaration extends React.Component {
     /* The id is the name of the Form.Item wrapping the input
     It is also the key needed for the given form object
     */
-    console.log("Event: ", e.target.id);
+
+    let field = e.target.id;
+    let value = e.target.value; 
+    this.debounceHandleChange(field, value);
+    // console.log("Event: ", e.target.id);
+    // // this.setState({
+    // //   visible: true,
+    // // });
+    // // this.state.declaration[e.target.id] = e.target.value;
+    // let newDeclaration = this.state.declaration;
+    // newDeclaration[e.target.id] = e.target.value
     // this.setState({
-    //   visible: true,
+    //   declaration: newDeclaration,
     // });
-    // this.state.declaration[e.target.id] = e.target.value;
-    let newDeclaration = this.state.declaration;
-    newDeclaration[e.target.id] = e.target.value
-    this.setState({
-      declaration: newDeclaration,
-    });
-    console.log("Declaration: ", this.state.declaration);
+    // console.log("Declaration: ", this.state.declaration);
   }
 
   handleImages = (form) => {
@@ -239,6 +278,11 @@ class Declaration extends React.Component {
     }
   }
 
+  getValidationProps = (key) => {
+    // console.log(this.props.submitStatus);
+    return ( this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL ) ? this.props.declarationValid[key] : null;
+  }
+
   render() {
 
     const initialValues = this.getInitialValues();
@@ -270,13 +314,15 @@ class Declaration extends React.Component {
           layout='vertical'
           initialValues={initialValues} 
         >
-            <Form.Item name="agreed"
+            <Form.Item name="declaration_read"
                 style={myStyle} 
+                {  ...this.getValidationProps('declaration_read')  }
             >
-              <Checkbox onChange={(e) => this.handleCheckboxChange(e)}><b>I have read and agreed to this declaration.</b></Checkbox>
+              <Checkbox onChange={(e) => this.handleCheckboxChange(e)}><b>I have read and understood to this declaration.</b></Checkbox>
+              {/* <input type="checkbox" /> */}
             </Form.Item>
 
-            <Form.Item name="signature" label="Signature:"
+            <Form.Item name="signature" label="Electronic Signature:"
                 style={myStyle} 
                 rules={[
                   {
@@ -287,10 +333,11 @@ class Declaration extends React.Component {
                       max: 256,
                       message: 'Signature must be less than 256 characters'
                   }
-                ]}
+                ]} 
+                {  ...this.getValidationProps('signature')  }
             >
                 <Input 
-                    placeholder="Enter your full legal name" 
+                    placeholder="Enter your full name as an electronic signature" 
                     onChange={(e) => this.handleChange(e)} 
                 />
             </Form.Item>
@@ -300,9 +347,10 @@ class Declaration extends React.Component {
                 rules={[
                   {
                       required: true,
-                      message: 'Signature required',
+                      message: "Please enter today's date", 
                   }
                 ]} 
+                {  ...this.getValidationProps('date')  }
             >
                 <Input  
                     type='date' 
@@ -327,13 +375,16 @@ const mapStateToProps = state => {
     studentForms: state.guest.studentForms,
     guardianForms: state.guest.guardianForms,
     declaration: state.guest.declarationForm,
-    images: state.guest.images
+    images: state.guest.images, 
+    declarationValid: state.guest.declarationFormValid, 
+
+    submitStatus: state.form.submitStatus, 
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateForm: (declaration) => dispatch(actions.updateDeclaration(declaration)),
+    updateForm: (declaration, declarationValid) => dispatch(actions.updateDeclaration(declaration, declarationValid)),
   }
 }
 
