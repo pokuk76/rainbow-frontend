@@ -76,7 +76,6 @@ class GuardianForm extends React.Component {
 
         this.state = {
             forms: [],
-            // currentId: -1, 
             modalVisible: false, 
             modalContent: <></>, 
         };
@@ -161,20 +160,11 @@ class GuardianForm extends React.Component {
      * TODO: Make this better?
      */
     renderForms(){
-        // console.log("Rendering forms...");
-
         var forms = [];
         let i = 0;
         const initialFormValues = getInitialValues(this.props.guardianForms);
         for (let formUID in this.props.guardianForms){
-            // console.log("Form UID:", formUID);
-            // let fileSelected = (this.props.images[formUID]) ? true : false;
-            // let fileList = (this.props.images[formUID] === undefined) ? [] : this.props.images[formUID];
             var key = "GuardianPanel" + i;
-            // this.setState(
-            // {
-            //     currentId: formUID,
-            // });
 
             const guardianFormProps = {
                 showModal: this.showModal,
@@ -199,20 +189,20 @@ class GuardianForm extends React.Component {
 
             let n = parseInt(formUID.split('_')[1], 10);
             forms.push(
-            <Panel 
-                // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
-                header={setPanelHeader("Guardian " + (n+1), checkValidityForm(this.props.guardianFormsValid[formUID]))} 
-                key={key} 
-                extra={
-                    (Object.keys(this.props.guardianForms).length > 1) ? 
-                        <Button type="text" icon={closeIcon} style={{padding: 0}} danger /> : <></> }
-            >
-                <GuardianFormComponent {...guardianFormProps} />
-                {/* </Form> */}
-            </Panel>
+                <Panel
+                    // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
+                    header={setPanelHeader("Guardian " + (n + 1), checkValidityForm(this.props.guardianFormsValid[formUID]))}
+                    key={key}
+                    extra={
+                        (Object.keys(this.props.guardianForms).length > 1) ?
+                            <Button type="text" icon={closeIcon} style={{ padding: 0 }} danger /> : <></>}
+                >
+                    <GuardianFormComponent {...guardianFormProps} />
+                </Panel>
             );
             i++;
         }
+        
         this.setState({forms: forms});
 
     }
@@ -241,13 +231,6 @@ class GuardianForm extends React.Component {
                 </Breadcrumb>
                 <h1><TeamOutlined /> Guardians</h1>
                 <br />
-                {/* <Form 
-                key={"GuardianForm"} 
-                layout='vertical' 
-                id={"GuardianForm"} 
-                initialValues={initialValues} 
-
-                > */}
                 <br />
                 <Collapse
                     key='CollapseGuardians'
@@ -259,10 +242,9 @@ class GuardianForm extends React.Component {
                             style={{ fontSize: '2em', }}
                         />
                     }
-                    // expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} style={{ fontSize: '2em', }} />}
                     expandIconPosition='left'
                 >
-                    {this.state.forms}
+                    { this.state.forms }
                 </Collapse>
 
                 {/* Was getting in the way of the next/prev buttons
@@ -289,34 +271,12 @@ class GuardianForm extends React.Component {
                 <br />
                 <br />
 
-                {/* <div style={{margin: "auto", width: "80%"}}>
-                    <br />
-                    <Button type="danger" htmlType="button" style={{float: "right"}}>Previous</Button>
-                    <Button type="danger" htmlType="button" onClick={ (e) => this.props.componentSwitch('declaration')} style={{float: "left"}}>Next</Button>
-                </div> */}
-                
-                {/* <div>
-                <Form.Item>
-                <Button type='primary' htmlType='submit' onClick={this.onSave}>
-                    <SaveOutlined /> Submit
-                </Button>
-                </Form.Item>
-                <Form.Item>
-                <Button type='secondary' htmlType='submit' onClick={this.onContinue}>
-                    <SaveOutlined /> Save & Continue
-                </Button>
-                </Form.Item>
-                </div> */}
-
-                {/* </Form> */}
-
             </div>
         );
     }
 };
 
 const mapStateToProps = state => {
-    // console.log("Forms state-to-props: ", state);
     return {
         guardianForms: state.guest.guardianForms,
         guardianFormsValid: state.guest.guardianFormsValid, 

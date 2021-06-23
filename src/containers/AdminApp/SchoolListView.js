@@ -26,7 +26,7 @@ class SchoolList extends React.Component {
     
 
     componentDidMount() {
-        axios.get('http://127.0.0.1:8000/api/school_list/')
+        axios.get('api/school_list/')
             .then(res => {
                 this.setState({
                     schools: res.data['results']

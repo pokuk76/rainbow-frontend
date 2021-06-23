@@ -17,12 +17,21 @@ export const authSuccess = (token, guests) => {
 
 export const authPreSuccess = token => {
     return dispatch => {
-        axios.get('http://127.0.0.1:8000/api/guests/')
+        // axios.get('http://127.0.0.1:8000/api/guests/', {
+        //     headers: {
+        //       'Authorization': `Token ${token}`
+        //     }
+        // })
+        axios.get('api/formsets/')
         .then(res => {
             //console.log(this.props);
-            console.log("Guests from API: ", res.data['results']);
-            var guests = res.data['results'];
+            console.log("Guests from API: ", res.data['formsets']);
+            var guests = res.data['formsets'];
             dispatch(authSuccess(token, guests));
+        })
+        .catch(error => {
+            console.log("Pre-success get request: ", error);
+            dispatch(authFail(error));
         });
     }
 }
@@ -45,7 +54,7 @@ export const checkAuthTimeout = expirationTime => {
 export const authLogin = (username, password, callback) => {
     return dispatch => {
         dispatch(authStart());
-        axios.post('http://127.0.0.1:8000/rest-auth/login/', {
+        axios.post('rest-auth/login/', {
             username: username,
             password: password
         })
@@ -74,7 +83,7 @@ export const authLogin = (username, password, callback) => {
 export const authSignup = (username, email=null, password1, password2) => {
     return dispatch => {
         dispatch(authStart());
-        axios.post('http://127.0.0.1:8000/rest-auth/registration/', {
+        axios.post('rest-auth/registration/', {
             username: username,
             email: email,
             password1: password1,
@@ -99,8 +108,10 @@ export const authLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('username');
     localStorage.removeItem('expirationDate');
+    localStorage.removeItem('token');
     return {
-        type: actionTypes.AUTH_LOGOUT,
+        type: actionTypes.AUTH_LOGOUT, 
+        loading: false, 
     };
 }
 

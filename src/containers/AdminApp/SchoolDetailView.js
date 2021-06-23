@@ -10,7 +10,7 @@ class SchoolDetail extends React.Component {
 
     componentDidMount() {
         const schoolID = this.props.match.params.schoolID;
-        axios.get(`http://127.0.0.1:8000/api/school_detail/${schoolID}`)
+        axios.get(`api/school_detail/${schoolID}`)
             .then(res => {
                 this.setState({
                     school: res.data

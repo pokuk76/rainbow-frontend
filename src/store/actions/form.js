@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as actionTypes from './actionTypes';
-import { guestFormItems, studentFormItems, guardianFormItems, checkValidityItem } from '../../utility/forms';
+import { guestFormItems, studentFormItems, guardianFormItems, declarationFormItems, checkValidityItem } from '../../utility/forms';
 
 /* Form Submission */
 
@@ -53,7 +53,7 @@ export const submitFormset = (formsetData) => {
     return dispatch => {
         axios({
             method: 'post',
-            url: 'http://127.0.0.1:8000/api/formsets/',
+            url: 'api/formsets/',
             // data: studentFormsData, 
             data: formsetData, 
             headers: { 'Accept': 'application/json', 'Content-Type': 'multipart/form-data' }
@@ -75,26 +75,6 @@ export const submitFormset = (formsetData) => {
     };
 }
 
-// const handleImages = (form, images) => {
-//     let formType; // GuestForm, StudentForm, GuardianForm
-//     for (let imageKey in images){
-//       formType = imageKey.split('_')[0];
-//       switch(formType) {
-//         case "GuestForm":
-//           console.log("Image: ", images[imageKey][0]);
-//           let image_blob = images[imageKey][0];
-//           form.append('image_file', image_blob, image_blob['name']);
-//           return form;
-//         case "StudentForm":
-//           break;
-//         case "GuardianForm":
-//           break;
-//       }
-//     }
-
-//     return form;
-// }
-
 const handleImage = (form, images, key) => {
     let image_blob;
     let keyUID = key.concat("+image_file");
@@ -111,16 +91,19 @@ const handleImage = (form, images, key) => {
 * Create and validate the guest form
 * @param {Event} e - A change event?
 */
-const createGuestForm = (guestForm, images) => {
+const createGuestForm = (guestForm, images, formFieldsObj, formPrefix) => {
     let form_data = new FormData();
     const keys = ['username', 'first_name', 'middle_name', 'last_name']
 
     let value;
-    for (let key of keys) {
-        if (!guestForm[key]) {
-            form_data.append(key, null);
-        } else {
-            form_data.append(key, guestForm[key]);
+    // for (let key of keys) {
+    for (let key in formFieldsObj) {
+        if (key !== "declaration_read") {  // declaration_read is not needed on the back end
+            if (!guestForm[key]) {
+                form_data.append(formPrefix.concat('+', key), null);
+            } else {
+                form_data.append(formPrefix.concat('+', key), guestForm[key]);
+            }
         }
     }
     // form_data = handleImage(form_data, images);
@@ -130,26 +113,6 @@ const createGuestForm = (guestForm, images) => {
     }
     return form_data;
 }
-
-// const createStudentForm = (guest_id, studentForm, key, images) => {
-//     let form_data = new FormData();
-//     const keys = ['first_name', 'middle_name', 'last_name', 'nationality', 'religion', 'sex', 'date_of_birth', 'has_ailments', 'former_school', 'former_school_address', 'class_reached', 'reason_for_leaving']
-
-//     let value;
-//     for (let key of keys) {
-//         if (!studentForm[key]) {
-//             form_data.append(key, "");
-//         } else {
-//             form_data.append(key, studentForm[key]);
-//         }
-//     }
-//     form_data = handleImage(form_data, images, key);
-//     form_data.append('guest_user', guest_id); 
-//     for (let entry of form_data.entries()) {
-//         console.log("form data entry: ", entry);
-//     }
-//     return form_data;
-// }
 
 const createStudentForm = (studentForm, key, images) => {
     let form_data = new FormData();
@@ -195,18 +158,20 @@ const createFormsData = (studentForms, images, formItemsObj) => {
     // console.log("Student forms FormData object [handleStudentForms]: ");
     // for (let entry of studentFormsData.entries()) {
     //     console.log("form data entry: ", entry);
-    // }
+    // } 
     return [studentFormsData, numForms];
 }
 
-export const handleSubmit = (guestForm, studentForms, guardianForms, declarationForm, images) => {
+export const handleSubmit = (guestForm, studentForms, guardianForms, declarationForm, images, kwargs={}) => {
 
     let [studentFormsData, numStudents] = createFormsData(studentForms, images, studentFormItems);
     let [guardianFormsData, numGuardians] = createFormsData(guardianForms, images, guardianFormItems);
     studentFormsData.append("numStudents", numStudents);
     guardianFormsData.append("numGuardians", numGuardians);
 
-    let guestFormData = createGuestForm(guestForm, images);
+    let guestFormData = createGuestForm(guestForm, images, guestFormItems, 'GuestForm_0');
+    let declarationData = createGuestForm(declarationForm, images, declarationFormItems, 'Declaration_0');
+
 
     let formsetData = new FormData();
     for (let [key, value] of guestFormData.entries()) {
@@ -221,6 +186,10 @@ export const handleSubmit = (guestForm, studentForms, guardianForms, declaration
         // console.log("Guardian forms data entry: ", [key, value]);
         formsetData.append(key, value)
     }
+    for (let [key, value] of declarationData.entries()) {
+        console.log("Declaration data entry: ", [key, value]);
+        formsetData.append(key, value)
+    }
 
     return (dispatch, getState) => {
         // const submitStatus = {...getState().form.submitStatus};
@@ -231,6 +200,7 @@ export const handleSubmit = (guestForm, studentForms, guardianForms, declaration
         dispatch(submitStart(guestFormValid));
         if( getState().form.submitStatus === actionTypes.SUBMIT_INVALID_FAIL ) {
             dispatch(submitInvalidFail());
+            kwargs['invalidFormCallback']();
         } else {
             /* I guess we should do the actual POSTing of the form
                 Should we do it all in here, or create another action creator and reducer?
@@ -243,26 +213,22 @@ export const handleSubmit = (guestForm, studentForms, guardianForms, declaration
             // }
             axios({
                 method: 'post',
-                url: 'http://127.0.0.1:8000/api/formsets/',
+                url: 'api/formsets/',
                 // data: studentFormsData, 
                 data: formsetData, 
                 headers: { 'Accept': 'application/json', 'Content-Type': 'multipart/form-data' }
             })
             .then(response => {
                 console.log("POST response:", response); 
-                dispatch(submitSuccess()); 
+                dispatch(submitSuccess());
+                kwargs['successCallback'](); 
             })
             .catch(error => {
                 console.log("POST error:", error); 
                 dispatch(submitNetworkFail()); 
+                kwargs['networkErrorCallback']();
             });
         }
-        /* POST Guest Form */
-
-        // for (let [key, value] of studentFormsData.entries()) {
-        //     // console.log("form data entry: ", entry);
-        //     guestFormData.append(key, value);
-        // }
         
     };
 }

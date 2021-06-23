@@ -5,7 +5,7 @@ import debounce from "lodash/debounce";
 
 import { Form, Input, Button, Select, Upload } from 'antd';
 import ImgCrop from 'antd-img-crop';
-import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
+import { InboxOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
 import { formsCopy } from '../../utility/deepCopy';
 import { guardianFormItems, checkValidityItem } from '../../utility/forms';
@@ -44,13 +44,10 @@ class GuardianFormComponent extends React.Component {
 
         let guardianForms = formsCopy(this.props.guardianForms);
         let guardianFormsValid = formsCopy(this.props.guardianFormsValid);
-        // let guardianFormsTouched = formsCopy(this.props.guardianFormsTouched);
-
         guardianForms[form][field] = value;
         var rules = guardianFormItems[field]['validation_rules'];
         guardianFormsValid[form][field] = checkValidityItem(value, rules);
-
-        this.props.updateForms(guardianForms, guardianFormsValid);
+        this.props.updateGuardians(guardianForms, guardianFormsValid);
     }
 
     handleChange(e) {
@@ -62,9 +59,6 @@ class GuardianFormComponent extends React.Component {
        let field = e.target.id.split("+")[1];
        let value = e.target.value; 
        this.debounceHandleChange(form, field, value);
-        // let form = e.target.id.split("+")[0];
-        // let field = e.target.id.split("+")[1];
-        // this.props.guardianForms[form][field] = e.target.value;
     }
 
     handleChangeSelect(value, option, form, field) {
@@ -75,9 +69,8 @@ class GuardianFormComponent extends React.Component {
     }
 
     getValidationProps = (form, key) => {
-        // console.log(this.props.submitStatus);
-        let s = ( this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL );
-        return true ? this.props.guardianFormsValid[form][key] : null;
+        // let s = ( this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL );
+        return ( this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL ) ? this.props.guardianFormsValid[form][key] : null;
     }
 
     render() {
@@ -95,14 +88,11 @@ class GuardianFormComponent extends React.Component {
             multiple: false,
       
             onRemove: () => {
-                // console.log("Props images before remove: ", this.props.images);
                 this.props.removeImage(this.props.images, this.props.formUID)
             },
       
             beforeUpload: file => {
-                // console.log("Props images before upload: ", this.props.images);
                 this.props.addImage(this.props.images, this.props.formUID, file);
-                // console.log("Props images after upload: ", this.props.images);
                 return false;
             },
 
@@ -115,7 +105,6 @@ class GuardianFormComponent extends React.Component {
                   reader.onload = () => resolve(reader.result);
                 });
               }
-              // console.log("Img src: ", src);
               let modalContent = <div style={{backgroundColor:'red', height:20, width:20, }} ></div>;
               modalContent = <img src={src} alt="your upload" style={{ width: '100%' }} />;
               this.props.showModal(modalContent);
@@ -171,9 +160,9 @@ class GuardianFormComponent extends React.Component {
 
         return (
             <Form
-                key={"GuardianForm"}
+                key={this.props.formUID}
                 layout='vertical'
-                id={"GuardianForm"}
+                id={this.props.formUID}
                 initialValues={this.props.initialValues}
 
             >
@@ -339,11 +328,7 @@ class GuardianFormComponent extends React.Component {
                         style={{ width: 200 }}
                         placeholder="Relationship to students"
                         optionFilterProp="children"
-                        // onChange={onChange}
                         onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID, "guardian_type")}
-                        // onFocus={onFocus}
-                        // onBlur={onBlur}
-                        // onSearch={onSearch}
                         filterOption={(input, option) =>
                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
@@ -415,7 +400,6 @@ class GuardianFormComponent extends React.Component {
                     <Input.TextArea onChange={e => this.handleChange(e)} />
                 </Form.Item>
 
-                {/* {fileList.append(formUID)} */}
                 { removeFormButton }
             </Form>
         );
@@ -429,15 +413,14 @@ const mapStateToProps = state => {
         guardianFormsTouched: state.guest.guardianFormsTouched, 
         guardianUID: state.guest.guardianUID,
         images: state.guest.images, 
-        guardianFormsValid: state.guest.guardianFormsValid, 
-        
+                
         submitStatus: state.form.submitStatus,
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        updateForms: (guardianForms, guardianFormsValid) => dispatch(actions.updateGuardians(guardianForms, guardianFormsValid)),
+        updateGuardians: (guardianForms, guardianFormsValid) => dispatch(actions.updateGuardians(guardianForms, guardianFormsValid)),
         addImage: (images, id, file) => dispatch(actions.addImage(images, id, file)),
         removeImage: (images, id) => dispatch(actions.removeImage(images, id)),
         removeForm: (guardianForms, guardianFormsValid, uid, currentForm, images) => dispatch(actions.removeForm(guardianForms, guardianFormsValid, uid, currentForm, images)),
@@ -445,4 +428,5 @@ const mapDispatchToProps = dispatch => {
 }
 
 connect(mapStateToProps, mapDispatchToProps)(Dragger);
+export { GuardianFormComponent as UnconnectedGuardianForm};
 export default connect(mapStateToProps, mapDispatchToProps)(GuardianFormComponent);

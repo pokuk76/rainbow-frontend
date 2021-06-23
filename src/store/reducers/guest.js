@@ -64,7 +64,11 @@ const initialState = {
             postal_address: false, 
         }, 
     }, 
-    declarationForm: {}, 
+    declarationForm: {
+        declaration_read: false, 
+        signature: '', 
+        date: '',
+    }, 
     declarationFormValid: {
         declaration_read: { validateStatus: "error", help: "Please indicate that you have read & understood this declaration" },  // So this is initially invalid
         signature: { validateStatus: "error", help: "Electronic signature required" }, 
@@ -72,7 +76,6 @@ const initialState = {
     }, 
     images: {},  // key-value pairs where the key is the form UID 
                 // and the value is an array holding a single image file object 
-    submitStatus: null, 
 }
 
 const updateImages = (state, action) => {

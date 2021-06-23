@@ -1,11 +1,11 @@
 import React from 'react';
 import { List, Avatar, Space, Modal, Button } from 'antd';
 
-import { MessageOutlined, LikeOutlined, StarOutlined } from '@ant-design/icons';
+import { CheckCircleTwoTone, ExclamationCircleTwoTone } from '@ant-design/icons';
 
 const IconText = ({ icon, text }) => (
     <Space>
-        {React.createElement(icon)}
+        {icon}
         {text}
     </Space>
 );
@@ -14,7 +14,8 @@ class Guest extends React.Component {
 
     state = {
         loading: false,
-        visible: false,
+        visible: false, 
+        image: null, 
     };
 
     showModal = () => {
@@ -37,62 +38,61 @@ class Guest extends React.Component {
     render() {
 
         return (
-
-            <List
-                itemLayout="vertical"
-                size="large"
-                pagination={{
-                    onChange: page => {
-                        console.log(page);
-                    },
-                    pageSize: 3,
-                }}
-                dataSource={this.props.data}
-                renderItem={item => (
-                    <div onClick={() => this.showModal}>
+            <>
+                <List
+                    itemLayout="vertical"
+                    size="large"
+                    pagination={{
+                        onChange: page => {
+                            console.log(page);
+                        },
+                        pageSize: 10,
+                    }}
+                    dataSource={this.props.data}
+                    renderItem={item => (
                         <List.Item
-                            key={item.username}
+                            key={item.guest.username}
+                            // onClick={() => this.showModal}
+                            onClick={() => console.log("List Item Clicked")}
                             actions={[
-                                <IconText icon={StarOutlined} text="156" key="list-vertical-star-o" />,
-                                <IconText icon={LikeOutlined} text="156" key="list-vertical-like-o" />,
-                                <IconText icon={MessageOutlined} text="2" key="list-vertical-message" />,
-                            ]}
+                                <IconText icon={ item.guest.processed ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <ExclamationCircleTwoTone twoToneColor="#ff0000" />} text="Processed" key="list-vertical-star-o" />,
+                            ]} 
                             extra={
                                 <img
-                                    width={272}
-                                    alt="logo"
-                                    src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                                    width={256} 
+                                    height={200}
+                                    alt="logo" 
+                                    src={ item.guest.image_file ? item.guest.image_file : "https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"} 
                                 />
                             }
                         >
                             <List.Item.Meta
-                                avatar={<Avatar src={item.image_file} />}
-                                title={<a href={`${item.id}`}>{item.username}</a>}
-                                description={"Submitted: " + item.created}
+                                // avatar={<Avatar src={item.image_file} />}
+                                title={<a href={`/portal/admin/${item.guest.id}`}>{`${item.guest.first_name} ${item.guest.last_name}`}</a>}
+                                description={`Username: ${item.guest.username}`}
                             />
                             {/* {console.log("Image file: ", item.image_file)} */}
 
                         </List.Item>
-                        <Modal
-                            visible={this.visible}
-                            title="Title"
-                            onOk={this.handleOk}
-                            onCancel={this.handleCancel}
-                            footer={[
-                                <Button key="back" onClick={this.handleCancel}>
-                                    Return
+                    )}
+                />
+                <Modal
+                    visible={this.visible}
+                    title="Title"
+                    onOk={this.handleOk}
+                    onCancel={this.handleCancel}
+                    footer={[
+                        <Button key="back" onClick={this.handleCancel}>
+                            Return
                                 </Button>,
-                                <Button key="submit" type="primary" loading={this.loading} onClick={this.handleOk}>
-                                    Submit
+                        <Button key="submit" type="primary" loading={this.loading} onClick={this.handleOk}>
+                            Submit
                                 </Button>,
-                            ]}
-                        >
-                            <p>{item.image_file}</p>
-                        </Modal>
-                    </div>
-                )}
-
-            />
+                    ]}
+                >
+                    <p>{this.state.image}</p>
+                </Modal>
+            </>
         );
     }
 }

@@ -8,36 +8,28 @@ import * as actions from './store/actions/auth';
 
 import { connect } from 'react-redux';
 
+import axios from "axios";
+
+if (window.location.origin === "http://localhost:3000") {
+  axios.defaults.baseURL = "http://127.0.0.1:8000";
+  // let one = 1;
+} else {
+  axios.defaults.baseURL = window.location.origin;
+}
 
 class App extends Component {
 
   componentDidMount = state => {
-    // TODO: Remove this, this is where the random AUTH_FAIL action is coming from
+    /* TODO: This is where the random AUTH_FAIL action is coming from in the registration portal
+       It's not really a big deal, and if we have it then I don't think we need to check localStorage for 
+       isAuthenticated in the routes but let's think about that some more */
     // this.props.onTryAutoSignup();
   }
 
 
   render() {
     return (
-      // <div>
-      //   <Router>
-      //     <Switch>
-      //       <Route exact path={["/"]}>
-      //         <CustomLayout {...this.props}>
-      //           <BaseRouter />
-      //         </CustomLayout>
-      //       </Route>
-
-      //       <Route exact path='/test'>
-      //         <SiderDemo {...this.props}>
-      //           <Route exact path='/test'/>
-      //         </SiderDemo>
-      //       </Route>
-      //     </Switch>
-          
-      //   </Router>
-      // </div>
-      <Router>
+      <Router basename="/portal">
         <BaseRouter {...this.props} />
       </Router>
     );
@@ -46,9 +38,10 @@ class App extends Component {
 }
 
 const mapStateToProps = state => {
+  console.log("App state: ", state);
   return {
-    isAuthenticated: state.token !== null,
-    username: state.username
+    isAuthenticated: state.auth.token !== null,
+    username: state.auth.username
   }
 }
 

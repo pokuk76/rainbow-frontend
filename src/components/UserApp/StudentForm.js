@@ -61,7 +61,7 @@ class StudentFormComponent extends React.Component {
         var rules = studentFormItems[field]['validation_rules'];
         studentFormsValid[form][field] = checkValidityItem(value, rules);
 
-        this.props.updateForms(studentForms, studentFormsValid);
+        this.props.updateStudents(studentForms, studentFormsValid);
     }
 
     handleChange(e) {
@@ -89,8 +89,7 @@ class StudentFormComponent extends React.Component {
     }
 
     getValidationProps = (form, key) => {
-        // console.log(this.props.submitStatus);
-        let s = (this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL);
+        // let s = (this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL);
         return ( this.props.submitStatus===actionTypes.SUBMIT_INVALID_FAIL ) ? this.props.studentFormsValid[form][key] : null;
     }
     
@@ -114,23 +113,10 @@ class StudentFormComponent extends React.Component {
             onRemove: () => {
                 // console.log("Props images before remove: ", this.props.images);
                 this.props.removeImage(this.props.images, this.props.formUID)
-                let images = {...this.state.images};
-                // delete images[this.state.currentId];
-                this.setState(
-                    {
-                        images: images,
-                    }
-                );
             },
       
             beforeUpload: file => {
-                // console.log("Props images before upload: ", this.props.images);
                 this.props.addImage(this.props.images, this.props.formUID, file);
-                // console.log("Props images after upload: ", this.props.images);
-                // let images = {...this.props.images};
-                // this.setState(state => ({
-                //     images: images,
-                // }));
                 return false;
             },
 
@@ -213,11 +199,10 @@ class StudentFormComponent extends React.Component {
 
         return (
             <Form 
-                key={"StudentForm"} 
+                key={this.props.formUID} 
                 layout='vertical' 
-                id={"StudentForm"} 
+                id={this.props.formUID} 
                 initialValues={this.props.initialValues} 
-
             >
                 <Form.Item name={this.props.formUID + "+first_name"} label="First Name:"
                     rules={[
@@ -254,8 +239,7 @@ class StudentFormComponent extends React.Component {
                 >
                     <Input
                         placeholder="Enter last name"
-                        onChange={(e) => this.handleChange(e)}
-
+                        onChange={(e) => this.handleChange(e)} 
                     />
                 </Form.Item>
 
@@ -268,7 +252,6 @@ class StudentFormComponent extends React.Component {
                     ]} 
                     { ...this.getValidationProps(this.props.formUID, 'sex') }
                 >
-                    {/* This is going to be a selection */}
                     <Select
                         style={{ width: 200 }}
                         placeholder="Student's Gender"
@@ -375,7 +358,6 @@ class StudentFormComponent extends React.Component {
                             // console.log(option)
                             option['value'].indexOf(input.toLowerCase()) >= 0
                         } 
-
                         onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID, "class_reached")} 
                         options={[
                             { label: "Test", value: "test"}, 
@@ -388,7 +370,6 @@ class StudentFormComponent extends React.Component {
                             { label: "Form 1", value: "form 1"}, 
                         ]}
                     >
-                        
                     </Select>
                 </Form.Item>
 
@@ -401,9 +382,6 @@ class StudentFormComponent extends React.Component {
                     />
                 </Form.Item>
 
-                {/* {console.log('Form ID: ', formUID)} */}
-                {/* {fileList.append(formUID)} */}
-
                 { removeFormButton }
             </Form>
         );
@@ -412,13 +390,11 @@ class StudentFormComponent extends React.Component {
 
 
 const mapStateToProps = state => {
-    // console.log("Forms state-to-props: ", state);
     return {
         studentForms: state.guest.studentForms,
         studentFormsValid: state.guest.studentFormsValid, 
         studentUID: state.guest.studentUID,
         images: state.guest.images, 
-        studentFormsValid: state.guest.studentFormsValid, 
         
         submitStatus: state.form.submitStatus, 
     }
@@ -426,7 +402,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        updateForms: (studentForms, studentFormsValid) => dispatch(actions.updateStudents(studentForms, studentFormsValid)),
+        updateStudents: (studentForms, studentFormsValid) => dispatch(actions.updateStudents(studentForms, studentFormsValid)),
         addImage: (images, id, file) => dispatch(actions.addImage(images, id, file)),
         removeImage: (images, id) => dispatch(actions.removeImage(images, id)),
         removeForm: (studentForms, studentFormsValid, uid, currentForm, images) => dispatch(actions.removeForm(studentForms, studentFormsValid, uid, currentForm, images)),
@@ -434,6 +410,7 @@ const mapDispatchToProps = dispatch => {
 }
 
 connect(mapStateToProps, mapDispatchToProps)(Dragger);
+export { StudentFormComponent as UnconnectedStudentForm};
 export default connect(mapStateToProps, mapDispatchToProps)(StudentFormComponent);
 
 

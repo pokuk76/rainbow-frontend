@@ -4,7 +4,7 @@ import axios from 'axios';
 import { withRouter } from'react-router-dom';
 import debounce from "lodash/debounce";
 
-import { Form, Input, Button, Upload, Checkbox, Breadcrumb} from 'antd';
+import { Form, Input, Button, Checkbox, Breadcrumb} from 'antd';
 import { WalletOutlined, } from '@ant-design/icons';
 
 import * as actions from '../../store/actions/guest';
@@ -14,17 +14,13 @@ import { declarationFormItems, checkValidityItem } from '../../utility/forms';
 
 import DeleteIcon from '../../components/Icons';
 
-const { Dragger } = Upload;
-
 class Declaration extends React.Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      fileList: [],
-      uploading: false,
-      fileSelected: this.props.fileSelected, 
+      checked: this.props.declaration['declaration_read'], 
       declaration: this.props.declaration // We're passing by reference, which actually works for us 
                                       // but might cause issues later?
     };
@@ -46,7 +42,7 @@ class Declaration extends React.Component {
     // if(testInvalidSubmitState) {
     //   this.props.guestFormValid[field] = checkValidityItem(value, guestFormItems[field]['validation_rules']);
     // }
-    this.props.updateForm(declaration, declarationValid);
+    this.props.updateDeclaration(declaration, declarationValid);
   }
 
   /**
@@ -58,7 +54,8 @@ class Declaration extends React.Component {
     /* The id is the name of the Form.Item wrapping the input
     It is also the key needed for the given form object
     */
-    console.log("Checkbox Event: ", e.target);
+    // console.log("Checkbox Event: ", e.target);
+    this.setState({checked: e.target.checked});
     let field = e.target.id;
     let value = e.target.checked;
     this.debounceHandleChange(field, value);
@@ -159,106 +156,6 @@ class Declaration extends React.Component {
     return form_data;
   }
 
-  handleFormSubmit = () => {
-    // event.preventDefault();
-
-    // let guestForm = this.props.guestForm;
-    const guestForm = this.createGuestForm();
-    // console.log("Guest form as form data: ", guestForm.entries());
-    // this.handleImages(guestForm);
-    console.log("Guest form: ", guestForm)
-    const studentForms = this.props.studentForms;
-    const guardianForms = this.props.guardianForms;
-    const declaration = this.props.declaration;
-    const guest_user = 'guest_user';
-
-    /* POST Guest Form */
-    axios({
-      method: 'post',
-      url: 'http://127.0.0.1:8000/api/guests/',
-      data: guestForm,
-      headers: {'Accept': 'application/json', 'Content-Type': 'multipart/form-data' }
-      })
-    .then(response => {
-      console.log("POST response:", response);
-      const guest_id = response.data['id'];
-
-      /* POST Image */ 
-      // let imageForm = {};
-      // // imageForm['guest'] = guest_id;
-      // imageForm['image_file'] = this.handleImage('Guest');
-      // console.log('Image form: ', imageForm);
-
-      // axios({
-      //   method: 'put',
-      //   url: 'http://127.0.0.1:8000/api/guests/',
-      //   data: imageForm,
-      //   headers: {'Accept': 'application/json', 'Content-Type': 'application/json' }
-      //   })
-      // .then(response => {
-      //   console.log("Guest image POST response:", response);
-      // })
-      // .catch(error => {
-      //   console.log("Guest image POST error:", error);
-      // });
-
-      // /* POST Students Forms */ 
-      // for (let formUID in studentForms){
-      //   let studentForm = studentForms[formUID];
-
-      //   studentForm[guest_user] = guest_id;
-      //   axios({
-      //     method: 'post',
-      //     url: 'http://127.0.0.1:8000/api/students/',
-      //     data: studentForm,
-      //     headers: {'Accept': 'application/json', 'Content-Type': 'application/json' }
-      //     })
-      //   .then(response => {
-      //     console.log("POST response:", response);
-      //   })
-      //   .catch(error => {
-      //     console.log("Student POST error:", error);
-      //   });
-      // }
-      // /* POST Guardians Forms */
-      // for (let formUID in guardianForms){
-      //   let guardianForm = guardianForms[formUID]
-
-      //   guardianForm[guest_user] = guest_id;
-      //   axios({
-      //     method: 'post',
-      //     url: 'http://127.0.0.1:8000/api/guardians/',
-      //     data: guardianForm,
-      //     headers: {'Accept': 'application/json', 'Content-Type': 'application/json' }
-      //     })
-      //   .then(response => {
-      //     console.log("POST response:", response);
-      //   })
-      //   .catch(error => {
-      //     console.log("Guardian POST error:", error);
-      //   });
-      // }
-      // /* POST Declaration Form */
-      // declaration[guest_user] = guest_id;
-      // axios({
-      //   method: 'post',
-      //   url: 'http://127.0.0.1:8000/api/declarations/',
-      //   data: declaration,
-      //   headers: {'Accept': 'application/json', 'Content-Type': 'application/json' }
-      //   })
-      // .then(response => {
-      //   console.log("POST response:", response);
-      //   this.props.history.push('/test/success');
-      // })
-      // .catch(error => {
-      //   console.log("Declaration POST error:", error);
-      // });
-    })
-    .catch(error => {
-      console.log("Guest POST error:", error);
-    });
-  }
-
   getInitialValues = () => {
     console.log("Getting initial values...");
     // let initialValues = {}; // Each form has its own initial values and we'll map then using the form's id
@@ -269,7 +166,6 @@ class Declaration extends React.Component {
 
     try {
       for (const [name, value] of Object.entries(declaration)) {
-        console.log(`${name}: ${value}`);
         initialForm[name] = value;
       }
     }
@@ -279,14 +175,12 @@ class Declaration extends React.Component {
   }
 
   getValidationProps = (key) => {
-    // console.log(this.props.submitStatus);
     return ( this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL ) ? this.props.declarationValid[key] : null;
   }
 
   render() {
 
-    const initialValues = this.getInitialValues();
-
+    // const initialValues = this.getInitialValues();
 
     const myStyle = {width: "50%", marginLeft:"auto", marginRight: "auto"};
 
@@ -312,13 +206,18 @@ class Declaration extends React.Component {
         <Form 
           key={"DeclarationForm"} 
           layout='vertical'
-          initialValues={initialValues} 
+          initialValues={{...this.props.declaration}} 
         >
             <Form.Item name="declaration_read"
                 style={myStyle} 
                 {  ...this.getValidationProps('declaration_read')  }
             >
-              <Checkbox onChange={(e) => this.handleCheckboxChange(e)}><b>I have read and understood to this declaration.</b></Checkbox>
+              <Checkbox 
+                // checked={this.props.declaration['declaration_read']} 
+                checked={ this.state.checked } 
+                onChange={(e) => this.handleCheckboxChange(e)}>
+                  <b>I have read and understood to this declaration.</b>
+              </Checkbox>
               {/* <input type="checkbox" /> */}
             </Form.Item>
 
@@ -357,10 +256,6 @@ class Declaration extends React.Component {
                     onChange={(e) => this.handleChange(e)} 
                 />
             </Form.Item>
-
-            {/* <Form.Item>
-                <Button type="primary" htmlType="submit" onClick={this.handleFormSubmit}>Finish</Button>
-            </Form.Item> */}
         </Form>
       </div>
     );
@@ -368,14 +263,8 @@ class Declaration extends React.Component {
 };
 
 const mapStateToProps = state => {
-  console.log("Forms state-to-props: ", state);
   return {
-    selectedMenuItem: state.guest.selectedMenuItem,
-    guestForm: state.guest.guestForm,
-    studentForms: state.guest.studentForms,
-    guardianForms: state.guest.guardianForms,
     declaration: state.guest.declarationForm,
-    images: state.guest.images, 
     declarationValid: state.guest.declarationFormValid, 
 
     submitStatus: state.form.submitStatus, 
@@ -384,9 +273,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateForm: (declaration, declarationValid) => dispatch(actions.updateDeclaration(declaration, declarationValid)),
+    updateDeclaration: (declaration, declarationValid) => dispatch(actions.updateDeclaration(declaration, declarationValid)),
   }
 }
 
-connect(mapStateToProps, mapDispatchToProps)(Dragger);
+export { Declaration as UnconnectedDeclaration};
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Declaration));

@@ -11,25 +11,23 @@ const { Header, Content, Footer } = Layout;
 
 class CustomLayout extends React.Component {
 
-    render() {
-        //console.log(localStorage.getItem('username'));
+    componentDidMount() {
+        this.props.authCheckState();
+    }
 
+    render() {
         return (
-            <Layout className="layout">
+            <Layout className="layout" style={{minHeight:"100vh"}}>
                 <Header style={{ position: 'fixed', zIndex: 1, width: '100%'}}>
                     <div className="logo"></div>
                     {
                         localStorage.getItem('isAuthenticated') ?
-                        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[]}>
+                        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[3]}>
                             <Menu.Item key="1" disabled>
                                 <Avatar size="large" icon={<UserOutlined />} />
                                 &nbsp;&nbsp;&nbsp;
                                 {
-                                    localStorage.getItem('isAuthenticated')
-                                    ?
                                     localStorage.getItem('username')
-                                    :
-                                    ""
                                 }  
                             </Menu.Item>
 
@@ -38,11 +36,11 @@ class CustomLayout extends React.Component {
                             </Menu.Item>
 
                             <Menu.Item key="3" icon={<UnorderedListOutlined />}>
-                                <Link to="/guests"> Guests</Link>
+                                <Link to="/portal/admin"> Guests</Link>
                             </Menu.Item>
 
                             <Menu.Item key="4" icon={<PlusCircleOutlined />}>
-                                <Link to="/guests"> New Application</Link>
+                                <Link to="/portal/admin"> New Application</Link>
                             </Menu.Item>
                             
                             <Menu.Item key="5" onClick={this.props.logout} icon={<LogoutOutlined />}>
@@ -55,17 +53,10 @@ class CustomLayout extends React.Component {
                             <Menu.Item key="1" disabled>
                                 <Avatar size="large" icon={<UserOutlined />} />
                                 &nbsp;&nbsp;&nbsp;
-                                {
-                                    localStorage.getItem('isAuthenticated')
-                                    ?
-                                    localStorage.getItem('username')
-                                    :
-                                    ""
-                                }  
                             </Menu.Item>
 
                             <Menu.Item key="2" icon={<LoginOutlined />}>
-                                <Link to="/login"> Login</Link>
+                                <Link to="/portal/login"> Login</Link>
                             </Menu.Item>
                         </Menu>
                     }
@@ -77,11 +68,11 @@ class CustomLayout extends React.Component {
                         // can have the Breadcrumb items render dynamically (see GuestDetailView)
                     }
                     <Breadcrumb style={{ margin: '16px 0' }}>
-                        <Breadcrumb.Item><Link to='/guests'>Guest</Link></Breadcrumb.Item>
-                        <Breadcrumb.Item><Link to='/'>Students</Link></Breadcrumb.Item>
+                        <Breadcrumb.Item>Portal</Breadcrumb.Item>
+                        <Breadcrumb.Item><Link to='/portal/admin'>Admin</Link></Breadcrumb.Item>
+                        {/* <Breadcrumb.Item><Link to='/'>Students</Link></Breadcrumb.Item>
                         <Breadcrumb.Item><Link to='/'>Guardians</Link></Breadcrumb.Item>
-                        <Breadcrumb.Item><Link to='/'>Declaration</Link></Breadcrumb.Item>
-                        <Breadcrumb.Item>App</Breadcrumb.Item>
+                        <Breadcrumb.Item><Link to='/'>Declaration</Link></Breadcrumb.Item> */}
                     </Breadcrumb>
                     <div className="site-layout-content">
                         {this.props.children}
@@ -105,7 +96,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        logout: () => dispatch(actions.authLogout())
+        logout: () => dispatch(actions.authLogout()), 
+        authCheckState: () => dispatch(actions.authCheckState()), 
     }
 }
 

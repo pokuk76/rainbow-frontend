@@ -59,7 +59,7 @@ class GuestInfo extends React.Component {
     /* I don't really like doing this in componentDidMount 
     https://www.google.com/search?q=react+call+setstate+in+componentdidmount&oq=react+calling+setstate+in+com&aqs=edge.2.0j69i64j0i22i30l3j69i57.11612j0j4&sourceid=chrome&ie=UTF-8
     */
-    axios.get('http://127.0.0.1:8000/api/usernames/')
+    axios.get('api/usernames/')
       .then(response => {
         console.log(response.data);
         this.setState({usernames: response.data});
@@ -111,7 +111,7 @@ class GuestInfo extends React.Component {
     // if(testInvalidSubmitState) {
     //   this.props.guestFormValid[field] = checkValidityItem(value, guestFormItems[field]['validation_rules']);
     // }
-    this.props.updateForm(guestForm, guestFormValid);
+    this.props.updateGuestInfo(guestForm, guestFormValid);
   }
 
   /**
@@ -400,7 +400,6 @@ class GuestInfo extends React.Component {
 const mapStateToProps = state => {
   // console.log("Forms state-to-props: ", state);
   return {
-    selectedMenuItem: state.guest.selectedMenuItem,
     guestForm: state.guest.guestForm,
     images: state.guest.images, 
     guestFormValid: state.guest.guestFormValid, 
@@ -411,11 +410,12 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    updateForm: (guestForm, guestFormValid) => dispatch(actions.updateGuestInfo(guestForm, guestFormValid)),
+    updateGuestInfo: (guestForm, guestFormValid) => dispatch(actions.updateGuestInfo(guestForm, guestFormValid)),
     addImage: (images, id, file) => dispatch(actions.addImage(images, id, file)),
     removeImage: (images, id) => dispatch(actions.removeImage(images, id)),
   }
 }
 
 connect(mapStateToProps, mapDispatchToProps)(Dragger);
+export { GuestInfo as GuestForm};
 export default connect(mapStateToProps, mapDispatchToProps)(GuestInfo);

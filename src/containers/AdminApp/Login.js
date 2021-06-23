@@ -3,6 +3,7 @@ import React from 'react';
 import { Form, Input, Button, Checkbox, Spin } from 'antd';
 import { LoadingOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux'
+
 import * as actions from '../../store/actions/auth';
 
 
@@ -31,7 +32,13 @@ class LoginForm extends React.Component {
     constructor(props) {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
-      }
+    }
+
+    componentDidMount() {
+        console.log("Login props: ", this.props);
+        console.log("Location: ", this.props.location.state)
+
+    }
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -51,12 +58,24 @@ class LoginForm extends React.Component {
 
     onFinish = (values) => {
         // console.log('Success:', values);
-        console.log('Props:', this.props);
-        this.props.history.push('/guests');
+        if (this.props.location.state) {
+            this.props.history.push(this.props.location.state.referrer);
+        } else {
+            this.props.history.push('/portal/admin');
+        }
     }
 
     onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
+    }
+
+    handleRedirected = () => {
+        try {
+            if (this.props.location.state.referrer) {
+                return <h1 style={{marginBottom:"1em"}}>Please sign in to access this page</h1>
+            }
+        } catch { }
+        return <h1 style={{marginBottom:"1em"}}>Please sign in to continue</h1>;
     }
     
     render() {
@@ -84,7 +103,8 @@ class LoginForm extends React.Component {
     
         return (
             <div>
-                {errorMessage}
+                { this.handleRedirected() }
+                { errorMessage }
                 {
                     this.props.loading
                     ? 
@@ -124,7 +144,7 @@ class LoginForm extends React.Component {
                             </a>
                         </Form.Item>
 
-                        <Form.Item {...tailLayout}>
+                        <Form.Item>
                             <Button type="primary" htmlType="submit" className="login-form-button" onClick={ (e) => this.handleSubmit(e) }>
                                 Log in
                             </Button>

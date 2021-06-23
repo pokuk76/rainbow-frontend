@@ -60,22 +60,6 @@ function callback(key) {
 }
  
 /*******/
-
-function panelHeader(text) {
-    return <div style={{ display: 'inline-flex', marginLeft: '1em', height: '100%', width: '70%', }}><h1
-        style={{
-            fontSize: '1.5em',
-            margin: 'auto',
-            textAlign: 'right',
-            height: '100%',
-            width: '60%',
-            // backgroundColor: 'red',
-        }}
-    >
-        {text}
-    </h1></div>;
-}
-
 function setPanelHeader(text, formValid) {
     return (
         <div style={{ display: 'inline-flex', marginLeft: '1em', height: '100%', width: '70%' }}>
@@ -96,9 +80,7 @@ class StudentForm extends React.Component {
 
         this.state = {
             forms: [],
-            fileList: this.props.fileList,
             uploading: false,
-            fileSelected: this.props.fileSelected,
             modalVisible: false, 
             modalContent: <></>, 
             // studentForms: this.props.studentForms // We're passing by reference, which actually works for us 
@@ -184,16 +166,11 @@ class StudentForm extends React.Component {
     }
 
     renderForms = () => {
-    // componentDidMount() {
-        // console.log("Render forms");
-        // const { fileList, uploading, fileSelected } = this.state;
 
         var forms = [];
         let i = 0;
         const initialFormValues = getInitialValues(this.props.studentForms);
         for (let formUID in this.props.studentForms){
-            // let fileSelected = (this.props.images[formUID]) ? true : false;
-            // let fileList = this.props.images[formUID];
             var key = "StudentPanel" + i;
             let closeIcon = <CloseSquareOutlined
                 // onMouseEnter={console.log("Square Hover")}
@@ -206,8 +183,6 @@ class StudentForm extends React.Component {
                     // ":hover": { fontColor: "blue" },
                     fontSize: '2em',
                     margin: 'auto',
-                    // backgroundColor: 'black',
-                    // display: 'inline',
                 }}
             />;
 
@@ -223,7 +198,6 @@ class StudentForm extends React.Component {
             <Panel 
                 // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
                 header={ setPanelHeader("Student " + (n+1), checkValidityForm(formUID, this.props.studentFormsValid)) } 
-                // header={setPanelHeader("Student " + (n+1))} 
                 key={key} 
                 extra={
                     (Object.keys(this.props.studentForms).length > 1) ? 
@@ -266,7 +240,6 @@ class StudentForm extends React.Component {
                     expandIcon={({ isActive }) => <RightOutlined rotate={isActive ? 90 : 0} style={{ fontSize: '2em', }} />}
                     expandIconPosition='left'
                 >
-                    {/* { console.log("Forms: ", this.state.forms) } */}
                     {this.state.forms}
                 </Collapse>
 
@@ -282,7 +255,6 @@ class StudentForm extends React.Component {
                 </Modal>
 
                 <br />
-                {/* { console.log("Selected menu item: ", this.state.selectedMenuItem) } */}
                 <Button key={this.props.selectedMenuItem} onClick={() => this.props.addForm(this.props.studentForms, this.props.studentFormsValid, this.props.studentUID, 'StudentForm')}>
                     <FileAddOutlined /> Add Student
                 </Button>
@@ -294,7 +266,6 @@ class StudentForm extends React.Component {
 };
 
 const mapStateToProps = state => {
-    // console.log("Forms state-to-props: ", state);
     return {
         studentForms: state.guest.studentForms,
         studentFormsValid: state.guest.studentFormsValid, 
@@ -311,5 +282,4 @@ const mapStateToProps = state => {
     }
   }
   
-//   connect(mapStateToProps, mapDispatchToProps)(Dragger);
   export default connect(mapStateToProps, mapDispatchToProps)(StudentForm);
