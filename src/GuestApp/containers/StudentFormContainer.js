@@ -2,50 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { Button, Collapse, Breadcrumb, Modal } from 'antd';
-import {
-    InboxOutlined, FileAddOutlined, CloseSquareOutlined, SaveOutlined, UserAddOutlined,
-    RightOutlined, CalendarOutlined
-} from '@ant-design/icons';
+import { FileAddOutlined, CloseSquareOutlined, UserAddOutlined, RightOutlined } from '@ant-design/icons';
 
-import { getInitialValues, checkValidityForm } from '../../utility/forms';
+import StudentFormComponent from '../components/StudentForm';
+
 import * as actions from '../../store/actions/guest';
-
-import StudentFormComponent from '../../components/UserApp/StudentForm';
-
-// Opera 8.0+
-// const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-
-// Firefox 1.0+
-const isFirefox = typeof InstallTrigger !== 'undefined';
-
-// Safari 3.0+ "[object HTMLElementConstructor]" 
-// const isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
-
-// Internet Explorer 6-11
-const isIE = /*@cc_on!@*/false || !!document.documentMode;
-
-// Edge 20+
-const isEdge = !isIE && !!window.StyleMedia;
-
-// Chrome 1 - 71
-const isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
-
-// Blink engine detection
-// const isBlink = (isChrome || isOpera) && !!window.CSS;
+import { getInitialValues, checkValidityForm } from '../../utility/forms';
 
 /* For the Select component */
-function onChange(value) {
-    console.log(`selected ${value}`);
-}
-
-function onBlur() {
-    console.log('blur');
-}
-
-function onFocus() {
-    console.log('focus');
-}
-
 function onSearch(val) {
     console.log('search:', val);
 }
@@ -66,8 +30,8 @@ function setPanelHeader(text, formValid) {
             <h1 style={{ fontSize: '1.5em', margin: 'auto', textAlign: 'right',
                 height: '100%', width: '60%', // backgroundColor: 'red',
             }} >
-                {text}
-                { ( formValid === null ) ? " Valid" : "Not Valid" }
+                { text }
+                {/* { ( formValid === null ) ? " Valid" : "Not Valid" } */}
             </h1>
         </div>
     );

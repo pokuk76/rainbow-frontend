@@ -5,9 +5,7 @@ import { Button, Spin } from 'antd';
 import { Link } from'react-router-dom';
 import { LoadingOutlined } from '@ant-design/icons';
 
-import Guest from '../../components/Guest';
-import CustomForm from '../../components/Form';
-
+import Guest from '../components/Guest';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -18,6 +16,9 @@ class GuestList extends React.Component {
         .then(res => {
             //console.log(this.props);
             console.log("Formsets from API: ", res.data);
+        })
+        .catch(error => {
+            console.log("Error getting formsets: ", error);
         })
     }
 

@@ -1,21 +1,23 @@
 // eslint-disable-next-line
 import React, { Component } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import BaseRouter from './routes';
+import { connect } from 'react-redux';
 import 'antd/dist/antd.css';
 
+import BaseRouter from './routes';
 import * as actions from './store/actions/auth';
 
-import { connect } from 'react-redux';
-
 import axios from "axios";
-
-if (window.location.origin === "http://localhost:3000") {
-  axios.defaults.baseURL = "http://127.0.0.1:8000";
-  // let one = 1;
-} else {
-  axios.defaults.baseURL = window.location.origin;
-}
+/**
+ * In production, the backend service will still be hosted at port 8000 while the React stuff will be served by 
+ * Nginx at port 80, so we do NOT want the base URL to become the React origin
+ */
+axios.defaults.baseURL = "http://127.0.0.1:8000";
+// if (window.location.origin === "http://localhost:3000") {
+//   axios.defaults.baseURL = "http://127.0.0.1:8000";
+// } else {
+//   axios.defaults.baseURL = window.location.origin;
+// }
 
 class App extends Component {
 
@@ -26,7 +28,6 @@ class App extends Component {
     // this.props.onTryAutoSignup();
   }
 
-
   render() {
     return (
       <Router basename="/portal">
@@ -34,11 +35,10 @@ class App extends Component {
       </Router>
     );
   }
-
 }
 
 const mapStateToProps = state => {
-  console.log("App state: ", state);
+  // console.log("App state: ", state);
   return {
     isAuthenticated: state.auth.token !== null,
     username: state.auth.username

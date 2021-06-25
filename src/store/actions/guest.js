@@ -2,10 +2,8 @@ import * as actionTypes from './actionTypes';
 import { formValidCopy } from '../../utility/deepCopy';
 import { studentFormValidInitialState, guardianFormValidInitialState } from '../../utility/forms';
 
-const GUEST_INFO = 'GuestForm';
 const STUDENT_FORM = 'StudentForm';
 const GUARDIAN_FORM = 'GuardianForm';
-const DECLARATION_FORM = 'DeclarationForm';
 const RESET_VALUES_ON_DEFAULT = 'RESET_VALUES_ON_DEFAULT';
 
 
@@ -72,12 +70,15 @@ export const updateGuardians = (guardianForms, guardianFormsValid, guardianUID=n
 // updateGuardians might be the only useful function here
 export const addForm = (formsObject, formsValid, uid, currentForm) => {
     uid++;  
+    let id;
+    let newFormSet;
+    let newFormValidSet;
     switch(currentForm) {
         case STUDENT_FORM:
             // console.log("StudentUID:", uid);
-            var id = "StudentForm_" + uid;
-            var newFormSet = {...formsObject};  // Don't think we need to make a deep copy since we are just adding a formObject
-            var newFormValidSet = {...formsValid}
+            id = "StudentForm_" + uid;
+            newFormSet = {...formsObject};  // Don't think we need to make a deep copy since we are just adding a formObject
+            newFormValidSet = {...formsValid}
             newFormSet[id] = {};
             newFormValidSet[id] = formValidCopy(studentFormValidInitialState);
 
@@ -85,9 +86,9 @@ export const addForm = (formsObject, formsValid, uid, currentForm) => {
                 dispatch( updateStudents(newFormSet, newFormValidSet, uid) );
             };
         case GUARDIAN_FORM:
-            var id = "GuardianForm_" + uid;
-            var newFormSet = {...formsObject};
-            var newFormValidSet = {...formsValid}
+            id = "GuardianForm_" + uid;
+            newFormSet = {...formsObject};
+            newFormValidSet = {...formsValid}
             newFormSet[id] = {};
             newFormValidSet[id] = formValidCopy(guardianFormValidInitialState);
             return dispatch => {
@@ -102,7 +103,7 @@ export const addForm = (formsObject, formsValid, uid, currentForm) => {
 
 export const removeForm = (formsObject, formsValid, uid, currentForm, images) => {
     // let newFormSet = [...formArray];
-    // newFormSet.splice(index, 1); 
+    // newFormSet.splice(index, 1);
 
     let newFormSet = {...formsObject};
     let newFormValidSet = {...formsValid}

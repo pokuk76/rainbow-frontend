@@ -1,21 +1,28 @@
 import axios from 'axios';
 import * as actionTypes from './actionTypes';
-import { guestFormItems, studentFormItems, guardianFormItems, declarationFormItems, checkValidityItem } from '../../utility/forms';
+import { guestFormItems, studentFormItems, guardianFormItems, declarationFormItems } from '../../utility/forms';
+import StudentForm from '../../GuestApp/components/StudentForm';
 
 /* Form Submission */
 
-export const submitStart = (guestFormValid) => {
+export const submitStart = (guestFormValid, studentFormsValid, guardianFormsValid, declarationFormValid) => {
     let formValid = true;
     for(let item in guestFormValid){
-        // var value = guestForm[item];
-        // var rules = guestFormItems[item]['validation_rules'];
-        // var checkValidityErrors = checkValidityItem(value, rules);
-        // if (checkValidityErrors === null) {
-        //     formValid = formValid && true;
-        // } else {
-        //     formValid = formValid && false;
-        // }
         formValid = (guestFormValid[item] === null) ? formValid && true : formValid && false;
+    }
+    for(let formKey in studentFormsValid){
+        // for(let field in studentFormItems) {
+        for(let field in studentFormsValid[formKey]) {
+            formValid = (studentFormsValid[formKey][field] === null) ? formValid && true : formValid && false;
+        }
+    }
+    for(let formKey in guardianFormsValid){
+        for(let field in guardianFormsValid[formKey]) {
+            formValid = (guardianFormsValid[formKey][field] === null) ? formValid && true : formValid && false;
+        }
+    }
+    for(let item in declarationFormValid){
+        formValid = (declarationFormValid[item] === null) ? formValid && true : formValid && false;
     }
     let submitStatus = formValid ? actionTypes.SUBMIT_START : actionTypes.SUBMIT_INVALID_FAIL;
     return {
@@ -93,9 +100,6 @@ const handleImage = (form, images, key) => {
 */
 const createGuestForm = (guestForm, images, formFieldsObj, formPrefix) => {
     let form_data = new FormData();
-    const keys = ['username', 'first_name', 'middle_name', 'last_name']
-
-    let value;
     // for (let key of keys) {
     for (let key in formFieldsObj) {
         if (key !== "declaration_read") {  // declaration_read is not needed on the back end
@@ -111,25 +115,6 @@ const createGuestForm = (guestForm, images, formFieldsObj, formPrefix) => {
     for (let entry of form_data.entries()) {
         console.log("form data entry: ", entry);
     }
-    return form_data;
-}
-
-const createStudentForm = (studentForm, key, images) => {
-    let form_data = new FormData();
-    const keys = ['first_name', 'middle_name', 'last_name', 'nationality', 'religion', 'sex', 'date_of_birth', 'has_ailments', 'former_school', 'former_school_address', 'class_reached', 'reason_for_leaving']
-
-    let value;
-    for (let key of keys) {
-        if (!studentForm[key]) {
-            form_data.append(key, "");
-        } else {
-            form_data.append(key, studentForm[key]);
-        }
-    }
-    form_data = handleImage(form_data, images, key);
-    // for (let entry of form_data.entries()) {
-    //     console.log("form data entry: ", entry);
-    // }
     return form_data;
 }
 
@@ -193,11 +178,13 @@ export const handleSubmit = (guestForm, studentForms, guardianForms, declaration
 
     return (dispatch, getState) => {
         // const submitStatus = {...getState().form.submitStatus};
-        // const guestFormValid = {...getState().form.guestFormValid};
         const guestFormValid = {...getState().guest.guestFormValid}; 
+        const studentFormsValid = {...getState().guest.studentFormsValid};
+        const guardianFormsValid = {...getState().guest.guardianFormsValid};
+        const declarationFormValid = {...getState().guest.declarationFormValid};
         const guestForm = {...getState().guest.guestForm}; 
 
-        dispatch(submitStart(guestFormValid));
+        dispatch(submitStart(guestFormValid, studentFormsValid, guardianFormsValid, declarationFormValid));
         if( getState().form.submitStatus === actionTypes.SUBMIT_INVALID_FAIL ) {
             dispatch(submitInvalidFail());
             kwargs['invalidFormCallback']();
@@ -205,12 +192,6 @@ export const handleSubmit = (guestForm, studentForms, guardianForms, declaration
             /* I guess we should do the actual POSTing of the form
                 Should we do it all in here, or create another action creator and reducer?
               */
-            // submitFormset(formsetData);
-            // if( getState().form.submitStatus === actionTypes.SUBMIT_NETWORK_FAIL ) {
-            //     dispatch(submitSuccess());
-            // } else {
-
-            // }
             axios({
                 method: 'post',
                 url: 'api/formsets/',

@@ -4,9 +4,9 @@ import debounce from "lodash/debounce";
 
 import { Form, Input, Button, Select, Upload, DatePicker } from 'antd';
 import ImgCrop from 'antd-img-crop';
-import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
+import { InboxOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
-import { DeleteIcon } from '../Icons';
+import { DeleteIcon } from '../../generics/Icons';
 
 import { formsCopy } from '../../utility/deepCopy';
 import { studentFormItems, checkValidityItem } from '../../utility/forms';
@@ -16,11 +16,6 @@ import * as actionTypes from '../../store/actions/actionTypes';
 
 const { Option } = Select;
 const { Dragger } = Upload;
-
-/* For the Select component */
-function onChange(value) {
-    console.log(`selected ${value}`);
-}
 
 const removeIcon = <CloseSquareOutlined
                 style={{
@@ -75,9 +70,7 @@ class StudentFormComponent extends React.Component {
     }
 
     handleChangeSelect(value, option, form, field) {
-        console.log("Handle Select component change [value, field, option]: ", value, field, option);
-        // let [form, field] = itemUID.split("+");
-        // console.log("form, field: ", form, field);
+        // console.log("Handle Select component change [value, field, option]: ", value, field, option);
         this.debounceHandleChange(form, field, value);
     }
 
@@ -349,9 +342,6 @@ class StudentFormComponent extends React.Component {
                         style={{ width: 200 }}
                         placeholder="Select the most applicable"
                         optionFilterProp="label"
-                        // onChange={onChange}
-                        // onFocus={onFocus}
-                        // onBlur={onBlur}
                         // onSearch={onSearch}
                         filterOption={(input, option) =>
                             // option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -412,5 +402,3 @@ const mapDispatchToProps = dispatch => {
 connect(mapStateToProps, mapDispatchToProps)(Dragger);
 export { StudentFormComponent as UnconnectedStudentForm};
 export default connect(mapStateToProps, mapDispatchToProps)(StudentFormComponent);
-
-

@@ -1,10 +1,12 @@
 import React from 'react';
-import { configure, shallow, render } from 'enzyme';
+import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import Provider from 'react-redux';
 
 import { GuestForm } from '../GuestForm';
 import { Form, Input } from 'antd';
+
+import { guestMockStateToProps, guestMockDispatchToProps, formMockStateToProps } from './testUtility'
+
 
 window.scroll = jest.fn();
 
@@ -18,14 +20,9 @@ describe('<GuestInfo />', () => {
         id: "GuestForm_0", 
         fileSelected: false,
         // Store props
-        guestForm: {},
-        images: {}, 
-        guestFormValid: {}, 
-        submitStatus: null, 
-
-        updateForm: () => {}, 
-        addImage: () => {},
-        removeImage: () => {},
+        ...guestMockStateToProps, 
+        ...guestMockDispatchToProps, 
+        ...formMockStateToProps
     };
 
     beforeEach(() => {

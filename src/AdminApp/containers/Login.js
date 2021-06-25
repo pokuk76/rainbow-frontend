@@ -35,16 +35,13 @@ class LoginForm extends React.Component {
     }
 
     componentDidMount() {
-        console.log("Login props: ", this.props);
         console.log("Location: ", this.props.location.state)
-
     }
 
     handleSubmit = (e) => {
         e.preventDefault();
         // this.props.onAuth(fields.username, fields.password);
         // console.log(this.props);
-        console.log(this.formRef.current.getFieldsValue(['username', 'password']));
         let credentials = this.formRef.current.getFieldsValue(['username', 'password']);
         this.props.onAuth(credentials.username, credentials.password, () => {
             console.log("Callback");
@@ -82,8 +79,6 @@ class LoginForm extends React.Component {
 
         let errorMessage = null;
         if (this.props.error) {
-            console.log(this.props);
-            //console.log(this.props.error.response);
             try {
                 if(this.props.error.response.request.status === 400){
                     errorMessage = (

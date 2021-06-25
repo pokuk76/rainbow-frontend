@@ -3,17 +3,14 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import debounce from "lodash/debounce";
 
-import { Form, Input, Button, Upload, Modal, Progress } from 'antd';
+import { Form, Input, Upload, Modal, Progress } from 'antd';
 import ImgCrop from 'antd-img-crop';
-import { UploadOutlined, InboxOutlined, StopOutlined, CloseSquareOutlined } from '@ant-design/icons';
+import { InboxOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
 import * as actions from '../../store/actions/guest';
 import * as actionTypes from '../../store/actions/actionTypes';
 import { guestFormCopy } from '../../utility/deepCopy';
 import { guestFormItems, checkValidityItem } from '../../utility/forms';
-
-import ValidationMessage from '../../components/ValidationMessage';
-import { DeleteIcon } from '../../components/Icons';
 
 const { Dragger } = Upload;
 
@@ -54,7 +51,6 @@ class GuestInfo extends React.Component {
       left: 0,
       behavior: 'smooth'
     });
-    // console.log("Guest form copy: ", guestFormCopy(this.props.guestForm));
 
     /* I don't really like doing this in componentDidMount 
     https://www.google.com/search?q=react+call+setstate+in+componentdidmount&oq=react+calling+setstate+in+com&aqs=edge.2.0j69i64j0i22i30l3j69i57.11612j0j4&sourceid=chrome&ie=UTF-8
@@ -81,7 +77,6 @@ class GuestInfo extends React.Component {
    * @param {Event} e - A click event
    */
   handleOk = (e) => {
-    // console.log(e);
     this.setState({
       modalVisible: false,
     });
@@ -92,7 +87,6 @@ class GuestInfo extends React.Component {
    * @param {Event} e - A change event?
    */
   handleCancel = (e) => {
-    // console.log(e);
     this.setState({
       modalVisible: false,
     });
@@ -131,32 +125,10 @@ class GuestInfo extends React.Component {
     this.debounceHandleChange(field, value);
   }
 
-  /**
-   * TODO: finish this? Get rid of it
-   * Gets called when the user clicks on the (Next || Save & Continue) button
-   * @param {Object} values -  An object holding the form values
-   */
-  handleFormSubmit = (values) => {
-    /* Need to understand how onFinish works (how do I override default behaviour then?)*/
-    // event.preventDefault();
-
-    const username = values['username'];
-    const first_name = values['first_name'];
-    const middle_name = values['middle_name'];
-    const last_name = values['last_name'];
-
-    console.log(values);
-    console.log(`
-    Username: ${username}
-    First name: ${first_name}
-    Last name: ${last_name}`);
-  };
-
 
   /**
    * Gets called every render. Populates the form with values from the guest store
    * TODO: Move the call into componentDidMount?
-   * 
    */
   getInitialValues = () => {
     const guestForm = this.props.guestForm;
@@ -291,16 +263,6 @@ class GuestInfo extends React.Component {
 
     )
 
-    // console.log(this.props.guestFormValid['username'] !== null);
-    // const testItemInvalid = this.props.guestFormValid['username'] !== null;
-
-    // const customValidationProps = ( (testInvalidSubmitState && testItemInvalid) ? 
-    //   { 
-    //     validateStatus: "error", 
-    //     help: <div><div>Should be combination of numbers & alphabets</div><div>Some other nonsense</div></div>
-    //   } : null
-    // );
-
     return (
       <div >
         <Form
@@ -398,7 +360,6 @@ class GuestInfo extends React.Component {
 };
 
 const mapStateToProps = state => {
-  // console.log("Forms state-to-props: ", state);
   return {
     guestForm: state.guest.guestForm,
     images: state.guest.images, 

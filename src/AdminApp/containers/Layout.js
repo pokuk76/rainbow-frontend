@@ -1,6 +1,7 @@
 import React from 'react';
 import { Layout, Menu, Breadcrumb, Avatar } from 'antd';
-import { UserOutlined, UnorderedListOutlined, LoginOutlined, LogoutOutlined, PlusCircleOutlined, HomeOutlined, PlusCircleTwoTone, HomeTwoTone} from '@ant-design/icons';
+import { UserOutlined, UnorderedListOutlined, LoginOutlined, LogoutOutlined, 
+    PlusCircleOutlined, HomeOutlined } from '@ant-design/icons';
 import { Link, withRouter } from'react-router-dom';
 import './layout.css';  
 /*Needed a CSS file because the div with class 'site-layout-content' wasn't being styled correctly */
@@ -63,22 +64,18 @@ class CustomLayout extends React.Component {
                     
                 </Header>
                 <Content style={{ padding: '0 50px', marginTop: 64 }}>
-                    {
-                        // Add something in the redux store that keeps track of the current page so we 
-                        // can have the Breadcrumb items render dynamically (see GuestDetailView)
-                    }
+
+                        {/* Add something in the redux store that keeps track of the current page so we 
+                           can have the Breadcrumb items render dynamically (see GuestDetailView) */}
                     <Breadcrumb style={{ margin: '16px 0' }}>
                         <Breadcrumb.Item>Portal</Breadcrumb.Item>
                         <Breadcrumb.Item><Link to='/portal/admin'>Admin</Link></Breadcrumb.Item>
-                        {/* <Breadcrumb.Item><Link to='/'>Students</Link></Breadcrumb.Item>
-                        <Breadcrumb.Item><Link to='/'>Guardians</Link></Breadcrumb.Item>
-                        <Breadcrumb.Item><Link to='/'>Declaration</Link></Breadcrumb.Item> */}
                     </Breadcrumb>
                     <div className="site-layout-content">
                         {this.props.children}
                     </div>
                 </Content>
-                <Footer style={{ textAlign: 'center' }}>kbd ©2020 Created by Kofi Poku</Footer>
+                <Footer style={{ textAlign: 'center' }}>Rainbow Edu ©2021 | By kbd</Footer>
             </Layout>
         );
     }
@@ -86,11 +83,9 @@ class CustomLayout extends React.Component {
 }
 
 const mapStateToProps = state => {
-    // console.log("Guest list state: ");
-    // console.log(state);
     return {
-      isAuthenticated: state.auth.token !== null,
-      loading: state.auth.loading,
+        isAuthenticated: state.auth.token !== null, 
+        loading: state.auth.loading,
     }
 }
 

@@ -1,9 +1,11 @@
 import React from 'react';
-import { configure, shallow, render } from 'enzyme';
+import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
 import { UnconnectedDeclaration } from '../Declaration';
 import { Form, Input, Checkbox } from 'antd';
+
+import { guestMockStateToProps, guestMockDispatchToProps, formMockStateToProps } from './testUtility'
 
 configure({ adapter: new Adapter() });
 
@@ -13,8 +15,11 @@ describe('<Declaration />', () => {
 
     let wrapper;
     let props = {
-        id: "DeclarationForm_0"
+        id: "DeclarationForm_0", 
         // Redux Store props
+        ...guestMockStateToProps, 
+        ...guestMockDispatchToProps, 
+        ...formMockStateToProps
     };
 
     beforeEach(() => {

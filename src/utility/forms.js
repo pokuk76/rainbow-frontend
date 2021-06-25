@@ -250,7 +250,7 @@ export const checkValidityItem = (value, rules, touched=false, kwargs={'username
                 /* If we somehow encounter a rule that we're not checking, we should just set valid to true right?
                     Ok decided that seemed like a bad idea so lets leave it unchanged?
                 */
-                valid = valid;
+                valid = valid && true;
         }
     }
     let response = !valid ? { validateStatus: "error", help: help_messages } : null;

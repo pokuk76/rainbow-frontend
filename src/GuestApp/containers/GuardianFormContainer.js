@@ -1,31 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Button, Collapse, Breadcrumb, Modal, BackTop } from 'antd';
-import {
-    InboxOutlined, FileAddOutlined, CloseSquareOutlined, SaveOutlined,
-    TeamOutlined, RightOutlined, ArrowUpOutlined
-} from '@ant-design/icons';
+import { Button, Collapse, Breadcrumb, Modal } from 'antd';
+import { FileAddOutlined, CloseSquareOutlined, TeamOutlined, RightOutlined } from '@ant-design/icons';
 
-import { getInitialValues, checkValidityForm } from '../../utility/forms';
+import GuardianFormComponent from '../components/GuardianForm';
 
 import * as actions from '../../store/actions/guest';
-
-import GuardianFormComponent from '../../components/UserApp/GuardianForm';
+import { getInitialValues, checkValidityForm } from '../../utility/forms';
 
 /* For the Select component */
-function onChange(value) {
-    console.log(`selected ${value}`);
-}
-
-function onBlur() {
-    console.log('blur');
-}
-
-function onFocus() {
-    console.log('focus');
-}
-
 function onSearch(val) {
     console.log('search:', val);
 }
@@ -47,20 +31,17 @@ function callback(key) {
 /*******/
 
 function setPanelHeader(text, formValid) {
-    return <div style={{ display: 'inline-flex', marginLeft: '1em', height: '100%', width: '70%' }}><h1 
-                style={{ fontSize: '1.5em', 
-                    margin: 'auto', 
-                    textAlign: 'right', 
-                    height: '100%', 
-                    width: '60%', 
-                    // backgroundColor: 'red',
-                }}
-            >
-                {text}
-                { ( formValid === null ) ? " Valid" : "Not Valid" }
-            </h1></div>;
+    return (
+        <div style={{ display: 'inline-flex', marginLeft: '1em', height: '100%', width: '70%' }}>
+            <h1 style={{ fontSize: '1.5em', margin: 'auto', textAlign: 'right', 
+                    height: '100%', width: '60%'
+            }}>
+                { text } 
+                {/* { ( formValid === null ) ? " Valid" : "Not Valid" } */}
+            </h1>
+        </div>
+    );
 }
-
 
 /**
  * Class-based Container for guardian input form(s)
@@ -82,12 +63,6 @@ class GuardianForm extends React.Component {
 
         // this.onCollapse = this.onCollapse.bind(this);
         this.renderForms = this.renderForms.bind(this);
-        this.onExpand = this.onExpand.bind(this);
-    }
-
-    onExpand(key) {
-        console.log("On expand:", key);
-        return 90;
     }
 
     showModal = (body) => {
@@ -98,14 +73,12 @@ class GuardianForm extends React.Component {
     };
 
     handleOk = (e) => {
-        // console.log(e);
         this.setState({
             modalVisible: false,
         });
     };
 
     handleCancel = (e) => {
-        // console.log(e);
         this.setState({
             modalVisible: false,
         });
@@ -124,18 +97,12 @@ class GuardianForm extends React.Component {
     }
 
     componentDidUpdate(prevProps){
-        /*  Added this to ensure that the forms re-render on add or remove (Forms & i think maybe images too)
+        /*  Added this to ensure that the forms re-render on addition or removal of Form & i think maybe images too 
+            (renderForms updates state causing a component re-render)
             Feels mad ghetto but it's working
             TODO: Try adding a state change on add and remove to auto re-render
         */
-
         if(prevProps.guardianForms !== this.props.guardianForms || prevProps.images !== this.props.images ){
-            // console.log("A disturbance in the force");
-            // this.setState(
-            //     {
-            //         images: this.props.images
-            //     }
-            // );
             this.renderForms();
         }
     }
@@ -288,7 +255,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         addForm: (forms, guardianFormsValid, uid, currentForm) => dispatch(actions.addForm(forms, guardianFormsValid, uid, currentForm)),
-        removeImage: (images, id, formData) => dispatch(actions.removeImage(images, id, formData)),
         removeForm: (guardianForms, guardianFormsValid, uid, currentForm, images) => dispatch(actions.removeForm(guardianForms, guardianFormsValid, uid, currentForm, images)),
     }
 }

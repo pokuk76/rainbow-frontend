@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, Avatar, Space, Modal, Button } from 'antd';
+import { List, Space, Modal, Button } from 'antd';
 
 import { CheckCircleTwoTone, ExclamationCircleTwoTone } from '@ant-design/icons';
 

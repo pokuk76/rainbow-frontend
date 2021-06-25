@@ -3,9 +3,8 @@ import axios from 'axios';
 
 import { Button, Card, Collapse } from 'antd';
 import {RightOutlined} from '@ant-design/icons'
-import { Link, Redirect } from'react-router-dom';
 
-import CustomForm from '../../components/Form';
+import CustomForm from '../components/Form';
 
 /* Collapse */
 const { Panel } = Collapse;

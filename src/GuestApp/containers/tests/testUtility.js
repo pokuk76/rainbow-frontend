@@ -15,7 +15,11 @@ export const guestMockStateToProps = {
 
 export const guestMockDispatchToProps = {
     updateGuestInfo: () => {}, 
-    updateDeclaration: () => {},
+    updateStudents: () => {},
+    updateGuardians: () => {}, 
+    updateDeclaration: () => {}, 
+    addForm: () => {}, 
+    removeForm: () => {}, 
     addImage: () => {},
     removeImage: () => {}, 
 }

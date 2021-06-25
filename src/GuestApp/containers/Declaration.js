@@ -1,18 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import axios from 'axios';
 import { withRouter } from'react-router-dom';
 import debounce from "lodash/debounce";
 
-import { Form, Input, Button, Checkbox, Breadcrumb} from 'antd';
+import { Form, Input, Checkbox, Breadcrumb} from 'antd';
 import { WalletOutlined, } from '@ant-design/icons';
 
 import * as actions from '../../store/actions/guest';
 import * as actionTypes from '../../store/actions/actionTypes';
 import { guestFormCopy } from '../../utility/deepCopy';
 import { declarationFormItems, checkValidityItem } from '../../utility/forms';
-
-import DeleteIcon from '../../components/Icons';
 
 class Declaration extends React.Component {
 
@@ -85,75 +82,6 @@ class Declaration extends React.Component {
     let field = e.target.id;
     let value = e.target.value; 
     this.debounceHandleChange(field, value);
-    // console.log("Event: ", e.target.id);
-    // // this.setState({
-    // //   visible: true,
-    // // });
-    // // this.state.declaration[e.target.id] = e.target.value;
-    // let newDeclaration = this.state.declaration;
-    // newDeclaration[e.target.id] = e.target.value
-    // this.setState({
-    //   declaration: newDeclaration,
-    // });
-    // console.log("Declaration: ", this.state.declaration);
-  }
-
-  handleImages = (form) => {
-    let formType; // GuestForm, StudentForm, GuardianForm
-    for (let imageKey in this.props.images){
-      formType = imageKey.split('_')[0];
-      switch(formType) {
-        case "GuestForm":
-          console.log("Image: ", this.props.images[imageKey][0]);
-          let image_blob = this.props.images[imageKey][0];
-          form.append('image_file', image_blob, image_blob['name']);
-          return form;
-        case "StudentForm":
-          break;
-        case "GuardianForm":
-          break;
-      }
-    }
-    return form;
-  }
-
-  handleImage = (fType) => {
-    let formType; // GuestForm, StudentForm, GuardianForm
-    for (let imageKey in this.props.images){
-      formType = imageKey.split('_')[0];
-      // console.log("Form type: ", formType);
-      switch(formType) {
-        case "GuestForm":
-          console.log("Image: ", this.props.images[imageKey][0]);
-          return this.props.images[imageKey][0];
-        case "StudentForm":
-          break;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * TODO: Determine if the store should just have the guest form stored  
-   *       as FormData object instead of JSON (This would really optimize things)
-   * Create the FormData object from the JSON containing the guest info form.
-   * Called when the user submits form.
-   * 
-   * @return {Object} form_data - A FormData object
-   */
-  createGuestForm = () => {
-    let form_data = new FormData();
-    const keys = ['username', 'first_name', 'middle_name', 'last_name']
-    for (let key of keys) {
-      console.log("key: ", key);
-      form_data.append(key, this.props.guestForm[key]);
-    }
-    // let form_data = new FormData(this.props.guestForm);
-    form_data = this.handleImages(form_data);
-    for (let entry of form_data.entries()) {
-      console.log("form data entry: ", entry);
-    }
-    return form_data;
   }
 
   getInitialValues = () => {
@@ -179,9 +107,7 @@ class Declaration extends React.Component {
   }
 
   render() {
-
     // const initialValues = this.getInitialValues();
-
     const myStyle = {width: "50%", marginLeft:"auto", marginRight: "auto"};
 
     return (

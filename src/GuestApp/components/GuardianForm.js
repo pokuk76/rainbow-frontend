@@ -69,7 +69,6 @@ class GuardianFormComponent extends React.Component {
     }
 
     getValidationProps = (form, key) => {
-        // let s = ( this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL );
         return ( this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL ) ? this.props.guardianFormsValid[form][key] : null;
     }
 

@@ -2,19 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from'react-router-dom';
 
-import { RainbowIcon } from '../../components/Icons';
+import { RainbowIcon } from '../../generics/Icons';
 
 // import { Flex } from 'antd-mobile';
 // import { Drawer } from 'antd-mobile';
 import { Layout, Menu, Breadcrumb, Form, Button, Drawer, Badge, Spin, notification } from 'antd';
 import { ProfileOutlined, UserAddOutlined, TeamOutlined, WalletOutlined,
-  CloseOutlined, CloseSquareOutlined, MenuOutlined, ExclamationCircleOutlined, 
+  CloseOutlined, MenuOutlined, ExclamationCircleOutlined, 
   LoadingOutlined, 
 } from '@ant-design/icons';
 
 import './layout.css';  
 
-import * as guestActions from '../../store/actions/guest';
 import * as formActions from '../../store/actions/form';
 import * as actionTypes from '../../store/actions/actionTypes';
 
@@ -25,15 +24,11 @@ import Declaration from './Declaration';
 
 import { checkValiditySection, checkValidityForm } from '../../utility/forms';
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Content, Footer } = Layout;
 
 const LoadingIcon = <LoadingOutlined style={{ fontSize: '5em' }} spin />;
 
 const menuItemStyle = { paddingTop: 0, paddingBottom: 0, marginTop: 0, marginBottom: 0, height: "10%", fontSize:"1.2em", display: "flex", alignItems:"center", paddingLeft:"3em" }
-
-function callback(key) {
-  console.log(key);
-}
 
 const openInvalidErrorNotification = () => {
   notification['warning']({
@@ -82,20 +77,6 @@ class GuestLayout extends React.Component {
     this.controlSwitch = this.controlSwitch.bind(this);
   }
 
-  // componentDidUpdate(prevProps) {
-  //   // TODO: Maybe provide the notification functions as callbacks to the submitForms action creator/handler thingy
-  //   // If the user submits an invalid formset more than once, notification won't fire more than once
-  //   if ( this.props.submitStatus === actionTypes.SUBMIT_INVALID_FAIL && !this.state.invalidNotificationShown ) {
-  //     openInvalidErrorNotification('warning');
-  //     this.setState({
-  //       invalidNotificationShown: true,
-  //     });
-  //   } else if ( this.props.submitStatus === actionTypes.SUBMIT_NETWORK_FAIL ) {
-  //     openNetworkErrorNotification('error');
-  //   }
-
-  // }
-
   checkValiditySection = (formObj) => {
     let valid = true;
     for (let formUID in formObj){
@@ -112,8 +93,6 @@ class GuestLayout extends React.Component {
   }
 
   componentSwitch = (key) => {
-    let forms = [];
-    var i=0;
 
     switch (key) {
       case 'guest-details':
@@ -249,8 +228,12 @@ class GuestLayout extends React.Component {
     return initialValues;
   }
 
+  /**
+   * TODO: finish/improve this? Idk
+   * @param 
+   */
   handleFormSubmit = () => {
-    console.log("Form Submit to be handled...");
+    console.log("Submit being handled...");
     this.props.handleSubmit( this.props.guestForm, this.props.studentForms, this.props.guardianForms, 
       this.props.declaration, this.props.images, 
       {'invalidFormCallback': openInvalidErrorNotification, 
@@ -383,7 +366,7 @@ class GuestLayout extends React.Component {
               </div>
             </Content>
 
-            <Footer style={{ textAlign: 'center' }}>Rainbow Edu ©2020 | By kbd</Footer>
+            <Footer style={{ textAlign: 'center' }}>Rainbow Edu ©2021 | By kbd</Footer>
           </Layout>
         </Spin>
 

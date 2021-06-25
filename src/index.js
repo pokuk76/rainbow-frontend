@@ -28,18 +28,18 @@ const app = (
         <App />
     </Provider>
 )
-// ReactDOM.render(
-//   <React.StrictMode>
-//     <App />
-//   </React.StrictMode>,
-//   document.getElementById('root')
-// );
+ReactDOM.render(
+  <React.StrictMode>
+    { app }
+  </React.StrictMode>,
+  document.getElementById('root')
+);
 
 // Got rid of the "Warning: findDOMNode is deprecated in StrictMode." error
 // <https://stackoverflow.com/questions/61220424/material-ui-drawer-finddomnode-is-deprecated-in-strictmode>
-ReactDOM.render(
-    app, document.getElementById('root')
-);
+// ReactDOM.render(
+//     app, document.getElementById('root')
+// );
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
