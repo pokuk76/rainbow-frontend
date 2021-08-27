@@ -6,7 +6,7 @@ import { Form, Input, Button, Select, Upload, DatePicker } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { InboxOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
-import { DeleteIcon } from '../../generics/Icons';
+import { DeleteIcon } from '../../shared_components/Icons';
 
 import { formsCopy } from '../../utility/deepCopy';
 import { studentFormItems, checkValidityItem } from '../../utility/forms';
@@ -278,7 +278,7 @@ class StudentFormComponent extends React.Component {
                             /> : <DatePicker />
                         } */}
                     <DatePicker 
-                        onChange={(dateMoment, dateString, itemUID) => this.handleChangeDate(dateMoment, dateString, this.props.formUID + "+date_of_birth")} 
+                        onChange={(dateMoment, dateString) => this.handleChangeDate(dateMoment, dateString, this.props.formUID + "+date_of_birth")} 
                     />
                 </Form.Item>
 

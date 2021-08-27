@@ -1,8 +1,7 @@
-// jest-dom adds custom jest matchers for asserting on DOM nodes.
-// allows you to do things like:
-// expect(element).toHaveTextContent(/react/i)
-// learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom/extend-expect';
+/** Okay so the following works if you set --env=jsdom when running tests 
+ * (Either in package.json or using npm run test)
+ * HOWEVER, jsdom environment causes tests to run significantly slower
+ */
 
-// const noop = () => {};
-// Object.defineProperty(window, 'scrollTo', { value: noop, writable: true });
+// const mockScroll = () => {};
+// Object.defineProperty(window, 'scroll', { value: mockScroll, writable: true });

@@ -1,4 +1,7 @@
 import React from 'react';
+import { Form, Input, Button, Select, Upload } from 'antd';
+const { Option } = Select;
+const { Dragger } = Upload;
 
 export const guestFormItems = {
     username: {
@@ -94,72 +97,205 @@ export const studentFormValidInitialState = {
     reason_for_leaving: null, 
 }
 
+const countryCodeSelector = (
+    <Form.Item name="prefix" noStyle>
+        <Select
+            style={{
+                width: 70,
+            }}
+        >
+            <Option value="Ghana">+233</Option>
+        </Select>
+    </Form.Item>
+);
+
 export const guardianFormItems = {
     first_name: {
+        // name: "first_name",  //Name is just be the object key so let's leave this out for now?
+        label: "First Name:",
         validation_rules: [ 
             { required: true, message: "First Name Required" }, 
             { max: 128, message: "First name must have fewer than 128 characters" }, 
-        ], 
+        ],
+        componentType: Input,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input
+                placeholder="First name"
+                onChange={onChangeFunction}
+            />;
+        },
     }, 
     middle_name: {
+        label: "Middle Name:",
         validation_rules: [ 
             { max: 128, message: "Middle name must have fewer than 128 characters" }, 
-        ], 
+        ],
+        componentType: Input,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input
+                placeholder="Middle name"
+                onChange={onChangeFunction}
+            />;
+        },
     }, 
     last_name: {
+        label: "Last Name:",
         validation_rules: [ 
             { required: true, message: "Last Name Required" }, 
             { max: 128, message: "Last name must have fewer than 128 characters" }, 
-        ], 
+        ],
+        componentType: Input,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input
+                placeholder="Last name"
+                onChange={onChangeFunction}
+            />;
+        },
     }, 
     phone_number: {
-        validation_rules: [ 
-            { required: true, message: "Please enter a phone number" }, 
-            { max: 13, message: "Phone number must be 10 character (written as 0244324577) or 13 characters (written as +233244324577)" } 
-        ], 
+        label: "Telephone Number (e.g., 0241234567 or +233241234567):",
+        validation_rules: [
+            { required: true, message: "Please enter a phone number" },
+            { max: 13, message: "Phone number must be 10 character (written as 0244324577) or 13 characters (written as +233244324577)" }
+        ],
+        componentType: Input,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input
+                placeholder="Enter your phone number"
+                type="tel"
+                onChange={onChangeFunction}
+            />;
+        },
     }, 
     email_address: {
-        validation_rules: [ 
-            { type: "email", message: "Please enter a valid a E-mail address" }, 
-            { max: 128, message: "E-mail must have fewer than 128 characters" }, 
-        ], 
-    }, 
-    image_file: { validation_rules: [ ], }, 
+        label: "Email Address:",
+        validation_rules: [
+            { type: "email", message: "Please enter a valid a E-mail address" },
+            { max: 128, message: "E-mail must have fewer than 128 characters" },
+        ],
+        componentType: Input,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input
+                placeholder="Enter your email"
+                type="email"
+                onChange={e => this.handleChange(e)}
+            />;
+        },
+    },
+    image_file: {
+        label: "Passport Photo: ",
+        validation_rules: [ ],
+        componentType: Upload,
+        getComponentJSX: () => {},
+    },
     nationality: {
-        validation_rules: [ 
-            { required: true, message: "Please specify a nationality" }, 
-            { max: 128, message: "Nationality must be less than 128 characters" }, 
-        ], 
+        label: "Nationality:",
+        validation_rules: [
+            { required: true, message: "Please specify a nationality" },
+            { max: 128, message: "Nationality must be less than 128 characters" },
+        ],
+        componentType: Input,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input
+                placeholder="Enter your nationality"
+                onChange={onChangeFunction}
+            />;
+        },
     }, 
     religion: {
-        validation_rules: [ 
-            { max: 128, message: "Religion must have fewer than 128 characters" }, 
-        ], 
+        label: "Religion:",
+        validation_rules: [
+            { max: 128, message: "Religion must have fewer than 128 characters" },
+        ],
+        componentType: Input,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input
+                placeholder="Enter your religion"
+                onChange={onChangeFunction} />;
+        },
     }, 
     guardian_type: {
+        label: "Guardian Type:",
         validation_rules: [ 
             { required: true, message: "Please indicate the type of guardian" }, 
-        ], 
+        ],
+        componentType: Select,
+        getComponentJSX: (onChangeFunction) => {
+            return <Select
+                showSearch
+                notFoundContent={<p>Not Found</p>}
+                style={{ width: 200 }}
+                placeholder="Relationship to students"
+                optionFilterProp="children"
+                onChange={(value, option) => onChangeFunction(value, option, "guardian_type")}
+                filterOption={(input, option) =>
+                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                }
+            >
+                <Option value="father">Father</Option>
+                <Option value="mother">Mother</Option>
+                <Option value="legal_guardian">Legal Guardian</Option>
+            </Select>;
+        },
     }, 
     lives_with_guardian: {
-        validation_rules: [ 
-            { required: true, message: "Please indicate whether students live with this guardian" }, 
-        ], 
-    }, 
+        label: 'Students that live with this parent:',
+        validation_rules: [
+            { required: true, message: "Please indicate which students live with this guardian" },
+        ],
+        componentType: Input.TextArea,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input.TextArea
+                placeholder="Modupe Poku, Abena Poku"
+                onChange={onChangeFunction} />;
+        },
+    },
     occupation: {
-        validation_rules: [ 
-            { required: true, message: "Please enter an occupation" }, 
-            { max: 256, message: "Occupation must have fewer than 256 characters" }, 
-        ], 
-    }, 
+        label: "Occupation:",
+        validation_rules: [
+            { required: true, message: "Please enter an occupation" },
+            { max: 256, message: "Occupation must have fewer than 256 characters" },
+        ],
+        componentType: Input,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input
+                placeholder="Enter occupation"
+                onChange={onChangeFunction} />;
+        },
+    },
     place_of_work: {
+        label: "Place of Work:",
         validation_rules: [ 
             { required: true, message: "Please enter a place of work" }, 
             { max: 256, message: "Place of work must have fewer than 256 characters" }, 
-        ], 
+        ],
+        componentType: Input,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input
+                placeholder="Enter place of work"
+                onChange={onChangeFunction} />;
+        },
+    },
+    home_address: {
+        label: "Home Address:", 
+        validation_rules: [ ],
+        componentType: Input.TextArea,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input.TextArea
+                placeholder={`45 Pawpaw Street\nCommunity 1995\nTema, Ghana`}
+                onChange={onChangeFunction} />;
+        },
+    },
+    postal_address: {
+        label: "Postal Address:",
+        validation_rules: [],
+        componentType: Input.TextArea,
+        getComponentJSX: (onChangeFunction) => {
+            return <Input.TextArea
+                placeholder={`P.O. Box NT 28\nAccra New Town, Ghana`}
+                onChange={onChangeFunction} />;
+        },
     }, 
-    home_address: { validation_rules: [ ], }, 
-    postal_address: { validation_rules: [ ], }, 
 }
 
 export const guardianFormValidInitialState = {
@@ -247,7 +383,8 @@ export const checkValidityItem = (value, rules, touched=false, kwargs={'username
                 }
                 break;
             default:
-                /* If we somehow encounter a rule that we're not checking, we should just set valid to true right?
+                /*  If we somehow encounter a rule that we're not checking, we 
+                    should just set valid to true right?
                     Ok decided that seemed like a bad idea so lets leave it unchanged?
                 */
                 valid = valid && true;

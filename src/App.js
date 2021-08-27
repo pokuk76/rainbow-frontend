@@ -8,16 +8,16 @@ import BaseRouter from './routes';
 import * as actions from './store/actions/auth';
 
 import axios from "axios";
-/**
- * In production, the backend service will still be hosted at port 8000 while the React stuff will be served by 
- * Nginx at port 80, so we do NOT want the base URL to become the React origin
- */
-axios.defaults.baseURL = "http://127.0.0.1:8000";
-// if (window.location.origin === "http://localhost:3000") {
-//   axios.defaults.baseURL = "http://127.0.0.1:8000";
-// } else {
-//   axios.defaults.baseURL = window.location.origin;
-// }
+// axios.defaults.baseURL = "http://127.0.0.1:8000";
+if (process.env.NODE_ENV !== "production") {
+  axios.defaults.baseURL = "http://127.0.0.1:8000";
+} else {
+  if ( process.env.IS_LOCAL_PRODUCTION_BUILD === "false" ) {
+    axios.defaults.baseURL = "http://rainbow.kofipoku.com"
+  } else {
+    axios.defaults.baseURL = "http://127.0.0.1:1337";
+  }
+}
 
 class App extends Component {
 

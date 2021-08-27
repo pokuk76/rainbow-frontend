@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from'react-router-dom';
 
-import { RainbowIcon } from '../../generics/Icons';
+import { RainbowIcon, RainbowLogoIcon } from '../../shared_components/Icons';
 
 // import { Flex } from 'antd-mobile';
 // import { Drawer } from 'antd-mobile';
@@ -75,6 +75,12 @@ class GuestLayout extends React.Component {
 
     this.componentSwitch = this.componentSwitch.bind(this);
     this.controlSwitch = this.controlSwitch.bind(this);
+  }
+
+  componentDidMount() {
+    console.log("Node env:", process.env.NODE_ENV);
+    console.log("Homepage url env:", process.env.REACT_APP_HOMEPAGE_URL);
+
   }
 
   checkValiditySection = (formObj) => {
@@ -328,9 +334,9 @@ class GuestLayout extends React.Component {
         <Spin spinning={this.props.loading} indicator={LoadingIcon} style={{position: "fixed"}}>
           <Drawer
             title={
-              <a href="http://127.0.0.1:8000/home/" 
+              <a href={process.env.REACT_APP_HOMEPAGE_URL} 
                 style={{ display: "flex", flexFlow: "column", justifyContent:"center", alignItems: "center", }}
-              ><RainbowIcon style={{ backgroundColor:"inherit", fontSize:"inherit"}} /> Rainbow School</a>
+              ><RainbowLogoIcon style={{ backgroundColor:"inherit", fontSize:"inherit"}} /></a>
             }
             placement="left" 
             closable={true} 

@@ -9,8 +9,6 @@ import { guestMockStateToProps, guestMockDispatchToProps } from '../../container
 
 configure({ adapter: new Adapter() });
 
-window.scroll = jest.fn();
-
 describe('<StudentForm />', () => {
 
     let wrapper;
@@ -25,10 +23,6 @@ describe('<StudentForm />', () => {
 
     beforeEach(() => {
         wrapper = shallow(<UnconnectedStudentForm {...props} />);
-    });
-
-    afterAll(() => {
-        window.scroll.mockClear();
     });
 
     it('should render <Form />', () => {

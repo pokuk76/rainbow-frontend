@@ -2,19 +2,20 @@
   "name": "portals",
   "version": "0.1.0",
   "homepage": "/portal",
-  "private": true, 
+  "private": true,
   "jest": {
     "transformIgnorePatterns": [
       "/node_modules/(?!antd|@ant-design|rc-.+?|@babel/runtime).+(js|jsx)$"
-    ]
-  }, 
+    ],
+    "globalSetup": "./src/testE2E/setup.js", 
+    "globalTeardown": "./src/testE2E/teardown.js"
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "antd": "^4.6.1",
     "antd-img-crop": "^3.10.0",
-    "antd-mobile": "^2.3.4",
     "axios": "^0.21.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -28,6 +29,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:e2e": "react-scripts test --testPathPattern=.*e2e.test.js$ --env=./src/testE2E/puppeteer_environment.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -49,6 +51,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.14.5",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.6"
+    "enzyme-adapter-react-16": "^1.15.6",
+    "puppeteer-core": "^10.2.0"
   }
 }

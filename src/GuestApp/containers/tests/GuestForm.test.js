@@ -5,7 +5,7 @@ import Adapter from 'enzyme-adapter-react-16';
 import { GuestForm } from '../GuestForm';
 import { Form, Input } from 'antd';
 
-import { guestMockStateToProps, guestMockDispatchToProps, formMockStateToProps } from './testUtility'
+import { guestMockStateToProps, guestMockDispatchToProps, formMockStateToProps } from '../../../utility/testUtility';
 
 
 window.scroll = jest.fn();
@@ -42,7 +42,7 @@ describe('<GuestInfo />', () => {
     //     expect(GuestForm);
     // });
 
-    it('should render antd <Form />', () => {
+    it('should render 1 antd <Form />', () => {
         expect(wrapper.find(Form)).toHaveLength(1);
     });
 

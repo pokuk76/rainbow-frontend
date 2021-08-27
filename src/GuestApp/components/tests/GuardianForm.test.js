@@ -5,11 +5,9 @@ import Adapter from 'enzyme-adapter-react-16';
 import { UnconnectedGuardianForm } from '../GuardianForm';
 import { Form } from 'antd';
 
-import { guestMockStateToProps, guestMockDispatchToProps } from '../../containers/tests/testUtility'
+import { guestMockStateToProps, guestMockDispatchToProps } from '../../../utility/testUtility'
 
 configure({ adapter: new Adapter() });
-
-window.scroll = jest.fn(); 
 
 describe('<GuardianForm />', () => {
 
@@ -25,10 +23,6 @@ describe('<GuardianForm />', () => {
 
     beforeEach(() => {
         wrapper = shallow(<UnconnectedGuardianForm {...props} />);
-    });
-
-    afterAll(() => {
-        window.scroll.mockClear();
     });
 
     it('should render <Form />', () => {

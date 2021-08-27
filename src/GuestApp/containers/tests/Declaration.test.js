@@ -5,7 +5,7 @@ import Adapter from 'enzyme-adapter-react-16';
 import { UnconnectedDeclaration } from '../Declaration';
 import { Form, Input, Checkbox } from 'antd';
 
-import { guestMockStateToProps, guestMockDispatchToProps, formMockStateToProps } from './testUtility'
+import { guestMockStateToProps, guestMockDispatchToProps, formMockStateToProps } from './testUtility';
 
 configure({ adapter: new Adapter() });
 

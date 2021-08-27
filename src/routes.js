@@ -8,11 +8,12 @@ import GuestDetail from './AdminApp/containers/GuestDetail';
 import Login from './AdminApp/containers/Login';
 
 import CustomLayout from './AdminApp/containers/Layout';
-import GuestLayout from './GuestApp/containers/LayoutGuest';
+import GuestLayout from './GuestApp/containers/Layout';
 
 
 const BaseRouter = (props) => (
     <Switch>
+        <Route exact path='/' render={matchProps => <div><h1>Landing</h1></div>} />
         <Route exact path='/school' render={matchProps => <CustomLayout {...matchProps} ><SchoolList /></CustomLayout>} />
         <Route exact path='/school/:schoolID' render={matchProps => <CustomLayout {...matchProps} ><SchoolDetail /></CustomLayout>} />
         <Route exact path='/admin' render={matchProps => <CustomLayout {...matchProps} ><GuestList {...matchProps} /></CustomLayout>} />

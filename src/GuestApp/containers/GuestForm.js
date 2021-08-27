@@ -267,10 +267,10 @@ class GuestInfo extends React.Component {
       <div >
         <Form
           key={"GuestForm"}
-          layout='vertical'
+          layout='vertical' 
           requiredMark={true}
           initialValues={initialValues}
-          style={{ padding: '0.5em', }}
+          style={{ padding: '0.5em', paddingRight: '5em' }}
         >
           <Form.Item name="username" label="Username:"
             rules={[
@@ -285,8 +285,8 @@ class GuestInfo extends React.Component {
             // rules={[{ validator: this.validateUsername}]}
           >
             <Input
-              placeholder="Enter username"
-              onChange={(e) => this.handleChange(e)}
+              placeholder="Enter username" 
+              onChange={(e) => this.handleChange(e)} 
             />
             
             {/* { customValidation } */}
@@ -308,7 +308,8 @@ class GuestInfo extends React.Component {
           >
             <Input
               placeholder="Enter first name"
-              onChange={(e) => this.handleChange(e)}
+              onChange={(e) => this.handleChange(e)} 
+              // style = {{width: '50%'}}
             />
           </Form.Item>
 

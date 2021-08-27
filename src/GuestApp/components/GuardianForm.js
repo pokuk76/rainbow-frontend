@@ -61,7 +61,7 @@ class GuardianFormComponent extends React.Component {
        this.debounceHandleChange(form, field, value);
     }
 
-    handleChangeSelect(value, option, form, field) {
+    handleChangeSelect(value, option, form=this.props.formUID, field) {
         // console.log("Handle Select component change [value, field, option]: ", value, field, option);
         // let [form, field] = itemUID.split("+");
         // console.log("form, field: ", form, field);
@@ -78,7 +78,6 @@ class GuardianFormComponent extends React.Component {
         try {
             fileSelected = (this.props.images[this.props.formUID]) ? true : false;
             fileList = this.props.images[this.props.formUID];
-
         }
         catch(error) {
         }
@@ -125,33 +124,37 @@ class GuardianFormComponent extends React.Component {
         const imageUpload = (
             fileSelected
                 ?
-                <Upload {...uploadProps} >
-
-                </Upload>
+                <Upload {...uploadProps} />
                 :
                 <ImgCrop>
                     <Dragger {...uploadProps} disabled={fileSelected} >
                         <p className="ant-upload-drag-icon">
                             <InboxOutlined />
                         </p>
-                        <p className="ant-upload-text">Please provide a photo suitable for official identification</p>
+                        <p className="ant-upload-text">Please provide a photo
+                            suitable for official identification</p>
                         <p className="ant-upload-hint">
                             Click or drag image to this area to upload
-                                </p>
+                        </p>
                     </Dragger>
                 </ImgCrop>
         );
 
         const removeFormButton = (
             (Object.keys(this.props.guardianForms).length > 1)
-                ?
+                ? 
                 <Form.Item style={{ marginTop: '1em' }}>
                     <Button
                         type='danger'
-                        onClick={() => this.props.removeForm(this.props.guardianForms, this.props.guardianFormsValid, this.props.formUID, 'GuardianForm', this.props.images)}
+                        onClick={() => this.props.removeForm(
+                            this.props.guardianForms,
+                            this.props.guardianFormsValid,
+                            this.props.formUID,
+                            'GuardianForm', this.props.images
+                        )}
                     >
                         Remove
-                            </Button>
+                    </Button>
                 </Form.Item>
                 :
                 <></>
@@ -166,7 +169,7 @@ class GuardianFormComponent extends React.Component {
 
             >
                 {/* <Form.Item name={this.props.formUID + "+first_name"} label={ this.props.guardianFormsValid[this.props.formUID]['first_name'] ? "First Name: " : "Invalid First Name"} */}
-                <Form.Item name={this.props.formUID + "+first_name"} label="First Name: "
+                <Form.Item name={`${this.props.formUID}+first_name`} label="First Name:"
                     rules={[
                         {
                             required: true,
@@ -186,7 +189,7 @@ class GuardianFormComponent extends React.Component {
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+middle_name"} label="Middle Name:"
+                <Form.Item name={`${this.props.formUID}+middle_name`} label="Middle Name:"
                     rules={[
                         {
                             max: 128,
@@ -201,7 +204,7 @@ class GuardianFormComponent extends React.Component {
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+last_name"} label="Last Name:"
+                <Form.Item name={`${this.props.formUID}+last_name`} label="Last Name:"
                     rules={[
                         {
                             required: true,
@@ -221,7 +224,7 @@ class GuardianFormComponent extends React.Component {
                 </Form.Item>
 
                 {/* TODO: Add some RegEx check for phone number inputs  */}
-                <Form.Item name={this.props.formUID + "+phone_number"} label="Telephone Number:"
+                <Form.Item name={`${this.props.formUID}+phone_number`} label="Telephone Number:"
                     // Add an object with pattern (holding a regex for acceptable phone number input) 
                     // to rules 
                     rules={[
@@ -240,13 +243,14 @@ class GuardianFormComponent extends React.Component {
                         placeholder="Enter your phone number"
                         type="tel"
                         // maxLength={13}
-                        // TODO: Think it's best if we remove this for now and let the validation feedback show. Should figure out a way to have both later
+                        // TODO: Think it's best if we remove this for now and 
+                        // let the validation feedback show. Should figure out a way to have both later
 
                         onChange={e => this.handleChange(e)}
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+email_address"} label="Email Address:"
+                <Form.Item name={`${this.props.formUID}+email_address`} label="Email Address:"
                     rules={[
                         {
                             type: 'email',
@@ -266,7 +270,7 @@ class GuardianFormComponent extends React.Component {
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+image_file"} label="Passport Photo: "
+                <Form.Item name={`${this.props.formUID}+image_file`} label="Passport Photo: "
                     rules={[
                         {
                             required: true,
@@ -278,7 +282,7 @@ class GuardianFormComponent extends React.Component {
                     { imageUpload }
                 </Form.Item>
                                 
-                <Form.Item name={this.props.formUID + "+nationality"} label="Nationality:"
+                <Form.Item name={`${this.props.formUID}+nationality`} label="Nationality:"
                     rules={[
                         {
                             required: true,
@@ -297,7 +301,7 @@ class GuardianFormComponent extends React.Component {
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+religion"} label="Religion:"
+                <Form.Item name={`${this.props.formUID}+religion`} label="Religion:"
                     rules={[
                         {
                             max: 128,
@@ -312,7 +316,7 @@ class GuardianFormComponent extends React.Component {
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+guardian_type"} label="Guardian Type:"
+                <Form.Item name={`${this.props.formUID}+guardian_type`} label="Guardian Type:"
                     rules={[
                         {
                             required: true,
@@ -327,7 +331,7 @@ class GuardianFormComponent extends React.Component {
                         style={{ width: 200 }}
                         placeholder="Relationship to students"
                         optionFilterProp="children"
-                        onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID, "guardian_type")}
+                        onChange={(value, option) => this.handleChangeSelect(value, option, "guardian_type")}
                         filterOption={(input, option) =>
                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
@@ -339,21 +343,22 @@ class GuardianFormComponent extends React.Component {
                 </Form.Item>
 
                 {/* TODO: Maybe change this so that they just indicate/list which students live with the guardian */}
-                <Form.Item name={this.props.formUID + "+lives_with_guardian"}
-                    label='Students that live with this parent/guardian (If no children reside with this parent please enter "N/A")'
+                <Form.Item name={`${this.props.formUID}+lives_with_guardian`}
+                    label='Students that live with this parent/guardian'
                     rules={[
                         {
                             required: true,
                             message: 'Please indicate which children live with this parent',
                         },
-                    ]} 
-                    { ...this.getValidationProps(this.props.formUID, 'lives_with_guardian') }
+                    ]}
+                    {...this.getValidationProps(this.props.formUID, 'lives_with_guardian')}
                 >
-                    <Input.TextArea onChange={e => this.handleChange(e)} />
-
+                    <Input.TextArea
+                        placeholder="Modupe Poku, Abena Poku"
+                        onChange={e => this.handleChange(e)} />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+occupation"} label="Occupation:"
+                <Form.Item name={`${this.props.formUID}+occupation`} label="Occupation:"
                     rules={[
                         {
                             required: true,
@@ -372,7 +377,7 @@ class GuardianFormComponent extends React.Component {
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+place_of_work"} label="Place of Work:"
+                <Form.Item name={`${this.props.formUID}+place_of_work`} label="Place of Work:"
                     rules={[
                         {
                             required: true,
@@ -391,12 +396,17 @@ class GuardianFormComponent extends React.Component {
                     />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+home_address"} label="Home Address:">
-                    <Input.TextArea onChange={e => this.handleChange(e)} />
+                <Form.Item name={`${this.props.formUID}+home_address`} label="Home Address:">
+                    <Input.TextArea
+                        style={{height:80}}
+                        placeholder={`45 Pawpaw Street\nCommunity 1995\nTema, Ghana`}
+                        onChange={e => this.handleChange(e)} />
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+postal_address"} label="Postal Address:">
-                    <Input.TextArea onChange={e => this.handleChange(e)} />
+                <Form.Item name={`${this.props.formUID}+postal_address`} label="Postal Address:">
+                    <Input.TextArea
+                        placeholder={`P.O. Box NT 28\nAccra New Town, Ghana`}
+                        onChange={e => this.handleChange(e)} />
                 </Form.Item>
 
                 { removeFormButton }
