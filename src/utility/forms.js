@@ -1,5 +1,7 @@
 import React from 'react';
-import { Form, Input, Button, Select, Upload } from 'antd';
+import { Form, Input, Select, Upload } from 'antd';
+import ImgCrop from 'antd-img-crop';
+import { InboxOutlined } from '@ant-design/icons';
 const { Option } = Select;
 const { Dragger } = Upload;
 
@@ -34,7 +36,7 @@ export const guestFormItems = {
 export const studentFormItems = {
     first_name: {
         validation_rules: [ 
-            { required: true, message: "First Name Required" }, 
+            { required: true, message: "Please input first name" }, 
             { max: 128, message: "First name must have fewer than 128 characters" }, 
         ], 
     }, 
@@ -45,7 +47,7 @@ export const studentFormItems = {
     }, 
     last_name: {
         validation_rules: [ 
-            { required: true, message: "Last Name Required" }, 
+            { required: true, message: "Please input last name" }, 
             { max: 128, message: "Last name must have fewer than 128 characters" }, 
         ], 
     }, 
@@ -98,12 +100,8 @@ export const studentFormValidInitialState = {
 }
 
 const countryCodeSelector = (
-    <Form.Item name="prefix" noStyle>
-        <Select
-            style={{
-                width: 70,
-            }}
-        >
+    <Form.Item name="country_code" noStyle>
+        <Select style={{width: 80}}>
             <Option value="Ghana">+233</Option>
         </Select>
     </Form.Item>
@@ -111,17 +109,16 @@ const countryCodeSelector = (
 
 export const guardianFormItems = {
     first_name: {
-        // name: "first_name",  //Name is just be the object key so let's leave this out for now?
         label: "First Name:",
         validation_rules: [ 
-            { required: true, message: "First Name Required" }, 
+            { required: true, message: "Please enter first name" }, 
             { max: 128, message: "First name must have fewer than 128 characters" }, 
         ],
-        componentType: Input,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input
                 placeholder="First name"
-                onChange={onChangeFunction}
+                onChange={(e) => kwargs.onChangeFunction(e)}
             />;
         },
     }, 
@@ -130,40 +127,41 @@ export const guardianFormItems = {
         validation_rules: [ 
             { max: 128, message: "Middle name must have fewer than 128 characters" }, 
         ],
-        componentType: Input,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input
                 placeholder="Middle name"
-                onChange={onChangeFunction}
+                onChange={(e) => kwargs.onChangeFunction(e)}
             />;
         },
     }, 
     last_name: {
         label: "Last Name:",
         validation_rules: [ 
-            { required: true, message: "Last Name Required" }, 
+            { required: true, message: "Please enter last name" }, 
             { max: 128, message: "Last name must have fewer than 128 characters" }, 
         ],
-        componentType: Input,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input
                 placeholder="Last name"
-                onChange={onChangeFunction}
+                onChange={(e) => kwargs.onChangeFunction(e)}
             />;
         },
     }, 
     phone_number: {
-        label: "Telephone Number (e.g., 0241234567 or +233241234567):",
+        label: "Telephone Number:",
         validation_rules: [
             { required: true, message: "Please enter a phone number" },
-            { max: 13, message: "Phone number must be 10 character (written as 0244324577) or 13 characters (written as +233244324577)" }
+            { max: 10, message: "Please enter phone number as 10 characters (e.g., 0241234567)" }
         ],
-        componentType: Input,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input
-                placeholder="Enter your phone number"
+                placeholder="0241234567"
                 type="tel"
-                onChange={onChangeFunction}
+                addonBefore={countryCodeSelector}
+                onChange={(e) => kwargs.onChangeFunction(e)}
             />;
         },
     }, 
@@ -173,20 +171,38 @@ export const guardianFormItems = {
             { type: "email", message: "Please enter a valid a E-mail address" },
             { max: 128, message: "E-mail must have fewer than 128 characters" },
         ],
-        componentType: Input,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input
                 placeholder="Enter your email"
                 type="email"
-                onChange={e => this.handleChange(e)}
+                onChange={(e) => kwargs.onChangeFunction(e)}
             />;
         },
     },
     image_file: {
-        label: "Passport Photo: ",
-        validation_rules: [ ],
-        componentType: Upload,
-        getComponentJSX: () => {},
+        label: "Passport-Style Picture:",
+        validation_rules: [],
+        componentType: "image_upload",
+        getComponentJSX: (kwargs) => {
+            console.log("File Selected: ", kwargs.fileSelected);
+            return (kwargs.fileSelected)
+                ?
+                <Upload {...kwargs.uploadProps} />
+                :
+                <ImgCrop>
+                    <Dragger {...kwargs.uploadProps} disabled={kwargs.fileSelected} >
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">Please provide a photo
+                            suitable for official identification</p>
+                        <p className="ant-upload-hint">
+                            Click or drag image to this area to upload
+                        </p>
+                    </Dragger>
+                </ImgCrop>;
+        },
     },
     nationality: {
         label: "Nationality:",
@@ -194,11 +210,11 @@ export const guardianFormItems = {
             { required: true, message: "Please specify a nationality" },
             { max: 128, message: "Nationality must be less than 128 characters" },
         ],
-        componentType: Input,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input
                 placeholder="Enter your nationality"
-                onChange={onChangeFunction}
+                onChange={(e) => kwargs.onChangeFunction(e)}
             />;
         },
     }, 
@@ -207,11 +223,11 @@ export const guardianFormItems = {
         validation_rules: [
             { max: 128, message: "Religion must have fewer than 128 characters" },
         ],
-        componentType: Input,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input
                 placeholder="Enter your religion"
-                onChange={onChangeFunction} />;
+                onChange={(e) => kwargs.onChangeFunction(e)} />;
         },
     }, 
     guardian_type: {
@@ -219,15 +235,15 @@ export const guardianFormItems = {
         validation_rules: [ 
             { required: true, message: "Please indicate the type of guardian" }, 
         ],
-        componentType: Select,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "select",
+        getComponentJSX: (kwargs) => {
             return <Select
                 showSearch
                 notFoundContent={<p>Not Found</p>}
                 style={{ width: 200 }}
                 placeholder="Relationship to students"
                 optionFilterProp="children"
-                onChange={(value, option) => onChangeFunction(value, option, "guardian_type")}
+                onChange={(value) => kwargs.onChangeFunction("guardian_type", value)}
                 filterOption={(input, option) =>
                     option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                 }
@@ -243,11 +259,11 @@ export const guardianFormItems = {
         validation_rules: [
             { required: true, message: "Please indicate which students live with this guardian" },
         ],
-        componentType: Input.TextArea,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input.TextArea
                 placeholder="Modupe Poku, Abena Poku"
-                onChange={onChangeFunction} />;
+                onChange={(e) => kwargs.onChangeFunction(e)} />;
         },
     },
     occupation: {
@@ -256,11 +272,11 @@ export const guardianFormItems = {
             { required: true, message: "Please enter an occupation" },
             { max: 256, message: "Occupation must have fewer than 256 characters" },
         ],
-        componentType: Input,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input
                 placeholder="Enter occupation"
-                onChange={onChangeFunction} />;
+                onChange={(e) => kwargs.onChangeFunction(e)} />;
         },
     },
     place_of_work: {
@@ -269,31 +285,32 @@ export const guardianFormItems = {
             { required: true, message: "Please enter a place of work" }, 
             { max: 256, message: "Place of work must have fewer than 256 characters" }, 
         ],
-        componentType: Input,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input
                 placeholder="Enter place of work"
-                onChange={onChangeFunction} />;
+                onChange={(e) => kwargs.onChangeFunction(e)} />;
         },
     },
     home_address: {
-        label: "Home Address:", 
-        validation_rules: [ ],
-        componentType: Input.TextArea,
-        getComponentJSX: (onChangeFunction) => {
+        label: "Home Address:",
+        validation_rules: [],
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input.TextArea
+                style={{ height: 80 }}
                 placeholder={`45 Pawpaw Street\nCommunity 1995\nTema, Ghana`}
-                onChange={onChangeFunction} />;
+                onChange={(e) => kwargs.onChangeFunction(e)} />;
         },
     },
     postal_address: {
         label: "Postal Address:",
         validation_rules: [],
-        componentType: Input.TextArea,
-        getComponentJSX: (onChangeFunction) => {
+        componentType: "input",
+        getComponentJSX: (kwargs) => {
             return <Input.TextArea
                 placeholder={`P.O. Box NT 28\nAccra New Town, Ghana`}
-                onChange={onChangeFunction} />;
+                onChange={(e) => kwargs.onChangeFunction(e)} />;
         },
     }, 
 }

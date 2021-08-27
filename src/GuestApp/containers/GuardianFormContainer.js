@@ -7,7 +7,7 @@ import { FileAddOutlined, CloseSquareOutlined, TeamOutlined, RightOutlined } fro
 import GuardianFormComponent from '../components/GuardianForm';
 
 import * as actions from '../../store/actions/guest';
-import { getInitialValues, checkValidityForm } from '../../utility/forms';
+import { getInitialValues, guardianFormItems, checkValidityForm } from '../../utility/forms';
 
 /* For the Select component */
 function onSearch(val) {
@@ -136,10 +136,11 @@ class GuardianForm extends React.Component {
             const guardianFormProps = {
                 showModal: this.showModal,
                 formUID: formUID,
-                initialValues: initialFormValues[formUID]
+                initialValues: {...initialFormValues[formUID], country_code: 'Ghana'},
+                formFields: guardianFormItems,
             }
 
-            let closeIcon = <CloseSquareOutlined
+            let removeFormIcon = <CloseSquareOutlined
                 onClick={event => {
                     event.stopPropagation();
                     this.props.removeForm(this.props.guardianForms, this.props.guardianFormsValid, formUID, 'GuardianForm', this.props.images);
@@ -147,7 +148,7 @@ class GuardianForm extends React.Component {
                 style={{
                     // color: 'red',
                     // ":hover": { fontColor: "blue" },
-                    fontSize: '2em',
+                    fontSize: '1.5em',
                     margin: 'auto',
                     // backgroundColor: 'black',
                     // display: 'inline',
@@ -162,7 +163,7 @@ class GuardianForm extends React.Component {
                     key={key}
                     extra={
                         (Object.keys(this.props.guardianForms).length > 1) ?
-                            <Button type="text" icon={closeIcon} style={{ padding: 0 }} danger /> : <></>}
+                            <Button type="text" icon={removeFormIcon} style={{ padding: 0 }} danger /> : <></>}
                 >
                     <GuardianFormComponent {...guardianFormProps} />
                 </Panel>
@@ -206,10 +207,11 @@ class GuardianForm extends React.Component {
                     expandIcon={
                         ({ isActive }) => <RightOutlined
                             rotate={isActive ? 90 : 0}
-                            style={{ fontSize: '2em', }}
+                            style={{ fontSize: '1.5em', }}
                         />
                     }
                     expandIconPosition='left'
+                    style={{width: '80%', margin: 'auto'}}
                 >
                     { this.state.forms }
                 </Collapse>
@@ -231,7 +233,17 @@ class GuardianForm extends React.Component {
                 </Modal>
 
                 <br />
-                <Button key={this.props.selectedMenuItem} onClick={() => this.props.addForm(this.props.guardianForms, this.props.guardianFormsValid, this.props.guardianUID, 'GuardianForm')}>
+                <Button
+                    key={this.props.selectedMenuItem}
+                    onClick={
+                        () => this.props.addForm(
+                            this.props.guardianForms,
+                            this.props.guardianFormsValid,
+                            this.props.guardianUID,
+                            'GuardianForm')
+                    }
+                    style={{marginLeft: '10%'}}
+                >
                     <FileAddOutlined /> Add Parent/Guardian
                 </Button>
 
