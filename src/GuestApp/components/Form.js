@@ -1,20 +1,14 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import debounce from "lodash/debounce";
 // import throttle from "lodash/throttle";
 
-import { Form, Input, Button, Select, Upload } from 'antd';
-import ImgCrop from 'antd-img-crop';
-import { InboxOutlined, CloseSquareOutlined } from '@ant-design/icons';
+import { Form, Button } from 'antd';
+import { CloseSquareOutlined } from '@ant-design/icons';
 
 import { formsCopy } from '../../utility/deepCopy';
 import { checkValidityItem } from '../../utility/forms';
 
-import * as actions from '../../store/actions/guest';
 import * as actionTypes from '../../store/actions/actionTypes';
-
-const { Option } = Select;
-const { Dragger } = Upload;
 
 const removeIcon = <CloseSquareOutlined
                 style={{
@@ -30,7 +24,7 @@ const removeIcon = <CloseSquareOutlined
  * @version 0.1
  * @author [Kofi Poku](https://github.com/pokuk76)
  */
-class GuardianFormComponent extends React.Component {
+class FormComponent extends React.Component {
 
     constructor(props) {
         super(props);
@@ -186,4 +180,4 @@ class GuardianFormComponent extends React.Component {
     }
 };
 
-export default GuardianFormComponent;
+export default FormComponent;

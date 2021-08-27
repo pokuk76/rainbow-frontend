@@ -2,14 +2,14 @@ import React from 'react';
 import { configure, shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 
-import { UnconnectedGuardianForm } from '../GuardianForm';
+import GuardianForm from '../Form';
 import { Form } from 'antd';
 
 import { guestMockStateToProps, guestMockDispatchToProps } from '../../../utility/testUtility'
 
 configure({ adapter: new Adapter() });
 
-describe('<GuardianForm />', () => {
+describe('Custom <Form /> (as GuardianForm)', () => {
 
     let wrapper;
     let props = {
@@ -22,10 +22,10 @@ describe('<GuardianForm />', () => {
     };
 
     beforeEach(() => {
-        wrapper = shallow(<UnconnectedGuardianForm {...props} />);
+        wrapper = shallow(<GuardianForm {...props} />);
     });
 
-    it('should render <Form />', () => {
+    it('should render 1 antd <Form />', () => {
         expect(wrapper.find(Form)).toHaveLength(1);
     });
 

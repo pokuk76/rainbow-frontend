@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Button, Collapse, Breadcrumb, Modal } from 'antd';
 import { FileAddOutlined, CloseSquareOutlined, TeamOutlined, RightOutlined } from '@ant-design/icons';
 
-import GuardianFormComponent from '../components/GuardianForm';
+import GuardianFormComponent from '../components/Form';
 
 import * as actions from '../../store/actions/guest';
 import { getInitialValues, guardianFormItems, checkValidityForm } from '../../utility/forms';
