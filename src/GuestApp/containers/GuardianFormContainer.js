@@ -135,9 +135,20 @@ class GuardianForm extends React.Component {
 
             const guardianFormProps = {
                 showModal: this.showModal,
+                update: this.props.updateGuardians,
+                addImage: this.props.addImage,
+                addForm: this.props.addForm,
+                removeForm: this.props.removeForm,
+
                 formUID: formUID,
+                forms: this.props.guardianForms,
+                formsValid: this.props.guardianFormsValid,
+                images: this.props.images,
+                submitStatus: this.props.submitStatus,
+
                 initialValues: {...initialFormValues[formUID], country_code: 'Ghana'},
                 formFields: guardianFormItems,
+                formType: 'GuardianForm'
             }
 
             let removeFormIcon = <CloseSquareOutlined
@@ -260,14 +271,22 @@ const mapStateToProps = state => {
         guardianForms: state.guest.guardianForms,
         guardianFormsValid: state.guest.guardianFormsValid, 
         guardianUID: state.guest.guardianUID,
-        images: state.guest.images
+        images: state.guest.images,
+
+        submitStatus: state.form.submitStatus,
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        addForm: (forms, guardianFormsValid, uid, currentForm) => dispatch(actions.addForm(forms, guardianFormsValid, uid, currentForm)),
-        removeForm: (guardianForms, guardianFormsValid, uid, currentForm, images) => dispatch(actions.removeForm(guardianForms, guardianFormsValid, uid, currentForm, images)),
+        updateGuardians: (guardianForms, guardianFormsValid) =>
+            dispatch(actions.updateGuardians(guardianForms, guardianFormsValid)),
+        addForm: (forms, guardianFormsValid, uid, currentForm) =>
+            dispatch(actions.addForm(forms, guardianFormsValid, uid, currentForm)),
+        removeForm: (guardianForms, guardianFormsValid, uid, currentForm, images) =>
+            dispatch(actions.removeForm(guardianForms, guardianFormsValid, uid, currentForm, images)),
+        addImage: (images, id, file) => dispatch(actions.addImage(images, id, file)),
+        removeImage: (images, id) => dispatch(actions.removeImage(images, id)),
     }
 }
 

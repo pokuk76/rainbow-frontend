@@ -181,11 +181,10 @@ export const guardianFormItems = {
         },
     },
     image_file: {
-        label: "Passport-Style Picture:",
+        label: "Passport-Style Photo:",
         validation_rules: [],
         componentType: "image_upload",
         getComponentJSX: (kwargs) => {
-            console.log("File Selected: ", kwargs.fileSelected);
             return (kwargs.fileSelected)
                 ?
                 <Upload {...kwargs.uploadProps} />
@@ -316,15 +315,15 @@ export const guardianFormItems = {
 }
 
 export const guardianFormValidInitialState = {
-    first_name: { validateStatus: "error", help: "First Name required" },
+    first_name: { validateStatus: "error", help: "First name required" },
     middle_name: null, 
-    last_name: { validateStatus: "error", help: "Last Name required" }, 
-    phone_number: { validateStatus: "error", help: "Please input a phone number" },
+    last_name: { validateStatus: "error", help: "Last name required" }, 
+    phone_number: { validateStatus: "error", help: "Phone number required" },
     email_address: null,
-    nationality: { validateStatus: "error", help: "Please specify a nationality" }, 
+    nationality: { validateStatus: "error", help: "Nationality required" }, 
     religion: null, 
-    guardian_type: { validateStatus: "error", help: "Please specify this guardian's relationship with the students" },
-    lives_with_guardian: { validateStatus: "error", help: "Please indicate which children live with this parent" },
+    guardian_type: { validateStatus: "error", help: "Specify this guardian's relationship with the students" },
+    lives_with_guardian: { validateStatus: "error", help: "Indicate which children live with this parent" },
     occupation: null, 
     place_of_work: null, 
     home_address: null, 
