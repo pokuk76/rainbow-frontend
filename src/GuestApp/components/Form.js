@@ -6,7 +6,7 @@ import { Form, Button } from 'antd';
 import { CloseSquareOutlined } from '@ant-design/icons';
 
 import { formsCopy } from '../../utility/deepCopy';
-import { checkValidityItem } from '../../utility/forms';
+import { fieldComponentTypes, checkValidityItem } from '../../utility/forms';
 
 import * as actionTypes from '../../store/actions/actionTypes';
 
@@ -65,16 +65,16 @@ class FormComponent extends React.Component {
     getFieldComponent = (field, fileSelected, uploadProps) => {
         let kwargs;
         switch (this.props.formFields[field].componentType) {
-            case 'input':
+            case fieldComponentTypes['input']:
                 kwargs = {onChangeFunction: this.handleChange};
                 break;
-            case 'select':
+            case fieldComponentTypes['select']:
                 kwargs = {onChangeFunction: this.handleChangeSelect};
                 break;
-            case 'date':
+            case fieldComponentTypes['date']:
                 kwargs = {onChangeFunction: this.handleChangeSelect};
                 break;
-            case 'image_upload':
+            case fieldComponentTypes['image_upload']:
                 kwargs = {fileSelected: fileSelected, uploadProps: uploadProps};
                 break;
             default:

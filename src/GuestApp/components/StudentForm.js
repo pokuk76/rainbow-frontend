@@ -69,15 +69,17 @@ class StudentFormComponent extends React.Component {
        this.debounceHandleChange(form, field, value);
     }
 
-    handleChangeSelect(value, option, form, field) {
+    handleChangeSelect(field, value) {
         // console.log("Handle Select component change [value, field, option]: ", value, field, option);
+        let form = this.props.formUID;
         this.debounceHandleChange(form, field, value);
     }
 
-    handleChangeDate(dateMoment, dateString, itemUID) {
+    handleChangeDate(dateMoment, dateString, field) {
         // Should probably just send a dateString and convert that on the backend to DateField (that's actually the only choice we have Kof)
+        // console.log("Handle DatePicker change (date moment): ", dateMoment);
         // console.log("Handle DatePicker change (date string): ", dateString);
-        let [form, field] = itemUID.split("+");
+        let form = this.props.formUID;
         this.debounceHandleChange(form, field, dateMoment);
     }
 
@@ -252,14 +254,14 @@ class StudentFormComponent extends React.Component {
                         filterOption={(input, option) =>
                             option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
-                        onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID, "sex")}
+                        onChange={(value, option) => this.handleChangeSelect("sex", value)}
                     >
                         <Option value="male">Male</Option>
                         <Option value="female">Female</Option>
                     </Select>
                 </Form.Item>
 
-                <Form.Item name={this.props.formUID + "+date_of_birth"} label="Date of Birth"
+                <Form.Item name={this.props.formUID + "+date_of_birth"} label="Date of Birth:"
                     rules={[
                         {
                             required: true,
@@ -278,7 +280,7 @@ class StudentFormComponent extends React.Component {
                             /> : <DatePicker />
                         } */}
                     <DatePicker 
-                        onChange={(dateMoment, dateString) => this.handleChangeDate(dateMoment, dateString, this.props.formUID + "+date_of_birth")} 
+                        onChange={(dateMoment, dateString) => this.handleChangeDate(dateMoment, dateString, "date_of_birth")} 
                     />
                 </Form.Item>
 
@@ -313,7 +315,7 @@ class StudentFormComponent extends React.Component {
                 </Form.Item>
 
 
-                <Form.Item name={this.props.formUID + "+has_ailments"} label="Please list any allergies or ailments"
+                <Form.Item name={this.props.formUID + "+has_ailments"} label="Please list any allergies or ailments:"
                     { ...this.getValidationProps(this.props.formUID, 'has_ailments') }
                 >
                     <Input.TextArea onChange={(e) => this.handleChange(e)} />
@@ -348,7 +350,7 @@ class StudentFormComponent extends React.Component {
                             // console.log(option)
                             option['value'].indexOf(input.toLowerCase()) >= 0
                         } 
-                        onChange={(value, option) => this.handleChangeSelect(value, option, this.props.formUID, "class_reached")} 
+                        onChange={(value, option) => this.handleChangeSelect("class_reached", value)} 
                         options={[
                             { label: "Test", value: "test"}, 
                             { label: "Class 1", value: "class 1"}, 
