@@ -66,10 +66,7 @@ class GuardianForm extends React.Component {
             modalVisible: false, 
             modalContent: <></>, 
             // If we set a state property to a pointer to something else, then it won't cause a re-render every time that something else changes because the pointer is the same (not sure if it's the same if its a reference)
-            // form
         };
-
-        // this.onCollapse = this.onCollapse.bind(this);
         this.renderForms = this.renderForms.bind(this);
     }
 
@@ -94,35 +91,20 @@ class GuardianForm extends React.Component {
     
 
     componentDidMount() {
-        // Not sure why we were calling get initialValues here?
-        // getInitialValues(this.props.guardianForms);
         window.scroll({
             top: 0, 
             left: 0, 
             behavior: 'smooth'
         });
-        // TODO: move the renderForms call into the constructor OR
-        // OR stop keeping the forms in state (there's no reason to?); 
-        // We can just call the renderForms function in the Collapse component and have renderForm return the forms
-        // This will *probably* fix the need for that hack in componentDidUpdate
-        this.renderForms();
         console.log("GuardianFormContainer mounted...");
     }
 
     componentDidUpdate(prevProps){
-    /*  Added this to ensure that the forms re-render on addition or removal of Form & i think maybe images too
-        (renderForms updates state causing a component re-render)
-        Feels mad ghetto but it's working
-        TODO: Try adding a state change on add and remove to auto re-render
-    */
         console.log("GuardianFormContainer update...");
-        if (prevProps.guardianForms !== this.props.guardianForms || prevProps.images !== this.props.images) {
-            this.renderForms();
-        }
     }
 
 
-    /** Unused (I believe) */
+    /** Unused */
     checkValidityForm = (formUID) => {
         let valid = true;
         for( let element in this.props.guardianForms[formUID]) {
@@ -172,7 +154,11 @@ class GuardianForm extends React.Component {
             let removeFormIcon = <CloseSquareOutlined
                 onClick={event => {
                     event.stopPropagation();
-                    this.props.removeForm(this.props.guardianForms, this.props.guardianFormsValid, formUID, 'GuardianForm', this.props.images);
+                    this.props.removeForm(
+                        this.props.guardianForms, 
+                        this.props.guardianFormsValid, 
+                        formUID, 'GuardianForm', this.props.images
+                    );
                 }}
                 style={{
                     // color: 'red',
@@ -205,8 +191,8 @@ class GuardianForm extends React.Component {
             i++;
         }
         
-        this.setState({forms: forms});
-
+        // this.setState({forms: forms});
+        return forms;
     }
 
 
@@ -247,7 +233,8 @@ class GuardianForm extends React.Component {
                     expandIconPosition='left'
                     style={{width: '80%', margin: 'auto'}}
                 >
-                    { this.state.forms }
+                    {/* { this.state.forms } */}
+                    { this.renderForms() }
                 </Collapse>
 
                 {/* Was getting in the way of the next/prev buttons

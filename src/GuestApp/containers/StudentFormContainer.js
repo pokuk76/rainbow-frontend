@@ -161,7 +161,11 @@ class StudentForm extends React.Component {
                 // onMouseEnter={console.log("Square Hover")}
                 onClick={event => {
                     event.stopPropagation();
-                    this.props.removeForm(this.props.studentForms, this.props.studentFormsValid, formUID, 'StudentForm', this.props.images);
+                    this.props.removeForm(
+                        this.props.studentForms, 
+                        this.props.studentFormsValid, 
+                        formUID, 'StudentForm', this.props.images
+                    );
                 }}
                 style={{
                     // color: 'red',
