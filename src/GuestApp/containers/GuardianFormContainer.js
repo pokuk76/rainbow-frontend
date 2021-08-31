@@ -173,14 +173,14 @@ class GuardianForm extends React.Component {
             let n = parseInt(formUID.split('_')[1], 10);
             forms.push(
                 <Panel
-                    // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
+                    // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}}
+                    key={key}
                     header={
                         setPanelHeader(
                             "Parent " + (n + 1),
                             this.props.guardianFormsValid[formUID]
                         )
                     }
-                    key={key}
                     extra={
                         (Object.keys(this.props.guardianForms).length > 1) ?
                             <Button type="text" icon={removeFormIcon} style={{ padding: 0 }} danger /> : <></>}
@@ -265,7 +265,7 @@ class GuardianForm extends React.Component {
                     }
                     style={{ marginLeft: '10%' }}
                 >
-                    <FileAddOutlined /> Add Parent/Guardian
+                    <FileAddOutlined /> Add Parent
                 </Button>
 
                 <br />

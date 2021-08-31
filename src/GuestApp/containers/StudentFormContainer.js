@@ -48,11 +48,10 @@ class StudentForm extends React.Component {
             uploading: false,
             modalVisible: false, 
             modalContent: <></>, 
-            // studentForms: this.props.studentForms // We're passing by reference, which actually works for us 
+            // studentForms: this.props.studentForms // We're passing by reference, which actually works well in this case 
                                                     // but might cause issues later?
         };
 
-        // this.onCollapse = this.onCollapse.bind(this);
     }
 
     componentDidMount() {
@@ -61,17 +60,6 @@ class StudentForm extends React.Component {
             left: 0, 
             behavior: 'smooth'
         });
-        this.renderForms();
-    }
-
-    componentDidUpdate(prevProps){
-        /*  Added this to ensure that the forms re-render on add or remove
-            Feels mad ghetto but it's working
-        */
-
-        if(prevProps.studentForms !== this.props.studentForms || prevProps.images !== this.props.images ){
-            this.renderForms();
-        }
     }
 
     /**
@@ -178,27 +166,28 @@ class StudentForm extends React.Component {
             let n = parseInt(formUID.split('_')[1], 10);
 
             forms.push(
-            <Panel 
-                // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
-                header={ setPanelHeader("Student " + (n+1), checkValidityForm(formUID, this.props.studentFormsValid)) } 
-                key={key} 
-                extra={
-                    (Object.keys(this.props.studentForms).length > 1) ? 
+                <Panel
+                    // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
+                    header={setPanelHeader("Student " + (n + 1), checkValidityForm(formUID, this.props.studentFormsValid))}
+                    key={key}
+                    extra={
+                        (Object.keys(this.props.studentForms).length > 1) ?
 
-                    <Button type="text" icon={closeIcon} style={{padding: 0, }} danger>
-                        
-                    </Button>
-                     : <></>
-                }
-                
-            >
-                <StudentFormComponent {...studentFormProps} />
-                {/* </Form> */}
-            </Panel>
+                            <Button type="text" icon={closeIcon} style={{ padding: 0, }} danger>
+
+                            </Button>
+                            : <></>
+                    }
+
+                >
+                    <StudentFormComponent {...studentFormProps} />
+                    {/* </Form> */}
+                </Panel>
             );
             i++;
         }
-        this.setState({forms: forms});
+        // this.setState({forms: forms});
+        return forms;
 
     }
 
@@ -224,7 +213,7 @@ class StudentForm extends React.Component {
                     expandIconPosition='left'
                     style={{width: '80%', margin: 'auto'}}
                 >
-                    {this.state.forms}
+                    {this.renderForms()}
                 </Collapse>
 
                 <Modal
