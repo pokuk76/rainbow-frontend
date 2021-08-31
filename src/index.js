@@ -13,6 +13,7 @@ import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
 const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
 const reducer = combineReducers({
     auth: authReducer,
     guest: guestReducer, 
@@ -27,21 +28,21 @@ const app = (
     <Provider store={store}>
         <App />
     </Provider>
-)
-
-/** TODO: Uncomment this for production and comment/remove the one below */
-// ReactDOM.render(
-//   <React.StrictMode>
-//     { app }
-//   </React.StrictMode>,
-//   document.getElementById('root')
-// );
-
-// Got rid of the "Warning: findDOMNode is deprecated in StrictMode." error
-// <https://stackoverflow.com/questions/61220424/material-ui-drawer-finddomnode-is-deprecated-in-strictmode>
-ReactDOM.render(
-    app, document.getElementById('root')
 );
+
+if (process.env.NODE_ENV === "production") {
+    ReactDOM.render(
+        <React.StrictMode>
+            {app}
+        </React.StrictMode>,
+        document.getElementById('root')
+    );
+} else {
+    // Get rid of the "Warning: findDOMNode is deprecated in StrictMode." error (I think its from AntD)
+    ReactDOM.render(
+        app, document.getElementById('root')
+    );
+};
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
