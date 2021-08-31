@@ -7,7 +7,7 @@ import { FileAddOutlined, CloseSquareOutlined, TeamOutlined, RightOutlined } fro
 import GuardianFormComponent from '../components/Form';
 
 import * as actions from '../../store/actions/guest';
-import { getInitialValues, guardianFormItems, checkValidityForm } from '../../utility/forms';
+import { guardianFormItems, getInitialValues, checkValidityForm } from '../../utility/forms';
 
 /* For the Select component */
 function onSearch(val) {
@@ -30,7 +30,13 @@ function callback(key) {
 
 /*******/
 
-function setPanelHeader(text, formValid) {
+/**
+ * 
+ * @param {string} text 
+ * @param {Object} formValidity - = this.props.guardianFormsValid[formUID]
+ */
+function setPanelHeader(text, formValidity) {
+    let formValid = checkValidityForm(formValidity);
     return (
         <div style={{ display: 'inline-flex', marginLeft: '1em', height: '100%', width: '70%' }}>
             <h1 style={{ fontSize: '1.5em', margin: 'auto', textAlign: 'right', 
@@ -46,7 +52,7 @@ function setPanelHeader(text, formValid) {
 /**
  * Class-based Container for guardian input form(s)
  *
- * @version 
+ * @class
  * @author [Kofi Poku](https://github.com/pokuk76)
  */
 
@@ -59,6 +65,8 @@ class GuardianForm extends React.Component {
             forms: [],
             modalVisible: false, 
             modalContent: <></>, 
+            // If we set a state property to a pointer to something else, then it won't cause a re-render every time that something else changes because the pointer is the same (not sure if it's the same if its a reference)
+            // form
         };
 
         // this.onCollapse = this.onCollapse.bind(this);
@@ -93,20 +101,28 @@ class GuardianForm extends React.Component {
             left: 0, 
             behavior: 'smooth'
         });
+        // TODO: move the renderForms call into the constructor OR
+        // OR stop keeping the forms in state (there's no reason to?); 
+        // We can just call the renderForms function in the Collapse component and have renderForm return the forms
+        // This will *probably* fix the need for that hack in componentDidUpdate
         this.renderForms();
+        console.log("GuardianFormContainer mounted...");
     }
 
     componentDidUpdate(prevProps){
-        /*  Added this to ensure that the forms re-render on addition or removal of Form & i think maybe images too 
-            (renderForms updates state causing a component re-render)
-            Feels mad ghetto but it's working
-            TODO: Try adding a state change on add and remove to auto re-render
-        */
-        if(prevProps.guardianForms !== this.props.guardianForms || prevProps.images !== this.props.images ){
+    /*  Added this to ensure that the forms re-render on addition or removal of Form & i think maybe images too
+        (renderForms updates state causing a component re-render)
+        Feels mad ghetto but it's working
+        TODO: Try adding a state change on add and remove to auto re-render
+    */
+        console.log("GuardianFormContainer update...");
+        if (prevProps.guardianForms !== this.props.guardianForms || prevProps.images !== this.props.images) {
             this.renderForms();
         }
     }
 
+
+    /** Unused (I believe) */
     checkValidityForm = (formUID) => {
         let valid = true;
         for( let element in this.props.guardianForms[formUID]) {
@@ -121,10 +137,12 @@ class GuardianForm extends React.Component {
     }
     
     /**
-     * Method to create the forms for the container, which are held in state
-     * Called when the GuardianFormContainer mounts and when it updates
+     * Method to create the forms for the container, which are held in state.
      * 
+     * Called when the GuardianFormContainer mounts and when it updates.
      * TODO: Make this better?
+     * 
+     * @function
      */
     renderForms(){
         var forms = [];
@@ -170,7 +188,12 @@ class GuardianForm extends React.Component {
             forms.push(
                 <Panel
                     // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
-                    header={setPanelHeader("Guardian " + (n + 1), checkValidityForm(this.props.guardianFormsValid[formUID]))}
+                    header={
+                        setPanelHeader(
+                            "Parent " + (n + 1),
+                            this.props.guardianFormsValid[formUID]
+                        )
+                    }
                     key={key}
                     extra={
                         (Object.keys(this.props.guardianForms).length > 1) ?
@@ -253,7 +276,7 @@ class GuardianForm extends React.Component {
                             this.props.guardianUID,
                             'GuardianForm')
                     }
-                    style={{marginLeft: '10%'}}
+                    style={{ marginLeft: '10%' }}
                 >
                     <FileAddOutlined /> Add Parent/Guardian
                 </Button>
@@ -275,7 +298,7 @@ const mapStateToProps = state => {
 
         submitStatus: state.form.submitStatus,
     }
-}
+};
 
 const mapDispatchToProps = dispatch => {
     return {
@@ -285,10 +308,12 @@ const mapDispatchToProps = dispatch => {
             dispatch(actions.addForm(forms, guardianFormsValid, uid, currentForm)),
         removeForm: (guardianForms, guardianFormsValid, uid, currentForm, images) =>
             dispatch(actions.removeForm(guardianForms, guardianFormsValid, uid, currentForm, images)),
-        addImage: (images, id, file) => dispatch(actions.addImage(images, id, file)),
-        removeImage: (images, id) => dispatch(actions.removeImage(images, id)),
+        addImage: (images, id, file) =>
+            dispatch(actions.addImage(images, id, file)),
+        removeImage: (images, id) =>
+            dispatch(actions.removeImage(images, id)),
     }
-}
+};
 
 // connect(mapStateToProps, mapDispatchToProps)(Dragger);
 export default connect(mapStateToProps, mapDispatchToProps)(GuardianForm);

@@ -4,10 +4,11 @@ import { connect } from 'react-redux';
 import { Button, Collapse, Breadcrumb, Modal } from 'antd';
 import { FileAddOutlined, CloseSquareOutlined, UserAddOutlined, RightOutlined } from '@ant-design/icons';
 
-import StudentFormComponent from '../components/StudentForm';
+// import StudentFormComponent from '../components/StudentForm';
+import StudentFormComponent from '../components/Form';
 
 import * as actions from '../../store/actions/guest';
-import { getInitialValues, checkValidityForm } from '../../utility/forms';
+import { studentFormItems, getInitialValues, checkValidityForm } from '../../utility/forms';
 
 /* For the Select component */
 function onSearch(val) {
@@ -61,7 +62,6 @@ class StudentForm extends React.Component {
             behavior: 'smooth'
         });
         this.renderForms();
-
     }
 
     componentDidUpdate(prevProps){
@@ -76,6 +76,7 @@ class StudentForm extends React.Component {
 
     /**
      * Called when the user clicks on an uploaded image
+     * @function
      * @param {ReactNode} body - content for the modal (In this case an image)
      */
     showModal = (body) => {
@@ -87,6 +88,7 @@ class StudentForm extends React.Component {
 
     /**
      * Called when the user clicks OK on the modal
+     * @function
      * @param {Event} e - A click event
      */
     handleOk = (e) => {
@@ -136,6 +138,25 @@ class StudentForm extends React.Component {
         const initialFormValues = getInitialValues(this.props.studentForms);
         for (let formUID in this.props.studentForms){
             var key = "StudentPanel" + i;
+
+            const studentFormProps = {
+                showModal: this.showModal,
+                update: this.props.updateStudents,
+                addImage: this.props.addImage,
+                addForm: this.props.addForm,
+                removeForm: this.props.removeForm,
+
+                formUID: formUID,
+                forms: this.props.studentForms,
+                formsValid: this.props.studentFormsValid,
+                images: this.props.images,
+                submitStatus: this.props.submitStatus,
+
+                initialValues: initialFormValues[formUID],
+                formFields: studentFormItems,
+                formType: 'StudentForm'
+            }
+
             let closeIcon = <CloseSquareOutlined
                 // onMouseEnter={console.log("Square Hover")}
                 onClick={event => {
@@ -150,14 +171,8 @@ class StudentForm extends React.Component {
                 }}
             />;
 
-            const studentFormProps = {
-                showModal: this.showModal,
-                formUID: formUID,
-                initialValues: initialFormValues[formUID]
-            }
-
             let n = parseInt(formUID.split('_')[1], 10);
-            console.log('FormUID :', formUID);
+
             forms.push(
             <Panel 
                 // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
@@ -203,6 +218,7 @@ class StudentForm extends React.Component {
                     onChange={callback}
                     expandIcon={({ isActive }) => <RightOutlined rotate={isActive ? 90 : 0} style={{ fontSize: '2em', }} />}
                     expandIconPosition='left'
+                    style={{width: '80%', margin: 'auto'}}
                 >
                     {this.state.forms}
                 </Collapse>
@@ -219,7 +235,17 @@ class StudentForm extends React.Component {
                 </Modal>
 
                 <br />
-                <Button key={this.props.selectedMenuItem} onClick={() => this.props.addForm(this.props.studentForms, this.props.studentFormsValid, this.props.studentUID, 'StudentForm')}>
+                <Button
+                    key={this.props.selectedMenuItem}
+                    onClick={
+                        () => this.props.addForm(
+                            this.props.studentForms,
+                            this.props.studentFormsValid,
+                            this.props.studentUID,
+                            'StudentForm')
+                    }
+                    style={{ marginLeft: '10%' }}
+                >
                     <FileAddOutlined /> Add Student
                 </Button>
                 <br />
@@ -232,18 +258,27 @@ class StudentForm extends React.Component {
 const mapStateToProps = state => {
     return {
         studentForms: state.guest.studentForms,
-        studentFormsValid: state.guest.studentFormsValid, 
+        studentFormsValid: state.guest.studentFormsValid,
         studentUID: state.guest.studentUID,
-        images: state.guest.images
+        images: state.guest.images,
+
+        submitStatus: state.form.submitStatus,
     }
-  }
+};
   
-  const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
     return {
-        addForm: (forms, studentFormsValid, uid, currentForm) => dispatch(actions.addForm(forms, studentFormsValid, uid, currentForm)),
-        removeImage: (images, id, formData) => dispatch(actions.removeImage(images, id, formData)),
-        removeForm: (studentForms, studentFormsValid, uid, currentForm, images) => dispatch(actions.removeForm(studentForms, studentFormsValid, uid, currentForm, images)),
+        updateStudents: (studentForms, studentFormsValid) =>
+            dispatch(actions.updateStudents(studentForms, studentFormsValid)),
+        addForm: (forms, studentFormsValid, uid, currentForm) =>
+            dispatch(actions.addForm(forms, studentFormsValid, uid, currentForm)),
+        removeForm: (studentForms, studentFormsValid, uid, currentForm, images) =>
+            dispatch(actions.removeForm(studentForms, studentFormsValid, uid, currentForm, images)),
+        addImage: (images, id, file) =>
+            dispatch(actions.addImage(images, id, file)),
+        removeImage: (images, id, formData) =>
+            dispatch(actions.removeImage(images, id, formData)),
     }
-  }
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(StudentForm);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(StudentForm);

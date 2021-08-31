@@ -12,34 +12,6 @@ export const fieldComponentTypes = {
     image_upload: Upload
 }
 
-export const guestFormItems = {
-    username: {
-        validation_rules: [ 
-            { required: true, message: "Username Required" }, 
-            { unique: true, message: "Username already exists"}, 
-            { type: "username", message: "Username can only contain alphanumeric characters, punctuation, and special characters" }, 
-            { max: 128, message: "First name must have fewer than 128 characters" }, 
-        ], 
-    }, 
-    first_name: {
-        validation_rules: [ 
-            { required: true, message: "First Name Required" }, 
-            { max: 128, message: "First name must have fewer than 128 characters" }, 
-        ], 
-    }, 
-    middle_name: {
-        validation_rules: [ 
-            { max: 128, message: "Middle name must have fewer than 128 characters" }, 
-        ], 
-    }, 
-    last_name: {
-        validation_rules: [ 
-            { required: true, message: "Last Name Required" }, 
-            { max: 128, message: "Last name must have fewer than 128 characters" }, 
-        ], 
-    }, 
-}
-
 const sharedFields = {
     first_name: {
         label: "First Name:",
@@ -83,6 +55,45 @@ const sharedFields = {
         },
     },
 }
+
+export const guestFormItems = {
+    username: {
+        validation_rules: [ 
+            { required: true, message: "Username Required" }, 
+            { unique: true, message: "Username already exists"}, 
+            { type: "username", message: "Username can only contain alphanumeric characters, punctuation, and special characters" }, 
+            { max: 128, message: "First name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+    first_name: {
+        validation_rules: [ 
+            { required: true, message: "First Name Required" }, 
+            { max: 128, message: "First name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+    middle_name: {
+        validation_rules: [ 
+            { max: 128, message: "Middle name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+    last_name: {
+        validation_rules: [ 
+            { required: true, message: "Last Name Required" }, 
+            { max: 128, message: "Last name must have fewer than 128 characters" }, 
+        ], 
+    }, 
+}
+
+const classReachedOptions = [
+    { label: "Test", value: "test" },
+    { label: "Class 1", value: "class 1" },
+    { label: "Class 2", value: "class 2" },
+    { label: "Class 3", value: "class 3" },
+    { label: "Class 4", value: "class 4" },
+    { label: "Class 5", value: "class 5" },
+    { label: "Class 6", value: "class 6" },
+    { label: "Form 1", value: "form 1" },
+];
 
 export const studentFormItems = {
     first_name: {
@@ -259,16 +270,7 @@ export const studentFormItems = {
                     option['value'].indexOf(input.toLowerCase()) >= 0
                 }
                 onChange={(value) => this.handleChangeSelect( "class_reached", value)}
-                options={[
-                    { label: "Test", value: "test" },
-                    { label: "Class 1", value: "class 1" },
-                    { label: "Class 2", value: "class 2" },
-                    { label: "Class 3", value: "class 3" },
-                    { label: "Class 4", value: "class 4" },
-                    { label: "Class 5", value: "class 5" },
-                    { label: "Class 6", value: "class 6" },
-                    { label: "Form 1", value: "form 1" },
-                ]}
+                options={classReachedOptions}
             >
             </Select>;
         },
@@ -284,19 +286,23 @@ export const studentFormItems = {
     }, 
 }
 
+/** 
+ * TODO: add description
+ * @constant
+ **/
 export const studentFormValidInitialState = {
-    first_name: { validateStatus: "error", help: "First Name required" }, 
-    middle_name: null, 
-    last_name: { validateStatus: "error", help: "Last Name required" }, 
-    sex: { validateStatus: "error", help: "Please specify child's sex" }, 
-    date_of_birth: { validateStatus: "error", help: "Please provide a date of birth" }, 
-    nationality: { validateStatus: "error", help: "Please specify child's nationality" }, 
-    religion: null, 
-    has_ailments: null, 
-    former_school: null, 
-    former_school_address: null, 
-    class_reached: null, 
-    reason_for_leaving: null, 
+    first_name: { validateStatus: "error", help: "First Name required" },
+    middle_name: null,
+    last_name: { validateStatus: "error", help: "Last Name required" },
+    sex: { validateStatus: "error", help: "Please specify child's sex" },
+    date_of_birth: { validateStatus: "error", help: "Please provide a date of birth" },
+    nationality: { validateStatus: "error", help: "Please specify child's nationality" },
+    religion: null,
+    has_ailments: null,
+    former_school: null,
+    former_school_address: null,
+    class_reached: null,
+    reason_for_leaving: null,
 }
 
 const countryCodeSelector = (
