@@ -9,7 +9,7 @@ import { RainbowLogoIcon } from '../../shared_components/Icons';
 
 import * as actionTypes from '../../store/actions/actionTypes';
 
-import { checkValiditySection, checkValidityForm } from '../../utility/forms';
+import { checkValiditySection, checkValidityForm } from '../../utility/form/methods';
 
 export const DrawerTitle = (props) => {
     return (

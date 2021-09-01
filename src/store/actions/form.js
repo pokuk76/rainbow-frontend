@@ -1,7 +1,6 @@
 import axios from 'axios';
 import * as actionTypes from './actionTypes';
-import { guestFormItems, studentFormItems, guardianFormItems, declarationFormItems } from '../../utility/forms';
-import StudentForm from '../../GuestApp/components/StudentForm';
+import { guestFormItems, studentFormItems, guardianFormItems, declarationFormItems } from '../../utility/form/data';
 
 /* Form Submission */
 

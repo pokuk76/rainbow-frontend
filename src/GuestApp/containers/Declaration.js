@@ -8,8 +8,9 @@ import { WalletOutlined, } from '@ant-design/icons';
 
 import * as actions from '../../store/actions/guest';
 import * as actionTypes from '../../store/actions/actionTypes';
-import { guestFormCopy } from '../../utility/deepCopy';
-import { declarationFormItems, checkValidityItem } from '../../utility/forms';
+
+import { declarationFormItems } from '../../utility/form/data';
+import { formCopy, checkValidityItem } from '../../utility/form/methods';
 
 class Declaration extends React.Component {
 
@@ -29,8 +30,8 @@ class Declaration extends React.Component {
 
   debounceHandleChange(field, value) {
 
-    let declaration = guestFormCopy(this.props.declaration);
-    let declarationValid = guestFormCopy(this.props.declarationValid);
+    let declaration = formCopy(this.props.declaration);
+    let declarationValid = formCopy(this.props.declarationValid);
 
     declaration[field] = value;
     var rules = declarationFormItems[field]['validation_rules'];

@@ -5,8 +5,8 @@ import debounce from "lodash/debounce";
 import { Form, Button } from 'antd';
 import { CloseSquareOutlined } from '@ant-design/icons';
 
-import { formsCopy } from '../../utility/deepCopy';
-import { fieldComponentTypes, checkValidityItem } from '../../utility/forms';
+import { fieldComponentTypes } from '../../utility/form/data';
+import { formsCopy, checkValidityItem } from '../../utility/form/methods';
 
 import * as actionTypes from '../../store/actions/actionTypes';
 

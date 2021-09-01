@@ -7,7 +7,8 @@ import { FileAddOutlined, CloseSquareOutlined, TeamOutlined, RightOutlined } fro
 import GuardianFormComponent from '../components/Form';
 
 import * as actions from '../../store/actions/guest';
-import { guardianFormItems, getInitialValues, checkValidityForm } from '../../utility/forms';
+import { guardianFormItems } from '../../utility/form/data';
+import { getInitialValues, checkValidityForm } from '../../utility/form/methods';
 
 /* For the Select component */
 function onSearch(val) {

@@ -4,11 +4,11 @@ import { connect } from 'react-redux';
 import { Button, Collapse, Breadcrumb, Modal } from 'antd';
 import { FileAddOutlined, CloseSquareOutlined, UserAddOutlined, RightOutlined } from '@ant-design/icons';
 
-// import StudentFormComponent from '../components/StudentForm';
 import StudentFormComponent from '../components/Form';
 
 import * as actions from '../../store/actions/guest';
-import { studentFormItems, getInitialValues, checkValidityForm } from '../../utility/forms';
+import { studentFormItems } from '../../utility/form/data';
+import { getInitialValues, checkValidityForm } from '../../utility/form/methods';
 
 /* For the Select component */
 function onSearch(val) {

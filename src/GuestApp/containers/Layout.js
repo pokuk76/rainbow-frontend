@@ -16,7 +16,7 @@ import { DrawerContents, DrawerTitle } from '../components/Drawer';
 import * as formActions from '../../store/actions/form';
 import * as actionTypes from '../../store/actions/actionTypes';
 
-import { checkValiditySection, checkValidityForm } from '../../utility/forms';
+import { checkValiditySection, checkValidityForm } from '../../utility/form/methods';
 
 import './layout.css';
 

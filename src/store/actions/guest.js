@@ -1,6 +1,6 @@
 import * as actionTypes from './actionTypes';
-import { formValidCopy } from '../../utility/deepCopy';
-import { studentFormValidInitialState, guardianFormValidInitialState } from '../../utility/forms';
+import { formValidCopy } from '../../utility/form/methods';
+import { studentFormValidInitialState, guardianFormValidInitialState } from '../../utility/form/data';
 
 const STUDENT_FORM = 'StudentForm';
 const GUARDIAN_FORM = 'GuardianForm';
@@ -25,7 +25,7 @@ export const updateImages = (imagesObj) => {
 export const addImage = (images, id, file) => {
     // console.log('Adding image form id: ', id)
     let newImages = {...images};
-    newImages[id] = [file];    //Can't remember why the file data needs to be an array but it does
+    newImages[id] = [file];  // Can't remember why the file data needs to be an array but it does
     // console.log('Images: ', images);
 
     return dispatch => {
@@ -67,7 +67,6 @@ export const updateGuardians = (guardianForms, guardianFormsValid, guardianUID=n
     return action;
 }
 
-// updateGuardians might be the only useful function here
 export const addForm = (formsObject, formsValid, uid, currentForm) => {
     uid++;  
     let id;
@@ -95,7 +94,7 @@ export const addForm = (formsObject, formsValid, uid, currentForm) => {
                 dispatch( updateGuardians(newFormSet, newFormValidSet, uid) );
             }
         default:
-            return{
+            return {
                 type: RESET_VALUES_ON_DEFAULT,
             }
     }

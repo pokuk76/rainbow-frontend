@@ -9,8 +9,9 @@ import { InboxOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
 import * as actions from '../../store/actions/guest';
 import * as actionTypes from '../../store/actions/actionTypes';
-import { guestFormCopy } from '../../utility/deepCopy';
-import { guestFormItems, checkValidityItem } from '../../utility/forms';
+
+import { guestFormItems } from '../../utility/form/data';
+import { formCopy, checkValidityItem } from '../../utility/form/methods';
 
 const { Dragger } = Upload;
 
@@ -95,8 +96,8 @@ class GuestInfo extends React.Component {
   //TODO: Maybe add a debounceCheckValidity? Or maybe we actually go with web workers?
   debounceHandleChange(field, value) {
 
-    let guestForm = guestFormCopy(this.props.guestForm);
-    let guestFormValid = guestFormCopy(this.props.guestFormValid);
+    let guestForm = formCopy(this.props.guestForm);
+    let guestFormValid = formCopy(this.props.guestFormValid);
 
     guestForm[field] = value;
     var rules = guestFormItems[field]['validation_rules'];

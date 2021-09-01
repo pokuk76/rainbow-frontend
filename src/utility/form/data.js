@@ -359,6 +359,7 @@ export const guardianFormItems = {
         label: "Telephone Number:",
         validation_rules: [
             { required: true, message: "Please enter a phone number" },
+            { type: 'number', message: "Only enter numerical characters (no spaces, dashes, etc)" },
             { max: 10, message: "Please enter phone number as 10 characters (e.g., 0241234567)" }
         ],
         componentType: fieldComponentTypes['input'],
@@ -554,94 +555,3 @@ export const declarationFormItems = {
         ], 
     }, 
 }
-
-export const getInitialValues = (formsObj) => {
-    // const guardianForms = this.props.guardianForms;
-    let initialValues = {}; // Each form has its own initial values and we'll map then using the form's id
-
-    for (let formUID in formsObj){
-        let formItems = formsObj[formUID];
-        let initialForm = {};
-        try{
-            for (const [field, value] of Object.entries(formItems)) {
-                let name = `${formUID}+${field}`;
-                // initialForm[name] = value;
-                initialForm[name] = value;
-            }
-            initialValues[formUID] = initialForm;
-        }
-        catch(error) {
-            console.log("Error getting initial values: ", error);
-        }
-    }
-
-    return initialValues;
-}
-
-// { validateStatus: "error", 
-// help: <div>Should be combination of numbers & alphabets<br/> Some other nonsense<br/></div>}
-export const checkValidityItem = (value, rules, touched=false, kwargs={'usernames': ["username"]}) => {
-    let valid = true;
-    let help_messages = [];
-    for(let rule of rules) {
-        // Each rule is an object of the form { rule_name:[Boolean | data], message: String  }
-        let [rule_name_key, message_key] = Object.keys(rule).slice(0, 2);  // Slice up to index 2 (3rd element) non-inclusive
-        switch (rule_name_key) {
-            case "required":
-                // Added null check for images (don't think this is used for images rn) and false check for checkbox
-                if (value === "" || value ===  null || value === false) {
-                    valid = false;
-                    help_messages.push(<div>{rule[message_key]}</div>);
-                }
-                break;
-            case "unique":
-                if (kwargs['usernames'].includes(value)) {
-                    valid = false;
-                    help_messages.push(<div>Some other nonsense</div>)
-                }
-                break;
-            default:
-                valid = valid && true;  // If encounter unexpected validation rule, leave validity unchanged
-        }
-    }
-    let response = !valid ? { validateStatus: "error", help: help_messages } : null;
-    return response;
-}
-
-export const checkValidityForm = (formValidObj) => {
-    let valid = true;
-    for (let element in formValidObj) {
-        valid = valid && ( formValidObj[element] === null );
-    }
-    // 
-    // try {
-    //     valid = valid && this.props.guardianFormsValid[formUID][element];
-    // }
-    // catch(error) {
-    //     valid = valid && true;  // If the form or element is undefined, we leave valid unchanged TODO: does this make sense?
-    // }
-    return valid;
-}
-
-export const checkValiditySection = (formValidObj) => {
-    let valid = true;
-    for (let formUID in formValidObj) {
-        valid = valid && checkValidityForm(formValidObj[formUID]);
-    }
-    return valid;
-}
-
-// checkValiditySection = (formObj) => {
-//     let valid = true;
-//     for (let formUID in formObj) {
-//         for (let element in formObj[formUID]) {
-//             try {
-//                 valid = valid && formObj[formUID][element];
-//             }
-//             catch (error) {
-//                 valid = valid && true;
-//             }
-//         }
-//     }
-//     return valid;
-// }
