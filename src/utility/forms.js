@@ -563,22 +563,19 @@ export const getInitialValues = (formsObj) => {
         let formItems = formsObj[formUID];
         let initialForm = {};
         try{
-            for (const [name, value] of Object.entries(formItems)) {
-                let key = formUID + "+" + name;
+            for (const [field, value] of Object.entries(formItems)) {
+                let name = `${formUID}+${field}`;
                 // initialForm[name] = value;
-                initialForm[key] = value;
+                initialForm[name] = value;
             }
             initialValues[formUID] = initialForm;
         }
         catch(error) {
-            //initialValues[formUID] = initialForm;
             console.log("Error getting initial values: ", error);
         }
     }
 
-    // console.log("Initial values: ", initialValues);
     return initialValues;
-    // this.setState({initialFormValues: initialValues});
 }
 
 // { validateStatus: "error", 
@@ -589,10 +586,9 @@ export const checkValidityItem = (value, rules, touched=false, kwargs={'username
     for(let rule of rules) {
         // Each rule is an object of the form { rule_name:[Boolean | data], message: String  }
         let [rule_name_key, message_key] = Object.keys(rule).slice(0, 2);  // Slice up to index 2 (3rd element) non-inclusive
-        // console.log("Message key: ", message_key);
         switch (rule_name_key) {
             case "required":
-                // Added null check for images (don't think it's even used rn) and false check for checkbox
+                // Added null check for images (don't think this is used for images rn) and false check for checkbox
                 if (value === "" || value ===  null || value === false) {
                     valid = false;
                     help_messages.push(<div>{rule[message_key]}</div>);
@@ -605,11 +601,7 @@ export const checkValidityItem = (value, rules, touched=false, kwargs={'username
                 }
                 break;
             default:
-                /*  If we somehow encounter a rule that we're not checking, we 
-                    should just set valid to true right?
-                    Ok decided that seemed like a bad idea so lets leave it unchanged?
-                */
-                valid = valid && true;
+                valid = valid && true;  // If encounter unexpected validation rule, leave validity unchanged
         }
     }
     let response = !valid ? { validateStatus: "error", help: help_messages } : null;
@@ -621,6 +613,13 @@ export const checkValidityForm = (formValidObj) => {
     for (let element in formValidObj) {
         valid = valid && ( formValidObj[element] === null );
     }
+    // 
+    // try {
+    //     valid = valid && this.props.guardianFormsValid[formUID][element];
+    // }
+    // catch(error) {
+    //     valid = valid && true;  // If the form or element is undefined, we leave valid unchanged TODO: does this make sense?
+    // }
     return valid;
 }
 
@@ -631,3 +630,18 @@ export const checkValiditySection = (formValidObj) => {
     }
     return valid;
 }
+
+// checkValiditySection = (formObj) => {
+//     let valid = true;
+//     for (let formUID in formObj) {
+//         for (let element in formObj[formUID]) {
+//             try {
+//                 valid = valid && formObj[formUID][element];
+//             }
+//             catch (error) {
+//                 valid = valid && true;
+//             }
+//         }
+//     }
+//     return valid;
+// }

@@ -102,21 +102,6 @@ class GuardianForm extends React.Component {
     componentDidUpdate(prevProps){
         console.log("GuardianFormContainer update...");
     }
-
-
-    /** Unused */
-    checkValidityForm = (formUID) => {
-        let valid = true;
-        for( let element in this.props.guardianForms[formUID]) {
-            try {
-                valid = valid && this.props.guardianFormsValid[formUID][element];
-            }
-            catch(error) {
-                valid = valid && true;  // If the form or element is undefined, we leave valid unchanged TODO: does this make sense?
-            }
-        }
-        return valid;
-    }
     
     /**
      * Method to create the forms for the container, which are held in state.
