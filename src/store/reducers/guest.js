@@ -1,5 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../utility';
+import { guardianFormValidInitialState } from '../../utility/form/data';
+import { formValidCopy } from '../../utility/form/methods';
 
 const initialState = {
     // username_valid: null,
@@ -32,21 +34,7 @@ const initialState = {
     guardianForms: { "GuardianForm_0": {}, }, 
     guardianUID: 0, 
     guardianFormsValid: { 
-        "GuardianForm_0": { 
-            first_name: { validateStatus: "error", help: "First Name required" }, 
-            middle_name: null, 
-            last_name: { validateStatus: "error", help: "Last Name required" }, 
-            phone_number: { validateStatus: "error", help: "Please input a phone number" }, 
-            email_address: null, 
-            nationality: { validateStatus: "error", help: "Please specify a nationality" }, 
-            religion: null, 
-            guardian_type: { validateStatus: "error", help: "Please specify this guardian's relationship with the students" }, 
-            lives_with_guardian: { validateStatus: "error", help: "Please indicate which children live with this parent" }, 
-            occupation: null, 
-            place_of_work: null, 
-            home_address: null, 
-            postal_address: null, 
-        }, 
+        "GuardianForm_0": formValidCopy(guardianFormValidInitialState), 
     }, 
     guardianFormsTouched: { 
         "GuardianForm_0": {

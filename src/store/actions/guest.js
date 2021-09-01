@@ -70,14 +70,19 @@ export const updateGuardians = (guardianForms, guardianFormsValid, guardianUID=n
 export const addForm = (formsObject, formsValid, uid, currentForm) => {
     uid++;  
     let id;
-    let newFormSet;
-    let newFormValidSet;
+
+    // Don't think we need to make a deep copy since we are just adding a formObject
+    // But I'll doing it anyway for completeness (and to avoid an strange behaviour down the line?)
+    let newFormSet = {...formsObject};
+    let newFormValidSet = {...formsValid};
     switch(currentForm) {
         case STUDENT_FORM:
             // console.log("StudentUID:", uid);
             id = "StudentForm_" + uid;
-            newFormSet = {...formsObject};  // Don't think we need to make a deep copy since we are just adding a formObject
-            newFormValidSet = {...formsValid}
+            // // Don't think we need to make a deep copy since we are just adding a formObject
+            // // But I'll doing it anyway for completeness (and to avoid an strange behaviour down the line?)
+            // newFormSet = {...formsObject};
+            // newFormValidSet = {...formsValid}
             newFormSet[id] = {};
             newFormValidSet[id] = formValidCopy(studentFormValidInitialState);
 
@@ -86,8 +91,8 @@ export const addForm = (formsObject, formsValid, uid, currentForm) => {
             };
         case GUARDIAN_FORM:
             id = "GuardianForm_" + uid;
-            newFormSet = {...formsObject};
-            newFormValidSet = {...formsValid}
+            // newFormSet = {...formsObject};
+            // newFormValidSet = {...formsValid}
             newFormSet[id] = {};
             newFormValidSet[id] = formValidCopy(guardianFormValidInitialState);
             return dispatch => {

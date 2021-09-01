@@ -359,7 +359,6 @@ export const guardianFormItems = {
         label: "Telephone Number:",
         validation_rules: [
             { required: true, message: "Please enter a phone number" },
-            { type: 'number', message: "Only enter numerical characters (no spaces, dashes, etc)" },
             { max: 10, message: "Please enter phone number as 10 characters (e.g., 0241234567)" }
         ],
         componentType: fieldComponentTypes['input'],
@@ -521,20 +520,22 @@ export const guardianFormItems = {
     }, 
 }
 
+// Things that are required are initially invalid
+// TODO: Stop hard-coding this logic
 export const guardianFormValidInitialState = {
     first_name: { validateStatus: "error", help: "First name required" },
-    middle_name: null, 
+    middle_name: {}, 
     last_name: { validateStatus: "error", help: "Last name required" }, 
     phone_number: { validateStatus: "error", help: "Phone number required" },
-    email_address: null,
+    email_address: {},
     nationality: { validateStatus: "error", help: "Nationality required" }, 
-    religion: null, 
+    religion: {}, 
     guardian_type: { validateStatus: "error", help: "Specify this guardian's relationship with the students" },
     lives_with_guardian: { validateStatus: "error", help: "Indicate which children live with this parent" },
-    occupation: null, 
-    place_of_work: null, 
-    home_address: null, 
-    postal_address: null, 
+    occupation: {}, 
+    place_of_work: {}, 
+    home_address: {}, 
+    postal_address: {}, 
 }
 
 export const declarationFormItems = {

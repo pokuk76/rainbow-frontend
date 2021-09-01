@@ -1,9 +1,4 @@
 import React from 'react';
-import { Form, Input, Select, Upload, DatePicker } from 'antd';
-import ImgCrop from 'antd-img-crop';
-import { InboxOutlined } from '@ant-design/icons';
-const { Option } = Select;
-const { Dragger } = Upload;
 
 export const getInitialValues = (formsObj) => {
     // const guardianForms = this.props.guardianForms;
@@ -74,9 +69,9 @@ export const checkValidityItem = (value, rules, touched=false, kwargs={'username
 export const checkValidityForm = (formValidObj) => {
     let valid = true;
     for (let element in formValidObj) {
-        valid = valid && ( formValidObj[element] === null );
+        valid = valid && ( formValidObj[element] === {} );
     }
-    // 
+
     // try {
     //     valid = valid && this.props.guardianFormsValid[formUID][element];
     // }
@@ -129,6 +124,10 @@ export const formsCopy = (formsObj) => {
     return forms;
 }
 
+/* I think formsCopy and formValidCopy are... exactly the same? 
+   Like they are doing two different things conceptually but the logic is the same
+   TODO: Figure this out
+*/
 export const formValidCopy = (formValidObj) => {
     let formValid = {};
     for (let field in formValidObj){
