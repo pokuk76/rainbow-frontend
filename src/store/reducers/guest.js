@@ -1,6 +1,8 @@
 import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../utility';
-import { guardianFormValidInitialState } from '../../utility/form/data';
+import { 
+    studentFormValidInitialState, guardianFormValidInitialState 
+} from '../../utility/form/data';
 import { formValidCopy } from '../../utility/form/methods';
 
 const initialState = {
@@ -16,20 +18,7 @@ const initialState = {
     studentForms: { "StudentForm_0": {}, },
     studentUID: 0, 
     studentFormsValid: { 
-        "StudentForm_0": { 
-            first_name: { validateStatus: "error", help: "First Name required" }, 
-            middle_name: null, 
-            last_name: { validateStatus: "error", help: "Last Name required" }, 
-            sex: { validateStatus: "error", help: "Please specify child's sex" }, 
-            date_of_birth: { validateStatus: "error", help: "Please provide a date of birth" }, 
-            nationality: { validateStatus: "error", help: "Please specify child's nationality" }, 
-            religion: null,  
-            has_ailments: null, 
-            former_school: null, 
-            former_school_address: null, 
-            class_reached: null, 
-            reason_for_leaving: null, 
-        }, 
+        "StudentForm_0": formValidCopy(studentFormValidInitialState), 
     }, 
     guardianForms: { "GuardianForm_0": {}, }, 
     guardianUID: 0, 
@@ -61,9 +50,9 @@ const initialState = {
         declaration_read: { validateStatus: "error", help: "Please indicate that you have read & understood this declaration" },  // So this is initially invalid
         signature: { validateStatus: "error", help: "Electronic signature required" }, 
         date: { validateStatus: "error", help: "Please enter today's date" }, 
-    }, 
-    images: {},  // key-value pairs where the key is the form UID 
-                // and the value is an array holding a single image file object 
+    },
+    /** @property images - key-value pairs where the key is the form UID and the value is a singleton array holding an image file object */
+    images: {}, 
 }
 
 const updateImages = (state, action) => {

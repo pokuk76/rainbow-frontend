@@ -292,17 +292,17 @@ export const studentFormItems = {
  **/
 export const studentFormValidInitialState = {
     first_name: { validateStatus: "error", help: "First Name required" },
-    middle_name: null,
+    middle_name: {},
     last_name: { validateStatus: "error", help: "Last Name required" },
     sex: { validateStatus: "error", help: "Please specify child's sex" },
     date_of_birth: { validateStatus: "error", help: "Please provide a date of birth" },
     nationality: { validateStatus: "error", help: "Please specify child's nationality" },
-    religion: null,
-    has_ailments: null,
-    former_school: null,
-    former_school_address: null,
-    class_reached: null,
-    reason_for_leaving: null,
+    religion: {},
+    has_ailments: {},
+    former_school: {},
+    former_school_address: {},
+    class_reached: {},
+    reason_for_leaving: {},
 }
 
 const countryCodeSelector = (
