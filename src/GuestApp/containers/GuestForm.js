@@ -17,8 +17,32 @@ const { Dragger } = Upload;
 
 const testInvalidSubmitState = true;
 
+function asyncDebounce(func, wait) {
+    const debounced = debounce((resolve, reject, args) => {
+        func(...args)
+            .then(response => {
+                console.log(response)
+                if (response.data['exists']) {
+                    reject("Username already exists")
+                } else {
+                    resolve()
+                }
+            })
+            .catch( error => {
+                console.log(error)
+                reject("Error")
+            });
+    }, wait);
+
+    return (...args) =>
+        new Promise((resolve, reject) => {
+            debounced(resolve, reject, args);
+        });
+}
+
 const sendLastFmQuery = (query) => {
     console.log(`querying ${query}`);
+
     return axios.get(`api/guests/${query}/username_exists/`)
         // .then(res => res.json())
         .then(res => {
@@ -47,11 +71,9 @@ class GuestInfo extends React.Component {
             fileSelected: this.props.fileSelected,
             // guestForm: this.props.guestForm 
             // We're passing by reference, which actually works for us but might cause issues later?
-            usernames: ["username1", "username2", "poku.flacko"], //Just some dummy date for if I'm not running the backend locally TODO: Remove this for production
         };
 
-        // this.delayedCheck = this.delayedCheck.bind(this);
-        this.asyncDebounce = this.asyncDebounce.bind(this);
+        this.delayedCheck = this.delayedCheck.bind(this);
         // this.sendLastFmQuery = this.sendLastFmQuery.bind(this);
         this.debounceHandleChange = debounce(
             this.debounceHandleChange.bind(this), 1000
@@ -70,40 +92,6 @@ class GuestInfo extends React.Component {
         /* I don't really like doing this in componentDidMount
         https://www.google.com/search?q=react+call+setstate+in+componentdidmount&oq=react+calling+setstate+in+com&aqs=edge.2.0j69i64j0i22i30l3j69i57.11612j0j4&sourceid=chrome&ie=UTF-8
         */
-
-        // TODO: Going to change the way we check username
-        // TLDR we'll send a get request for that username and if it gives a 404 error we know it's unique
-        axios.get('api/usernames/')
-            .then(response => {
-                console.log(response.data);
-                this.setState({ usernames: response.data });
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
-    asyncDebounce(func, wait) {
-        const debounced = debounce((resolve, reject, args) => {
-            func(...args)
-                .then(response => {
-                    console.log(response)
-                    if (response.data['exists']) {
-                        reject("Username already exists")
-                    } else {
-                        resolve()
-                    }
-                    // resolve()
-                })
-                .catch( error => {
-                    reject("Error")
-                });
-        }, wait);
-    
-        return (...args) =>
-            new Promise((resolve, reject) => {
-                debounced(resolve, reject, args);
-            });
     }
 
     showModal = (body) => {
@@ -175,12 +163,6 @@ class GuestInfo extends React.Component {
         let field = e.target.id;
         let value = e.target.value;
         this.debounceHandleChange(field, value);
-
-        // if (field === "username") {
-        //     this.debounceHandleUsernameChange(field, value)
-        // } else {
-        //     this.debounceHandleChange(field, value);
-        // }
     }
 
 
@@ -203,13 +185,15 @@ class GuestInfo extends React.Component {
         }
     }
 
-    delayedCheck = this.asyncDebounce(async function (q) {
+
+    delayedCheck = asyncDebounce(async function (q) {
         console.log(this)
-        var delayedResponse = await sendLastFmQuery(q);
+        var delayedResponse = (q.trim() !== '') 
+        ? await sendLastFmQuery(q) : {data:{exists: false}};
         // console.log(delayedResponse);
         // let text = (delayedResponse.data['exists']) ? "Username already exists" : '';
         return delayedResponse;
-    }, 1000);
+    }.bind(this), 1000);
 
     getValidationProps = (key) => {
         // console.log(this.props.submitStatus);
@@ -329,8 +313,19 @@ class GuestInfo extends React.Component {
                             // to rules 
                             { required: true, message: 'Username is required' },
                             { max: 128, message: 'username must be less than 128 characters' },
+                            // {
+                            //     validator: async (rule, value) => {
+                            //         // let state = this.isNameUnique(rule, value);
+                            //         await new Promise( (resolve) => {
+                            //             console.log("something", this.debounced( () => this.isNameUnique(rule, value) ))
+                            //             // console.log(state)
+                            //         } );
+                                    
+                            //     }
+                            // }
+                            
                             {
-                                validator: value => this.delayedCheck(value)
+                                validator: (rule, value) => this.delayedCheck(value)
                             }
                         ]}
                         // { ...customValidationProps }
