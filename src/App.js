@@ -30,7 +30,7 @@ class App extends Component {
 
   render() {
     return (
-      <Router basename="/portal">
+      <Router basename="/portals">
         <BaseRouter {...this.props} />
       </Router>
     );
