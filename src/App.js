@@ -8,14 +8,14 @@ import BaseRouter from './routes';
 import * as actions from './store/actions/auth';
 
 import axios from "axios";
-// axios.defaults.baseURL = "http://127.0.0.1:8000";
+
 if (process.env.NODE_ENV !== "production") {
   axios.defaults.baseURL = "http://127.0.0.1:8000";
 } else {
   if ( process.env.IS_LOCAL_PRODUCTION_BUILD === "false" ) {
-    axios.defaults.baseURL = "http://rainbow.kofipoku.com"
+    axios.defaults.baseURL = process.env.PRODUCTION_BASE_URL;
   } else {
-    axios.defaults.baseURL = "http://127.0.0.1:1337";
+    axios.defaults.baseURL = process.env.LOCAL_PRODUCTION_BASE_URL;
   }
 }
 
