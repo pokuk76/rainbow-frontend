@@ -1,8 +1,11 @@
 import React from 'react';
 
-import { Form, Input, Button, Checkbox, Spin } from 'antd';
+import { Form, Input, Button, Checkbox, Spin, Breadcrumb } from 'antd';
 import { LoadingOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux'
+
+import { Link, withRouter } from'react-router-dom';
+
 
 import * as actions from '../../store/actions/auth';
 
@@ -58,7 +61,7 @@ class LoginForm extends React.Component {
         if (this.props.location.state) {
             this.props.history.push(this.props.location.state.referrer);
         } else {
-            this.props.history.push('/portal/admin');
+            this.props.history.push('/admin');
         }
     }
 
@@ -98,14 +101,21 @@ class LoginForm extends React.Component {
     
         return (
             <div>
-                { this.handleRedirected() }
+                {/* <Breadcrumb style={{ margin: '0 0 16px 0' }}>
+                    <Breadcrumb.Item><Link to='/portal'>Portal</Link></Breadcrumb.Item>
+                            <Breadcrumb.Item>Admin</Breadcrumb.Item>
+                            <Breadcrumb.Item>Login</Breadcrumb.Item>
+                </Breadcrumb> */}
+                {/* { this.handleRedirected() } */}
                 { errorMessage }
                 {
                     this.props.loading
                     ? 
                     <Spin indicator={antIcon} />
                     :
-                    <Form
+                    <>
+                        { this.handleRedirected() }
+                        <Form
                         {...layout}
                         name="normal_login" 
                         className="login-form" 
@@ -145,6 +155,8 @@ class LoginForm extends React.Component {
                             </Button>
                         </Form.Item>
                     </Form>
+                    </>
+                    
                 }
             </div>
         );
@@ -164,4 +176,4 @@ const mapDispatchToProps = dispatch => {
         onAuth: (username, password, callback) => dispatch(actions.authLogin(username, password, callback))
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(LoginForm);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(LoginForm));

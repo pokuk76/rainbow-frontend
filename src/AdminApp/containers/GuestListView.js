@@ -1,8 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import { Button, Spin } from 'antd';
-import { Link } from'react-router-dom';
+import { Button, Spin, Breadcrumb } from 'antd';
+import { Link, withRouter } from'react-router-dom';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import Guest from '../components/Guest';
@@ -25,11 +25,16 @@ class GuestList extends React.Component {
     render() {
         return (
             <div>
+                {/* <Breadcrumb style={{ margin: '16px 0' }}>
+                    <Breadcrumb.Item><Link to='/portal'>Portal</Link></Breadcrumb.Item>
+                            <Breadcrumb.Item>Admin</Breadcrumb.Item>
+                            <Breadcrumb.Item>Login</Breadcrumb.Item>
+                </Breadcrumb> */}
                 {console.log(this.props.isAuthenticated)}
                 {
                     // localStorage.getItem('isAuthenticated') ?
                     this.props.isAuthenticated ?
-                    <div>
+                    <div style={{boxSizing: 'border-box', }}>
                         <Guest data={this.props.guests} isAuthenticated={this.props.isAuthenticated} />
                         {/* <br />
                         <h2>Create new guest</h2>
@@ -64,4 +69,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default connect(mapStateToProps, null)(GuestList);
+export default withRouter(connect(mapStateToProps, null)(GuestList));

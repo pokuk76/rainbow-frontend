@@ -18,7 +18,21 @@ const BaseRouter = (props) => (
         <Route path='/login' render={matchProps => <CustomLayout {...matchProps} ><Login {...matchProps} /></CustomLayout>} />
         <Route exact path='/school' render={matchProps => <CustomLayout {...matchProps} ><SchoolList /></CustomLayout>} />
         <Route exact path='/school/:schoolID' render={matchProps => <CustomLayout {...matchProps} ><SchoolDetail /></CustomLayout>} />
-        <Route exact path='/admin' render={matchProps => <CustomLayout {...matchProps} ><GuestList {...matchProps} /></CustomLayout>} />
+        <Route exact path='/admin' 
+            render={ matchProps => { 
+                const redirectAfterLogin = matchProps.location.pathname;
+                return <CustomLayout {...matchProps} >
+                    {/* <GuestList {...matchProps} /> */}
+                    { localStorage.getItem('isAuthenticated') ? 
+                        <GuestList {...matchProps} />
+                        : <Redirect to={{
+                            pathname: `/login`,
+                            state: { referrer: redirectAfterLogin }
+                        }} />
+                    }
+                </CustomLayout>
+            }} 
+        />
         
         {/* This looks ugly but it works ¯\_( ͡° ͜ʖ ͡°)_/¯ */}
         <Route exact path='/admin/:guestID' 
@@ -28,6 +42,7 @@ const BaseRouter = (props) => (
                 const redirectAfterLogin = matchProps.location.pathname;
                 return <CustomLayout {...matchProps} >
                     { localStorage.getItem('isAuthenticated') ? 
+                        // Don't think isAuthenticated is needed any longer
                         <GuestDetail {...matchProps} isAuthenticated={props.isAuthenticated} />
                         : <Redirect to={{
                             pathname: `/login`,
