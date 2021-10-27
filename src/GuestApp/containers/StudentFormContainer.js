@@ -10,6 +10,8 @@ import * as actions from '../../store/actions/guest';
 import { studentFormItems } from '../../utility/form/data';
 import { getInitialValues, checkValidityForm } from '../../utility/form/methods';
 
+import classes from './styles/FormContainer.module.scss';
+
 /* For the Select component */
 function onSearch(val) {
     console.log('search:', val);
@@ -58,7 +60,7 @@ class StudentForm extends React.Component {
         window.scroll({
             top: 0, 
             left: 0, 
-            behavior: 'smooth'
+            // behavior: 'smooth'
         });
     }
 
@@ -167,7 +169,6 @@ class StudentForm extends React.Component {
 
             forms.push(
                 <Panel
-                    // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}} 
                     header={setPanelHeader("Student " + (n + 1), checkValidityForm(formUID, this.props.studentFormsValid))}
                     key={key}
                     extra={
@@ -180,7 +181,7 @@ class StudentForm extends React.Component {
                     }
 
                 >
-                    <StudentFormComponent {...studentFormProps} />
+                    <StudentFormComponent className={classes.FormComponent} {...studentFormProps} />
                     {/* </Form> */}
                 </Panel>
             );
@@ -211,7 +212,7 @@ class StudentForm extends React.Component {
                     onChange={callback}
                     expandIcon={({ isActive }) => <RightOutlined rotate={isActive ? 90 : 0} style={{ fontSize: '2em', }} />}
                     expandIconPosition='left'
-                    style={{width: '80%', margin: 'auto'}}
+                    className={classes.Collapse}
                 >
                     {this.renderForms()}
                 </Collapse>
@@ -237,7 +238,7 @@ class StudentForm extends React.Component {
                             this.props.studentUID,
                             'StudentForm')
                     }
-                    style={{ marginLeft: '10%' }}
+                    className={classes.addFormButton}
                 >
                     <FileAddOutlined /> Add Student
                 </Button>

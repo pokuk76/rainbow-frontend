@@ -1,0 +1,56 @@
+.layout {
+  min-height: 100vh; max-width: 100vw; box-sizing: border-box;
+  p {
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+}
+
+/* Think we could also do something like:
+  :global {
+      p {...}
+
+      input {...}
+  }
+*/
+
+.controlSwitch {
+  width: 100%;
+  margin: auto;
+}
+
+.antFormItemLabel {
+  margin: 0;
+}
+
+
+.antFormItemLabel{
+  font-size: 16px;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .controlSwitch {
+    width: 80%;
+    margin: auto;
+  }
+}
+
+
+/* .my-drawer {
+  position: relative;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.my-drawer .am-drawer-sidebar {
+  background-color: #fff;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.my-drawer .am-drawer-sidebar .am-list {
+  width: 300px;
+  padding: 0;
+} */

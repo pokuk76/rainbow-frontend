@@ -2,9 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
-import { Layout, Breadcrumb, Form, Button, Drawer, Badge, Spin, notification } from 'antd';
+import { Layout, Form, Button, Drawer, Badge, Spin, notification } from 'antd';
 import { 
-    ProfileOutlined, CloseOutlined, MenuOutlined, LoadingOutlined,
+    CloseOutlined, MenuOutlined, LoadingOutlined,
 } from '@ant-design/icons';
 
 import GuestInfo from './GuestForm';
@@ -18,7 +18,7 @@ import * as actionTypes from '../../store/actions/actionTypes';
 
 import { checkValiditySection, checkValidityForm } from '../../utility/form/methods';
 
-import './layout.css';
+import classes from './styles/Layout.module.scss';
 
 const { Header, Content, Footer } = Layout;
 
@@ -62,7 +62,7 @@ class GuestLayout extends React.Component {
         this.state = {
             collapsed: false,
             prevMenuItem: '',
-            selectedMenuItem: 'guest-details',
+            selectedMenuItem: 'guest-info',
             visible: false,
             invalidNotificationShown: false,
         };
@@ -74,26 +74,17 @@ class GuestLayout extends React.Component {
     componentDidMount() {
         console.log("Node env:", process.env.NODE_ENV);
         console.log("Homepage url env:", process.env.REACT_APP_HOMEPAGE_URL);
-
     }
 
     componentSwitch = (key) => {
         switch (key) {
-            case 'guest-details':
+            case 'guest-info':
                 const id = "GuestForm_0";
                 return (
-                    <div>
-                        <Breadcrumb style={{ margin: '3.5em 0 2em 0' }}>
-                            <Breadcrumb.Item>Portals</Breadcrumb.Item>
-                            <Breadcrumb.Item>Registration</Breadcrumb.Item>
-                            <Breadcrumb.Item>Guest Details</Breadcrumb.Item>
-                        </Breadcrumb>
-                        <h1><ProfileOutlined /> Guest Account</h1>
-                        <GuestInfo
-                            id={id}
-                            fileSelected={(this.props.images[id]) ? true : false}
-                        />
-                    </div>
+                    <GuestInfo
+                        id={id}
+                        fileSelected={(this.props.images[id]) ? true : false}
+                    />
                 );
             case 'students':
                 return (<StudentFormContainer
@@ -122,7 +113,7 @@ class GuestLayout extends React.Component {
 
     controlSwitch = (key) => {
         switch (key) {
-            case 'guest-details':
+            case 'guest-info':
                 return (
                     <div style={{ margin: "auto", width: "80%" }}>
                         <br />
@@ -131,19 +122,19 @@ class GuestLayout extends React.Component {
                 );
             case 'students':
                 return (
-                    <div style={{ margin: "auto", width: "80%" }}>
+                    <>
                         <br />
-                        <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'guest-details', visible: false })} style={{ float: "left" }}>Previous</Button>
+                        <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'guest-info', visible: false })} style={{ float: "left" }}>Previous</Button>
                         <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'guardians', visible: false })} style={{ float: "right" }}>Next</Button>
-                    </div>
+                    </>
                 );
             case 'guardians':
                 return (
-                    <div style={{ margin: "auto", width: "80%" }}>
+                    <>
                         <br />
                         <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'students', visible: false })} style={{ float: "left" }}>Previous</Button>
                         <Button type="danger" htmlType="button" onClick={(e) => this.setState({ prevMenuItem: this.state.selectedMenuItem, selectedMenuItem: 'declaration', visible: false })} style={{ float: "right" }}>Next </Button>
-                    </div>
+                    </>
                 );
             case 'declaration':
                 return (
@@ -250,7 +241,7 @@ class GuestLayout extends React.Component {
 
         return (
             <Layout
-                style={{ minHeight: '100vh', maxWidth: '100vw', boxSizing: 'border-box' }}
+                className={classes.layout}
             >
                 <Spin spinning={this.props.loading} indicator={LoadingIcon} style={{ position: "fixed" }}>
                     <Drawer
@@ -273,7 +264,7 @@ class GuestLayout extends React.Component {
                         />
                     </Drawer>
 
-                    <Layout key={"Layout" + this.state.selectedMenuItem}>
+                    <Layout key={"Layout" + this.state.selectedMenuItem} className={classes.innerLayout}>
                         <Header style={{ position: 'fixed', zIndex: 1, width: '100vw', paddingLeft: "3em", boxSizing: 'border-box' }}>
                             <Badge dot={this.showBadge()}>
                                 <Button type="primary" onClick={this.showDrawer} icon={<MenuOutlined style={{ fontSize: "1.5em" }} />} style={{ backgroundColor: 'inherit', borderColor: "white" }}>
@@ -292,7 +283,9 @@ class GuestLayout extends React.Component {
                             <Form.Provider>
                                 {this.componentSwitch(this.state.selectedMenuItem)}
                             </Form.Provider>
-                            {this.controlSwitch(this.state.selectedMenuItem)}
+                            <div className={classes.controlSwitch}>
+                                {this.controlSwitch(this.state.selectedMenuItem)}
+                            </div>
                         </Content>
 
                         <Footer style={{ textAlign: 'center' }}>Rainbow Edu ©2021 | By kbd</Footer>

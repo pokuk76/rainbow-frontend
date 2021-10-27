@@ -1,13 +1,13 @@
 {
   "name": "portals",
   "version": "0.1.0",
-  "homepage": "https://nginx-pokuk76.cloud.okteto.net/portals",
+  "homepage": "/portals",
   "private": true,
   "jest": {
     "transformIgnorePatterns": [
       "/node_modules/(?!antd|@ant-design|rc-.+?|@babel/runtime).+(js|jsx)$"
     ],
-    "globalSetup": "./src/testE2E/setup.js", 
+    "globalSetup": "./src/testE2E/setup.js",
     "globalTeardown": "./src/testE2E/teardown.js"
   },
   "dependencies": {
@@ -23,7 +23,8 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "sass": "^1.43.3"
   },
   "scripts": {
     "start": "react-scripts start",

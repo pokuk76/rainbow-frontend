@@ -10,6 +10,8 @@ import { formsCopy, checkValidityItem } from '../../utility/form/methods';
 
 import * as actionTypes from '../../store/actions/actionTypes';
 
+import classes from './styles/Form.module.scss';
+
 const removeIcon = <CloseSquareOutlined
                 style={{
                     color: 'red',
@@ -81,6 +83,10 @@ class FormComponent extends React.Component {
                 kwargs = {onChangeFunction: this.handleChange, fileSelected: fileSelected, uploadProps: uploadProps}
                 break;
         }
+        try {
+            kwargs['className'] = this.props.classNames[field];
+        } catch(error) {}
+
         return this.props.formFields[field].getComponentJSX(kwargs);
     }
 
@@ -91,8 +97,7 @@ class FormComponent extends React.Component {
             fileSelected = (this.props.images[this.props.formUID]) ? true : false;
             fileList = this.props.images[this.props.formUID];
         }
-        catch(error) {
-        }
+        catch(error) {}
 
         const uploadProps = {
             multiple: false,
@@ -162,12 +167,14 @@ class FormComponent extends React.Component {
                 layout='vertical'
                 id={this.props.formUID}
                 initialValues={this.props.initialValues}
+                className={this.props.className}
+                // style={{...this.props.style}}
             >
                 {fields.map(field => {
                     return <Form.Item
                         key={`${this.props.formUID}+${field}`}
                         name={`${this.props.formUID}+${field}`}
-                        label={this.props.formFields[field].label}
+                        label={<p className={classes.antFormItemLabel}>{this.props.formFields[field].label}</p>}
                         rules={this.props.formFields[field].validation_rules}
                         {...this.getValidationProps(this.props.formUID, field)}
                     >

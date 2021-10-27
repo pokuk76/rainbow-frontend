@@ -60,7 +60,10 @@ export const guestFormItems = {
     username: {
         validation_rules: [ 
             { required: true, message: "Username Required" }, 
-            { unique: true, message: "Username already exists"}, 
+            // Don't think "unique" is a rule, hence why we need the custom validator
+            // { unique: true, message: "Username already exists"}, 
+
+            // Also do not think there is a "username" type -> switch to pattern <https://github.com/yiminghe/async-validator#pattern>
             { type: "username", message: "Username can only contain alphanumeric characters, punctuation, and special characters" }, 
             { max: 128, message: "First name must have fewer than 128 characters" }, 
         ], 
@@ -224,12 +227,12 @@ export const studentFormItems = {
         },
     }, 
     has_ailments: {
-        label: "Please list any allergies or ailments:",
+        label: "Please detail any allergies or ailments:",
         validation_rules: [],
         componentType: fieldComponentTypes['input'],
         getComponentJSX: (kwargs) => {
             return <Input.TextArea
-                placeholder={"Peanuts, pollen"}
+                placeholder={"Peanuts: severe allergy; pollen: mild allergies"}
                 onChange={(e) => kwargs.onChangeFunction(e)} />;
         },
     }, 
@@ -239,7 +242,7 @@ export const studentFormItems = {
         componentType: fieldComponentTypes['input'],
         getComponentJSX: (kwargs) => {
             return <Input
-                placeholder="Previous school if applicable"
+                placeholder="Previous school attended, if applicable"
                 onChange={(e) => kwargs.onChangeFunction(e)} />;
         },
     }, 
@@ -249,7 +252,7 @@ export const studentFormItems = {
         componentType: fieldComponentTypes['input'],
         getComponentJSX: (kwargs) => {
             return <Input.TextArea
-                placeholder="Address of previous school"
+                placeholder="Address of previous school attended"
                 onChange={(e) => kwargs.onChangeFunction(e)} />;
         },
     }, 
@@ -368,6 +371,7 @@ export const guardianFormItems = {
                 type="tel"
                 addonBefore={countryCodeSelector}
                 onChange={(e) => kwargs.onChangeFunction(e)}
+                className={kwargs['className']}
             />;
         },
     }, 

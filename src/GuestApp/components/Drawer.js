@@ -29,12 +29,12 @@ export const DrawerContents = (props) => {
         <Menu
                 theme="dark"
                 style={{ height: '100%', marginTop: 0 }}
-                defaultSelectedKeys={["guest-details"]}
+                defaultSelectedKeys={["guest-info"]}
                 selectedKeys={props.selectedMenuItem}
                 onClick={(e) => props.setCurrentView(e)}
             >
                 <Menu.Item
-                    key="guest-details"
+                    key="guest-info"
                     icon={<ProfileOutlined />}
                     style={menuItemStyle}
                 >

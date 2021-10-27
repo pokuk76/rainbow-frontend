@@ -10,6 +10,10 @@ import * as actions from '../../store/actions/guest';
 import { guardianFormItems } from '../../utility/form/data';
 import { getInitialValues, checkValidityForm } from '../../utility/form/methods';
 
+import globalClasses from './styles/Layout.module.scss';
+import classes from './styles/FormContainer.module.scss';
+
+
 /* For the Select component */
 function onSearch(val) {
     console.log('search:', val);
@@ -95,7 +99,7 @@ class GuardianForm extends React.Component {
         window.scroll({
             top: 0, 
             left: 0, 
-            behavior: 'smooth'
+            // behavior: 'smooth'
         });
         console.log("GuardianFormContainer mounted...");
     }
@@ -134,6 +138,9 @@ class GuardianForm extends React.Component {
 
                 initialValues: {...initialFormValues[formUID], country_code: 'Ghana'},
                 formFields: guardianFormItems,
+                classNames: {
+                    'phone_number': classes.phone_number,
+                },
                 formType: 'GuardianForm'
             }
 
@@ -159,7 +166,9 @@ class GuardianForm extends React.Component {
             let n = parseInt(formUID.split('_')[1], 10);
             forms.push(
                 <Panel
-                    // style={{":hover": { backgroundColor: "blue"}, zIndex: 1}}
+                    style={{
+                        // ":hover": { backgroundColor: "blue"}, zIndex: 1
+                    }}
                     key={key}
                     header={
                         setPanelHeader(
@@ -171,7 +180,7 @@ class GuardianForm extends React.Component {
                         (Object.keys(this.props.guardianForms).length > 1) ?
                             <Button type="text" icon={removeFormIcon} style={{ padding: 0 }} danger /> : <></>}
                 >
-                    <GuardianFormComponent {...guardianFormProps} />
+                    <GuardianFormComponent className={classes.FormComponent} {...guardianFormProps} />
                 </Panel>
             );
             i++;
@@ -217,7 +226,7 @@ class GuardianForm extends React.Component {
                         />
                     }
                     expandIconPosition='left'
-                    style={{width: '80%', margin: 'auto'}}
+                    className={classes.Collapse}
                 >
                     {/* { this.state.forms } */}
                     { this.renderForms() }
@@ -249,7 +258,7 @@ class GuardianForm extends React.Component {
                             this.props.guardianUID,
                             'GuardianForm')
                     }
-                    style={{ marginLeft: '10%' }}
+                    className={classes.addFormButton}
                 >
                     <FileAddOutlined /> Add Parent
                 </Button>

@@ -3,15 +3,19 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import debounce from "lodash/debounce";
 
-import { Form, Input, Upload, Modal, Progress } from 'antd';
+import { Breadcrumb, Form, Input, Upload, Modal, Progress } from 'antd';
 import ImgCrop from 'antd-img-crop';
-import { InboxOutlined, CloseSquareOutlined } from '@ant-design/icons';
+import { ProfileOutlined, InboxOutlined, CloseSquareOutlined } from '@ant-design/icons';
 
 import * as actions from '../../store/actions/guest';
 import * as actionTypes from '../../store/actions/actionTypes';
 
 import { guestFormItems } from '../../utility/form/data';
 import { formCopy, checkValidityItem } from '../../utility/form/methods';
+
+import globalClasses from './styles/Layout.module.scss';
+import classes from './styles/GuestForm.module.scss';
+
 
 const { Dragger } = Upload;
 
@@ -40,15 +44,18 @@ function asyncDebounce(func, wait) {
         });
 }
 
-const sendLastFmQuery = (query) => {
-    console.log(`querying ${query}`);
+const checkUsername = (username) => {
+    console.log(`querying ${username}`);
 
-    return axios.get(`api/guests/${query}/username_exists/`)
+    return axios.get(`api/guests/${username}/username_exists/`)
         // .then(res => res.json())
         .then(res => {
             return res;
         })
-        .catch(err => {console.log("Error", err); return err});
+        .catch(err => {
+            console.error("Error ", err); 
+            return err;
+        });
 }
 
 /**
@@ -74,7 +81,7 @@ class GuestInfo extends React.Component {
         };
 
         this.delayedCheck = this.delayedCheck.bind(this);
-        // this.sendLastFmQuery = this.sendLastFmQuery.bind(this);
+        // this.checkUsername = this.checkUsername.bind(this);
         this.debounceHandleChange = debounce(
             this.debounceHandleChange.bind(this), 1000
         );
@@ -88,6 +95,7 @@ class GuestInfo extends React.Component {
             left: 0,
             behavior: 'smooth'
         });
+        console.log("Something");
 
         /* I don't really like doing this in componentDidMount
         https://www.google.com/search?q=react+call+setstate+in+componentdidmount&oq=react+calling+setstate+in+com&aqs=edge.2.0j69i64j0i22i30l3j69i57.11612j0j4&sourceid=chrome&ie=UTF-8
@@ -188,8 +196,9 @@ class GuestInfo extends React.Component {
 
     delayedCheck = asyncDebounce(async function (q) {
         console.log(this)
+        // Trim input to avoid sending an API request on an empty string
         var delayedResponse = (q.trim() !== '') 
-        ? await sendLastFmQuery(q) : {data:{exists: false}};
+        ? await checkUsername(q) : {data:{exists: false}};
         // console.log(delayedResponse);
         // let text = (delayedResponse.data['exists']) ? "Username already exists" : '';
         return delayedResponse;
@@ -299,45 +308,36 @@ class GuestInfo extends React.Component {
         )
 
         return (
-            <div >
+            <div>
+                        <Breadcrumb style={{ margin: '3.5em 0 2em 0' }}>
+                            <Breadcrumb.Item>Portals</Breadcrumb.Item>
+                            <Breadcrumb.Item>Registration</Breadcrumb.Item>
+                            <Breadcrumb.Item>Guest Details</Breadcrumb.Item>
+                        </Breadcrumb>
+                        <h1><ProfileOutlined /> Guest Account</h1>
                 <Form
                     key={"GuestForm"}
                     layout='vertical'
                     requiredMark={true}
                     initialValues={initialValues}
-                    style={{ padding: '0.5em', paddingRight: '5em' }}
+                    className={classes.GuestForm}
                 >
-                    <Form.Item name="username" label="Username:"
+                    <Form.Item name="username" label={<p className={globalClasses.antFormItemLabel}>Username:</p>}
                         rules={[
-                            // Add an object with pattern (holding a regex for acceptable username input) 
-                            // to rules 
+                            // TODO: Add a pattern rule w/ a regex for acceptable username input 
                             { required: true, message: 'Username is required' },
                             { max: 128, message: 'username must be less than 128 characters' },
-                            // {
-                            //     validator: async (rule, value) => {
-                            //         // let state = this.isNameUnique(rule, value);
-                            //         await new Promise( (resolve) => {
-                            //             console.log("something", this.debounced( () => this.isNameUnique(rule, value) ))
-                            //             // console.log(state)
-                            //         } );
-                                    
-                            //     }
-                            // }
                             
                             {
                                 validator: (rule, value) => this.delayedCheck(value)
                             }
                         ]}
-                        // { ...customValidationProps }
                         {...this.getValidationProps('username')}
-                    // rules={[{ validator: this.validateUsername}]}
                     >
                         <Input
                             placeholder="Enter username"
                             onChange={(e) => this.handleChange(e)}
                         />
-
-                        {/* { customValidation } */}
 
                     </Form.Item>
 
@@ -357,7 +357,6 @@ class GuestInfo extends React.Component {
                         <Input
                             placeholder="Enter first name"
                             onChange={(e) => this.handleChange(e)}
-                        // style = {{width: '50%'}}
                         />
                     </Form.Item>
 
@@ -403,7 +402,7 @@ class GuestInfo extends React.Component {
                     </Modal>
 
                 </Form>
-            </div>
+                </div>
         );
     }
 };

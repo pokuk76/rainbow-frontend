@@ -1,0 +1,45 @@
+/* We're going mobile-first */
+
+.FormComponent {
+    padding: 0.5em;
+    margin: auto;
+}
+
+.phone_number {
+    width: auto;
+}
+
+.Collapse {
+    width: 100%;
+    margin: auto;
+}
+
+
+@media (min-width: 576px) {
+    .FormComponent {
+        padding-right: 5em;
+        padding-left: 1em;
+    }
+
+    .phone_number {
+        width: 60%;
+    }
+}
+
+@media (min-width: 768px) {
+    .Collapse {
+        width: 80%;
+        margin: auto;
+    }
+
+    .addFormButton {
+        margin-left: 10%;
+    }
+}
+
+@media (min-width: 992px) {
+    .phone_number {
+        width: 40%;
+    }
+    
+}

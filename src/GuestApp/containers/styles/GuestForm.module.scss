@@ -1,0 +1,12 @@
+.GuestForm {
+    padding: 0.5em;
+    padding-left: 10em;
+    padding-right: 13em;
+}
+
+@media (max-width: 576px) {
+    .GuestForm {
+        padding: 0.5em;
+        margin: auto;
+    }
+}
