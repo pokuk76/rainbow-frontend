@@ -7,7 +7,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 
 import Guest from '../components/Guest';
 
-const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+const LoadingIcon = <LoadingOutlined style={{ fontSize: '6em' }} spin />;
 
 class GuestList extends React.Component {
 
@@ -32,9 +32,11 @@ class GuestList extends React.Component {
                 </Breadcrumb> */}
                 {console.log(this.props.isAuthenticated)}
                 {
-                    // localStorage.getItem('isAuthenticated') ?
-                    this.props.isAuthenticated ?
-                    <div style={{boxSizing: 'border-box', }}>
+                        this.props.loading
+                            ?
+                            <Spin indicator={LoadingIcon} />
+                            :
+                            <div style={{boxSizing: 'border-box', }}>
                         <Guest data={this.props.guests} isAuthenticated={this.props.isAuthenticated} />
                         {/* <br />
                         <h2>Create new guest</h2>
@@ -43,18 +45,6 @@ class GuestList extends React.Component {
                             guestID={null}
                             btnText="Create" /> */}
                     </div>
-                    :
-                    (
-                        this.props.loading
-                            ?
-                            <Spin indicator={antIcon} />
-                            :
-                            <div>
-                                <Button type="primary" style={{ margin: 'auto' }}>
-                                    <Link to="/portal/login">Login to view this page</Link>
-                                </Button>
-                            </div>
-                    )
                 }
             </div>
         )

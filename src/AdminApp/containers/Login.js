@@ -9,6 +9,7 @@ import { Link, withRouter } from'react-router-dom';
 
 import * as actions from '../../store/actions/auth';
 
+import classes from './styles/Login.module.scss';
 
 const layout = {
   labelCol: {
@@ -26,7 +27,7 @@ const tailLayout = {
 };
 
 
-const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+const LoadingIcon = <LoadingOutlined style={{ fontSize: '6em' }} spin />;
 
 class LoginForm extends React.Component {
 
@@ -38,7 +39,7 @@ class LoginForm extends React.Component {
     }
 
     componentDidMount() {
-        console.log("Location: ", this.props.location.state)
+        // console.log("Location: ", this.props.location.state)
     }
 
     handleSubmit = (e) => {
@@ -100,7 +101,7 @@ class LoginForm extends React.Component {
         }
     
         return (
-            <div>
+            <div >
                 {/* <Breadcrumb style={{ margin: '0 0 16px 0' }}>
                     <Breadcrumb.Item><Link to='/portal'>Portal</Link></Breadcrumb.Item>
                             <Breadcrumb.Item>Admin</Breadcrumb.Item>
@@ -111,17 +112,22 @@ class LoginForm extends React.Component {
                 {
                     this.props.loading
                     ? 
-                    <Spin indicator={antIcon} />
+                    <Spin indicator={LoadingIcon} />
                     :
                     <>
                         { this.handleRedirected() }
                         <Form
                         {...layout}
                         name="normal_login" 
-                        className="login-form" 
-                        initialValues={{ remember: true }}
+                        // className="login-form" 
+                        initialValues={{ remember: false }}
                         ref={this.formRef} 
                         onFinishFailed={(errorInfo) => this.onFinishFailed(errorInfo)}
+                        style={{ 
+                            // boxSizing: 'border-box', paddingLeft: '4em',
+                            width: '80%'
+                        }}
+                        // className={classes['ant-form-item']}
                     >
                         <Form.Item
                             name="username"
