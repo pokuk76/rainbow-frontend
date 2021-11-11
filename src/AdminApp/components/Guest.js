@@ -41,7 +41,6 @@ class Guest extends React.Component {
 
         // Needed for List renderItem prop
         const finalListItem = this.props.data[this.props.data.length-1];
-        console.log("item", finalListItem);
 
         return (
             <>
@@ -60,16 +59,17 @@ class Guest extends React.Component {
                         position: 'both'
                     }}
                     dataSource={this.props.data}
-                    renderItem={(item, index, array) => (
+                    renderItem={(item, index) => (
                         <List.Item
                             key={item.guest.username}
+                            // TODO: Figure out a better way to do this styling
                             style={
                                 (index === 0) 
                                 ? {borderTop: '1px outset #f0f2f5', marginTop: '2em'} 
                                 : ( ((index+1)%pageSize === 0 || item.guest.id==finalListItem.guest.id) ? {marginBottom: '2em'} : null )
                             }
-                            // onClick={() => this.showModal}
-                            onClick={() => console.log("List Item Clicked")}
+                            onClick={() => this.showModal()}
+                            // onClick={() => console.log("List Item Clicked")}
                             actions={[
                                 <IconText icon={ item.guest.processed ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <ExclamationCircleTwoTone twoToneColor="#ff0000" />} text="Processed" key="list-vertical-star-o" />,
                             ]} 
@@ -87,23 +87,21 @@ class Guest extends React.Component {
                                 title={<a href={`/portals/admin/${item.guest.id}`}>{`${item.guest.first_name} ${item.guest.last_name}`}</a>}
                                 description={`Username: ${item.guest.username}`}
                             />
-                            {console.log(item.guest.username)}
-
                         </List.Item>
                     )}
                 />
                 <Modal
-                    visible={this.visible}
+                    visible={this.state.visible}
                     title="Title"
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     footer={[
                         <Button key="back" onClick={this.handleCancel}>
                             Return
-                                </Button>,
+                        </Button>,
                         <Button key="submit" type="primary" loading={this.loading} onClick={this.handleOk}>
                             Submit
-                                </Button>,
+                        </Button>,
                     ]}
                 >
                     <p>{this.state.image}</p>

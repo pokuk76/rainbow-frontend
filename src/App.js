@@ -25,7 +25,7 @@ class App extends Component {
         /* TODO: This is where the random AUTH_FAIL action is coming from in the registration portal
            It's not really a big deal, and if we have it then I don't think we need to check localStorage for 
            isAuthenticated in the routes but let's think about that some more */
-        // this.props.onTryAutoSignup();
+        this.props.authCheckState();
     }
 
     render() {
@@ -45,9 +45,9 @@ const mapStateToProps = state => {
     }
 }
 
-const mapDispatchToProps = dispatchEvent => {
+const mapDispatchToProps = dispatch => {
     return {
-        onTryAutoSignup: () => dispatchEvent(actions.authCheckState())
+        authCheckState: () => dispatch(actions.authCheckState()),
     }
 }
 

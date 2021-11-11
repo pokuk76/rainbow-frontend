@@ -7,6 +7,7 @@ import * as serviceWorker from './serviceWorker';
 import authReducer from './store/reducers/auth';
 import guestReducer from './store/reducers/guest';
 import formReducer from './store/reducers/form';
+import adminReducer from './store/reducers/admin';
 
 import { createStore, compose, applyMiddleware, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
@@ -17,7 +18,8 @@ const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const reducer = combineReducers({
     auth: authReducer,
     guest: guestReducer, 
-    form: formReducer, 
+    form: formReducer,
+    admin: adminReducer,
 });
 
 const store = createStore(reducer, composeEnhancer(

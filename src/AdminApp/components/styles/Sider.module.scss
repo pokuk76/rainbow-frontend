@@ -1,0 +1,17 @@
+.AdminSider {
+    overflow: auto;
+    height: 100vh;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+}
+
+.titleContainer {
+    display: flex;
+    flex-flow: colum;
+    align-items: center;
+    justify-content: center; 
+    box-sizing: content-box;
+    border-bottom: 2px solid #fff; 
+    margin-bottom: 0.75em;
+}

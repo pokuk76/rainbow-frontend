@@ -4,18 +4,19 @@ import * as actionTypes from './actionTypes';
 export const authStart = () => {
     return {
         type: actionTypes.AUTH_START
-    }
+    };
 }
 
-export const authSuccess = (token, guests) => {
+export const authSuccess = (token, guests=null) => {
     return {
         type: actionTypes.AUTH_SUCCESS,
         token: token,
-        guests: guests
-    }
+        // guests: guests
+    };
 }
 
-export const authPreSuccess = token => {
+/* Currently unused; Moved logic for retrieving users to Layout */
+export const authPreSuccess = (token) => {
     return dispatch => {
         // axios.get('http://127.0.0.1:8000/api/guests/', {
         //     headers: {
@@ -25,7 +26,7 @@ export const authPreSuccess = token => {
         axios.get('api/formsets/')
         .then(res => {
             //console.log(this.props);
-            console.log("Guests from API: ", res.data['formsets']);
+            console.log("Formsets from API: ", res.data['formsets']);
             var guests = res.data['formsets'];
             dispatch(authSuccess(token, guests));
         })
@@ -33,17 +34,17 @@ export const authPreSuccess = token => {
             console.log("Pre-success get request: ", error);
             dispatch(authFail(error));
         });
-    }
+    };
 }
 
-export const authFail = error => {
+export const authFail = (error) => {
     return {
         type: actionTypes.AUTH_FAIL,
         error: error
-    }
+    };
 }
 
-export const checkAuthTimeout = expirationTime => {
+export const checkAuthTimeout = (expirationTime) => {
     return dispatch => {
         setTimeout(() => {
             dispatch(authLogout());
@@ -67,7 +68,7 @@ export const authLogin = (username, password, callback) => {
             localStorage.setItem('username', username);
             let isAuthenticated = true;
             localStorage.setItem('isAuthenticated', isAuthenticated);
-            dispatch(authPreSuccess(token));
+            dispatch(authSuccess(token));
             callback();
             // TODO: Do I need to call the callback within a dispatch?
             dispatch(checkAuthTimeout(3600));
@@ -81,7 +82,7 @@ export const authLogin = (username, password, callback) => {
 }
 
 export const authSignup = (username, email=null, password1, password2) => {
-    return dispatch => {
+    return (dispatch => {
         dispatch(authStart());
         axios.post('rest-auth/registration/', {
             username: username,
@@ -94,13 +95,13 @@ export const authSignup = (username, email=null, password1, password2) => {
             const expirationDate = new Date(new Date().getTime() + (3600*1000));
             localStorage.setItem('token', token);
             localStorage.setItem('expirationDate', expirationDate);
-            dispatch(authPreSuccess(token));
+            dispatch(authSuccess(token));
             dispatch(checkAuthTimeout(3600));
         })
         .catch(error => {
             dispatch(authFail(error))
         })
-    }
+    });
 }
 
 export const authLogout = () => {
@@ -117,7 +118,7 @@ export const authLogout = () => {
 
 
 export const authCheckState = () => {
-    return dispatch => {
+    return (dispatch => {
         const token = localStorage.getItem('token');
         if (token === undefined) {
             dispatch(authLogout());
@@ -126,9 +127,9 @@ export const authCheckState = () => {
             if (expirationDate <= new Date()) {
                 dispatch(authLogout());
             } else {
-                dispatch( authPreSuccess(token) );
+                dispatch( authSuccess(token) );
                 dispatch( checkAuthTimeout( (expirationDate.getTime() - new Date().getTime()) / 1000 ) )
             }
         }
-    }
+    });
 }

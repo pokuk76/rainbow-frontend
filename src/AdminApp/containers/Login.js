@@ -1,15 +1,34 @@
 import React from 'react';
-
-import { Form, Input, Button, Checkbox, Spin, Breadcrumb } from 'antd';
-import { LoadingOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux'
-
 import { Link, withRouter } from'react-router-dom';
 
+import { Layout, Form, Input, Button, Checkbox, Spin, Breadcrumb, Menu } from 'antd';
+import { LoginOutlined, LoadingOutlined, UserOutlined, LockOutlined } from '@ant-design/icons';
 
+import Sider from '../components/Sider';
 import * as actions from '../../store/actions/auth';
 
 import classes from './styles/Login.module.scss';
+
+const { Header, Content, Footer } = Layout;
+
+let headerHeight = '64px';
+let siderWidth = '80px';
+
+let styles = {
+    MenuItem: {
+        display: "flex", flexFlow: "column", alignItems: 'center', 
+        justifyContent: 'flex-start', height: 'auto', 
+        padding: '0.5em', boxSizing: 'border-box',
+        margin: 0,
+    },
+    icon: {
+        margin: '0',
+        fontSize: '1.5em',
+        position: 'relative',
+    },
+    anchor: { fontSize: 12, margin: 0, }
+};
 
 const layout = {
   labelCol: {
@@ -101,70 +120,106 @@ class LoginForm extends React.Component {
         }
     
         return (
-            <div >
+            <Layout style={{minHeight:"100vh", maxWidth: '100vw', boxSizing: 'border-box'}}>
+
+                <Sider
+                    width={siderWidth}
+                    // className={classes.Sider}
+                    // theme="dark"
+                >
+                    <Menu theme="dark" mode="vertical" defaultSelectedKeys={[2]}>
+
+                        <Menu.Item
+                            key="2"
+                            icon={<LoginOutlined style={styles.icon} />}
+                            style={styles.MenuItem}
+                        >
+                            <Link to="/login" style={styles.anchor}>Login</Link>
+                        </Menu.Item>
+                    </Menu>
+                </Sider>
+
+                <Layout style={{marginLeft: siderWidth}}>
+
+                    <Content style={{ padding: '0 50px', marginTop: headerHeight }}>
+
+                        <Breadcrumb style={{ margin: '0 0 16px 0' }}>
+                            <Breadcrumb.Item><Link to='/portal'>Portal</Link></Breadcrumb.Item>
+                            <Breadcrumb.Item>Admin</Breadcrumb.Item>
+                            <Breadcrumb.Item>Login</Breadcrumb.Item>
+                        </Breadcrumb>
+                        <div className="site-layout-content">
+                            {errorMessage}
+                            {
+                                this.props.loading
+                                    ?
+                                    <Spin indicator={LoadingIcon} />
+                                    :
+                                    <>
+                                        {this.handleRedirected()}
+                                        <Form
+                                            {...layout}
+                                            name="normal_login"
+                                            // className="login-form" 
+                                            initialValues={{ remember: false }}
+                                            ref={this.formRef}
+                                            onFinishFailed={(errorInfo) => this.onFinishFailed(errorInfo)}
+                                            style={{
+                                                // boxSizing: 'border-box', paddingLeft: '4em',
+                                                width: '80%'
+                                            }}
+                                        // className={classes['ant-form-item']}
+                                        >
+                                            <Form.Item
+                                                name="username"
+                                                rules={[{ required: true, message: 'Please input your Username!' }]}
+                                            >
+                                                <Input 
+                                                    prefix={<UserOutlined className="site-form-item-icon" />} 
+                                                    placeholder="Username" 
+                                                    className={classes.LoginInput} />
+                                            </Form.Item>
+                                            <Form.Item
+                                                name="password"
+                                                rules={[{ required: true, message: 'Please input your Password!' }]}
+                                            >
+                                                <Input.Password
+                                                    prefix={<LockOutlined className="site-form-item-icon" />}
+                                                    type="password"
+                                                    placeholder="Password"
+                                                />
+                                            </Form.Item>
+                                            <Form.Item>
+                                                <Form.Item {...tailLayout} name="remember" valuePropName="checked" noStyle>
+                                                    <Checkbox>Remember me</Checkbox>
+                                                </Form.Item>
+
+                                                <a className="login-form-forgot" href="#">
+                                                    <br />Forgot password
+                            </a>
+                                            </Form.Item>
+
+                                            <Form.Item>
+                                                <Button type="primary" htmlType="submit" className="login-form-button" onClick={(e) => this.handleSubmit(e)}>
+                                                    Log in
+                            </Button>
+                                            </Form.Item>
+                                        </Form>
+                                    </>
+
+                            }
+                        </div>
+                    </Content>
+                    <Footer style={{ textAlign: 'center' }}>Rainbow Edu ©2021 | By kbd</Footer>
+                </Layout>
+
                 {/* <Breadcrumb style={{ margin: '0 0 16px 0' }}>
                     <Breadcrumb.Item><Link to='/portal'>Portal</Link></Breadcrumb.Item>
                             <Breadcrumb.Item>Admin</Breadcrumb.Item>
                             <Breadcrumb.Item>Login</Breadcrumb.Item>
                 </Breadcrumb> */}
                 {/* { this.handleRedirected() } */}
-                { errorMessage }
-                {
-                    this.props.loading
-                    ? 
-                    <Spin indicator={LoadingIcon} />
-                    :
-                    <>
-                        { this.handleRedirected() }
-                        <Form
-                        {...layout}
-                        name="normal_login" 
-                        // className="login-form" 
-                        initialValues={{ remember: false }}
-                        ref={this.formRef} 
-                        onFinishFailed={(errorInfo) => this.onFinishFailed(errorInfo)}
-                        style={{ 
-                            // boxSizing: 'border-box', paddingLeft: '4em',
-                            width: '80%'
-                        }}
-                        // className={classes['ant-form-item']}
-                    >
-                        <Form.Item
-                            name="username"
-                            rules={[{ required: true, message: 'Please input your Username!' }]}
-                        >
-                            <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
-                        </Form.Item>
-                        <Form.Item
-                            name="password"
-                            rules={[{ required: true, message: 'Please input your Password!' }]}
-                        >
-                            <Input.Password
-                                prefix={<LockOutlined className="site-form-item-icon" />}
-                                type="password"
-                                placeholder="Password"
-                            />
-                        </Form.Item>
-                        <Form.Item>
-                            <Form.Item {...tailLayout} name="remember" valuePropName="checked" noStyle>
-                                <Checkbox>Remember me</Checkbox>
-                            </Form.Item>
-
-                            <a className="login-form-forgot" href="#">
-                                <br />Forgot password
-                            </a>
-                        </Form.Item>
-
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit" className="login-form-button" onClick={ (e) => this.handleSubmit(e) }>
-                                Log in
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                    </>
-                    
-                }
-            </div>
+            </Layout>
         );
     }
   

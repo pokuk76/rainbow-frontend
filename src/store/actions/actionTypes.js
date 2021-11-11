@@ -21,3 +21,12 @@ export const SUBMIT_INVALID_FAIL = "SUBMIT_INVALID_FAIL";
 // export const SUBMIT_GUEST_FORM_SUCCESS = "SUBMIT_GUEST_FORM_SUCCESS";
 export const SUBMIT_SUCCESS = "SUBMIT_SUCCESS";
 
+
+/* Admin actions */
+export const SEARCH_START = "SEARCH_START";
+export const SEARCH_SUCCESS = "SEARCH_SUCCESS";
+export const SEARCH_FAIL = "SEARCH_FAIL";
+
+
+
+
