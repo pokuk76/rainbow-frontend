@@ -5,7 +5,7 @@ import {
     WalletOutlined, ExclamationCircleOutlined,
 } from '@ant-design/icons';
 
-import { RainbowLogoIcon } from '../../shared_components/Icons';
+import { RainbowLogoIcon } from '../../sharedComps/Icons';
 
 import * as actionTypes from '../../store/actions/actionTypes';
 

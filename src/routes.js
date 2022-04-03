@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, Redirect, Link } from 'react-router-dom';
 
 import SchoolList from './AdminApp/containers/SchoolListView';
 import SchoolDetail from './AdminApp/containers/SchoolDetailView';
@@ -13,7 +13,14 @@ import GuestLayout from './GuestApp/containers/Layout';
 
 const BaseRouter = (props) => (
     <Switch>
-        <Route exact path='/' render={matchProps => <div><h1>Landing</h1></div>} />
+        <Route exact path='/' render={matchProps => (
+            <div><h1>Landing</h1>
+                <Link to={"/admin"}>Admin Portal</Link>
+                <br />
+                <Link to={"/registration"}>Registration Portal</Link>
+            </div>
+        )} />
+
         <Route path='/login' 
             render={ matchProps => {
                 const redirectFromLogin = matchProps.location.pathname;
@@ -35,7 +42,7 @@ const BaseRouter = (props) => (
                 return (
                     // localStorage.getItem('isAuthenticated') 
                     props.isAuthenticated
-                    ? <CustomLayout {...matchProps} component={(props) => <GuestList {...props} />} />
+                    ? <CustomLayout {...matchProps} renderComponent={(props) => <GuestList {...props} />} />
                     : <Redirect to={{
                         pathname: `/login`,
                         state: { referrer: redirectAfterLogin }
@@ -52,9 +59,7 @@ const BaseRouter = (props) => (
                 const redirectAfterLogin = matchProps.location.pathname;
                 // return localStorage.getItem('isAuthenticated') 
                 return props.isAuthenticated
-                    ? <CustomLayout {...matchProps} >
-                        <GuestDetail {...matchProps} isAuthenticated={props.isAuthenticated} />
-                    </CustomLayout>
+                    ? <CustomLayout {...matchProps} renderComponent={(inputProps) => <GuestDetail {...matchProps} {...inputProps} isAuthenticated={props.isAuthenticated} />} />
                     : <Redirect to={{
                         pathname: `/login`,
                         state: {referrer: redirectAfterLogin},

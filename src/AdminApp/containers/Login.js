@@ -174,9 +174,9 @@ class LoginForm extends React.Component {
                                                 name="username"
                                                 rules={[{ required: true, message: 'Please input your Username!' }]}
                                             >
-                                                <Input 
-                                                    prefix={<UserOutlined className="site-form-item-icon" />} 
-                                                    placeholder="Username" 
+                                                <Input
+                                                    prefix={<UserOutlined className="site-form-item-icon" />}
+                                                    placeholder="Username"
                                                     className={classes.LoginInput} />
                                             </Form.Item>
                                             <Form.Item
@@ -196,13 +196,13 @@ class LoginForm extends React.Component {
 
                                                 <a className="login-form-forgot" href="#">
                                                     <br />Forgot password
-                            </a>
+                                                </a>
                                             </Form.Item>
 
                                             <Form.Item>
                                                 <Button type="primary" htmlType="submit" className="login-form-button" onClick={(e) => this.handleSubmit(e)}>
                                                     Log in
-                            </Button>
+                                                </Button>
                                             </Form.Item>
                                         </Form>
                                     </>

@@ -62,11 +62,13 @@ class Guest extends React.Component {
                     renderItem={(item, index) => (
                         <List.Item
                             key={item.guest.username}
-                            // TODO: Figure out a better way to do this styling
+                            
                             style={
+                                // Handle styles for first item (outer ternary) and then last item per page (inner ternary)
+                                // TODO: Figure out a better way to do this? Logic's not bad tbh
                                 (index === 0) 
                                 ? {borderTop: '1px outset #f0f2f5', marginTop: '2em'} 
-                                : ( ((index+1)%pageSize === 0 || item.guest.id==finalListItem.guest.id) ? {marginBottom: '2em'} : null )
+                                : ( ((index+1)%pageSize === 0 || item.guest.id===finalListItem.guest.id) ? {marginBottom: '2em'} : null )
                             }
                             onClick={() => this.showModal()}
                             // onClick={() => console.log("List Item Clicked")}

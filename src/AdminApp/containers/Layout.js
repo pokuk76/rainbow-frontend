@@ -43,33 +43,39 @@ const LoadingIcon = <LoadingOutlined style={{ fontSize: '6em' }} spin />;
 
 class CustomLayout extends React.Component {
 
-    state = {
-        searchByValue: "username",
-        formsets: [],
-        loading: true
+    constructor(props) {
+        super(props);
+        this.state = {
+            searchByValue: "username",
+            searchResults: null,
+            formsets: [],
+            loading: false
+        };
     }
+
+    
 
     componentDidMount() {
         // Being called in the top-level App component; don't think it's required again
         // this.props.authCheckState();
 
-        let config = {
-            method: 'get',
-            url: `api/formsets/`,
-            headers: {
-                'Authorization': `Token ${localStorage.getItem('token')}`
-            },
-        };
+        // let config = {
+        //     method: 'get',
+        //     url: `api/formsets/`,
+        //     headers: {
+        //         'Authorization': `Token ${localStorage.getItem('token')}`
+        //     },
+        // };
 
-        axios(config)
-        .then(res => {
-            this.setState({loading: false, formsets: res.data['formsets']});
-        })
-        .catch(error => {
-            console.log("Error", error);
-            this.setState({loading: false});
+        // axios(config)
+        // .then(res => {
+        //     this.setState({loading: false, formsets: res.data['formsets']});
+        // })
+        // .catch(error => {
+        //     console.log("Error", error);
+        //     this.setState({loading: false});
 
-        })
+        // })
     }
 
     getBreadcrumbs() {
@@ -100,7 +106,7 @@ class CustomLayout extends React.Component {
         this.setState({searchByValue: value});
     }
 
-    getPlaceholder() {
+    getSearchPlaceholder() {
         let p = "Search by ";
         let searchBy = this.state.searchByValue.split('_').join(' ');
         p += searchBy;
@@ -207,7 +213,7 @@ class CustomLayout extends React.Component {
                             className={classes.Search} 
                             addonBefore={searchBy} 
                             // searchBy={this.state.searchByValue} 
-                            placeholder={this.getPlaceholder()}
+                            placeholder={this.getSearchPlaceholder()}
                             onSearch={this.onSearch}
                         />
                     </Header>
@@ -215,10 +221,13 @@ class CustomLayout extends React.Component {
                     <Content style={{ padding: '0 50px', marginTop: headerHeight }}>
                         {this.getBreadcrumbs()}
                         <div className="site-layout-content">
-                            {this.props.children}
+                            {/* {this.props.children} */}
                             {this.state.loading
                                 ? <Spin indicator={LoadingIcon} />
-                                : this.props.component({loading: this.state.loading, guests: this.state.formsets})
+                                : <>
+                                    {this.props.renderComponent({ loading: this.state.loading, guests: this.state.searchResults })}
+                                    {this.props.children}
+                                </>
                             }
                         </div>
                     </Content>
